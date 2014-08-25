@@ -874,7 +874,6 @@ class ProfileController extends AppController {
 	}
 
 	public function send_mail($data = array()){
-		$smtp_config = Configure::read('MAILGUN');
 		$view = new View($this, false);
 
 		if(isset($this->request->data_request))
