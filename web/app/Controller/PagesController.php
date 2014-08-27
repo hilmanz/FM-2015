@@ -140,7 +140,7 @@ class PagesController extends AppController {
 	    	
 		    //get the current matchday
 		    $sql = "SELECT matchday FROM ffgame.game_fixtures 
-		    		WHERE is_processed = 1 AND period='FullTime' 
+		    		WHERE is_processed = 1 AND period='FullTime'  AND session_id = 2014
 		    		ORDER BY matchday DESC LIMIT 1;";
 
 		    $match = $this->Game->query($sql);

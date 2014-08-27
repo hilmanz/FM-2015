@@ -115,10 +115,12 @@ function getMasterTopPlayers(total,callback){
 		async.waterfall([
 				function(callback){
 					conn.query("SELECT a.uid AS player_id,a.team_id,\
-								name,SUM(points) AS total\
+								NAME,SUM(points) AS total\
 								FROM "+config.database.database+".master_player a\
 								INNER JOIN "+config.database.statsdb+".master_match_player_points b\
 								ON a.uid = b.player_id\
+								WHERE EXISTS (SELECT 1 FROM ffgame.game_fixtures c \
+								WHERE c.game_id = b.game_id AND session_id=2014 LIMIT 1)\
 								GROUP BY b.player_id ORDER BY total DESC LIMIT ?;",
 					[parseInt(total)],
 					function(err,players){
