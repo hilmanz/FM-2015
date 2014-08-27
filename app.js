@@ -100,7 +100,7 @@ if ('development' == app.get('env')) {
 
 app.get('/', routes.index);
 
-app.get('/fixtures', [auth.canAccess],gameplay.fixtures);
+app.get('/fixtures/', [auth.canAccess],gameplay.fixtures);
 app.get('/match/list',[auth.canAccess],gameplay.fixtures);
 
 

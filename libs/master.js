@@ -119,7 +119,8 @@ function master_players(conn,team_id,players,done){
 								 join_date= VALUES(join_date),\
 								 country= VALUES(country),\
 								 team_id= VALUES(team_id)\
-								 ;";
+								 ON DUPLICATE KEY UPDATE\
+								 team_id = VALUES(team_id);";
 						
 						var params = [
 							player.uID,
