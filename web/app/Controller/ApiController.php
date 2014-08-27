@@ -3155,9 +3155,13 @@ class ApiController extends AppController {
 	*/
 	public function catalog_purchase($game_team_id){
 		
-		$param = unserialize(decrypt_param($this->request->data['param']));
+		$this->layout="ajax";
 
-		$result = $this->pay_with_coins($game_team_id,$param);
+		$param = unserialize(decrypt_param($this->request->data['param']));
+		$fb_id = intval($this->request->data['fb_id']);
+		CakeLog::write('debug','param '.json_encode($param));
+
+		$result = $this->pay_with_coins($fb_id,$game_team_id,$param);
 		CakeLog::write('debug',$game_team_id.'-team_id');
 		CakeLog::write('debug',$game_team_id,'data ->'.json_encode($this->request->data));
 		CakeLog::write('debug','catalog - '.json_encode($result));
@@ -3165,13 +3169,22 @@ class ApiController extends AppController {
 		$no_fund = @$result['no_fund'];
 		$order_id = @$result['order_id'];
 		
-		if($is_transaction_ok == true){
+		if($is_transaction_ok == true)
+		{
 			//check accross the items, we apply the perk for all digital items
 			$this->process_items($result['items'],$order_id);
+			$this->set('response',array('status'=>1,'data'=>$result));
 		}
-
-		$this->layout="ajax";
-		$this->set('response',array('status'=>1,'data'=>$result));
+		else
+		{
+			$data_error = array(
+									"game_team_id" => $game_team_id,
+									"request_data" => $this->request->data,
+									"result" => $result
+								);
+			CakeLog::write('error', 'api.catalog_purchase '.json_encode($data_error));
+			$this->set('response',array('status'=>0));
+		}
 		$this->render('default');
 	}
 	/*
@@ -3232,7 +3245,7 @@ class ApiController extends AppController {
 		}
 	}
 
-	private function pay_with_coins($game_team_id,$shopping_cart){
+	private function pay_with_coins($fb_id, $game_team_id, $shopping_cart){
 
 		CakeLog::write('debug',$game_team_id.' - pay with coins');
 		$game_team_id = intval($game_team_id);
@@ -3267,7 +3280,7 @@ class ApiController extends AppController {
 				$all_stock_ok = false;
 			}
 		}
-		$cash = $this->Game->getCash($game_team_id);
+		$cash = $this->Game->getCash($fb_id);
 		CakeLog::write('debug',$game_team_id.' cash : '.$cash);
 		CakeLog::write('debug',$game_team_id.' total coins : '.$total_coins);
 
@@ -3757,7 +3770,7 @@ class ApiController extends AppController {
 		$team = $this->Game->getTeam($fb_id);
 
 		if(isset($team['id'])){
-			$cash = $this->Game->getCash($team['id']);
+			$cash = $this->Game->getCash($fb_id);
 		}else{
 			$cash = 0;
 		}
