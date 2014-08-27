@@ -42,7 +42,7 @@ function isMonthAvailable($available,$m,$y){
     					</td>
                         <td>
                             <span>Rank: <strong><?=number_format($USER_RANK)?></strong></span>
-                            <span>Stars: <strong><?=number_format($team_bugdet)?> Star</strong></span>
+                            <span>ss$: <strong><?=number_format($team_bugdet)?></strong></span>
                             <span>Point: <strong><?=number_format($USER_POINTS)?></strong></span>
                         </td>
                         <!--<td colspan="2" class="pendapatan">
