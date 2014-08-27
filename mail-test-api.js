@@ -26,9 +26,9 @@ var crypto = require('crypto');
 var sha1sum = crypto.createHash('sha1');
 //email setup
 
-
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 var transport = nodemailer.createTransport(smtpTransport({
-			    	host: "128.199.222.110", // hostname
+			    	host: "sg.supersoccer.co.id", // hostname
 			    	secure: false, // use SSL
 			    	port: 587, // port for secure SMTP
 			    	auth:{

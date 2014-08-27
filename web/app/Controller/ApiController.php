@@ -632,7 +632,7 @@ class ApiController extends AppController {
 										d as Defender,
 										m as Midfielder,
 										f as Forward
-										FROM ".$_SESSION['ffgamedb'].".game_matchstats_modifier as stats;");
+										FROM ".$this->ffgamedb.".game_matchstats_modifier as stats;");
 
 		$modifier = array();
 		foreach($rs as $r){
@@ -642,10 +642,10 @@ class ApiController extends AppController {
 		unset($rs);
 
 		$fixture  = $this->Game->query("SELECT a.*,b.name as home_name,c.name as away_name
-										FROM ".$_SESSION['ffgamedb'].".game_fixtures a
-										INNER JOIN ".$_SESSION['ffgamedb'].".master_team b
+										FROM ".$this->ffgamedb.".game_fixtures a
+										INNER JOIN ".$this->ffgamedb.".master_team b
 										ON a.home_id = b.uid
-										INNER JOIN ".$_SESSION['ffgamedb'].".master_team c
+										INNER JOIN ".$this->ffgamedb.".master_team c
 										ON a.away_id = c.uid
 										WHERE a.game_id='{$game_id}'
 										LIMIT 1");
@@ -759,7 +759,7 @@ class ApiController extends AppController {
 
 		
 		//stats modifier
-		$modifiers = $this->Game->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_matchstats_modifier as Modifier");
+		$modifiers = $this->Game->query("SELECT * FROM ".$this->ffgamedb.".game_matchstats_modifier as Modifier");
 		
 		if($rs['status']==1){
 
@@ -768,7 +768,7 @@ class ApiController extends AppController {
 				foreach($rs['data']['daily_stats'] as $n=>$v){
 					$fixture = $this->Team->query("SELECT matchday,match_date,
 										UNIX_TIMESTAMP(match_date) as ts
-										FROM ".$_SESSION['ffgamedb'].".game_fixtures 
+										FROM ".$this->ffgamedb.".game_fixtures 
 										WHERE game_id='{$n}' 
 										LIMIT 1");
 
@@ -1052,14 +1052,14 @@ class ApiController extends AppController {
 			$a_game_ids = implode(',',$game_ids);
 			$sql = "SELECT game_id,home_id,away_id,b.name AS home_name,c.name AS away_name,
 					a.matchday,a.match_date,a.home_score,a.away_score
-					FROM ".$_SESSION['ffgamedb'].".game_fixtures a
-					INNER JOIN ".$_SESSION['ffgamedb'].".master_team b
+					FROM ".$this->ffgamedb.".game_fixtures a
+					INNER JOIN ".$this->ffgamedb.".master_team b
 					ON a.home_id = b.uid
-					INNER JOIN ".$_SESSION['ffgamedb'].".master_team c
+					INNER JOIN ".$this->ffgamedb.".master_team c
 					ON a.away_id = c.uid
 					WHERE (a.home_id = '{$team_id}' 
 							OR a.away_id = '{$team_id}')
-					AND EXISTS (SELECT 1 FROM ".$_SESSION['ffgamestatsdb'].".game_match_player_points d
+					AND EXISTS (SELECT 1 FROM ".$this->ffgamestatsdb.".game_match_player_points d
 								WHERE d.game_id = a.game_id 
 								AND d.game_team_id = {$game_team_id} LIMIT 1)
 					ORDER BY a.game_id";
@@ -1949,7 +1949,7 @@ class ApiController extends AppController {
 		
 		
 		//stats modifier
-		$modifiers = $this->Game->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_matchstats_modifier as Modifier");
+		$modifiers = $this->Game->query("SELECT * FROM ".$this->ffgamedb.".game_matchstats_modifier as Modifier");
 
 		if($rs['status']==1){
 
@@ -1957,7 +1957,7 @@ class ApiController extends AppController {
 				foreach($rs['data']['daily_stats'] as $n=>$v){
 					$fixture = $this->Team->query("SELECT matchday,match_date,
 										UNIX_TIMESTAMP(match_date) as ts
-										FROM ".$_SESSION['ffgamedb'].".game_fixtures 
+										FROM ".$this->ffgamedb.".game_fixtures 
 										WHERE game_id='{$n}' 
 										LIMIT 1");
 					
@@ -2232,14 +2232,14 @@ class ApiController extends AppController {
 	}
 	public function livestats($game_id){
 		$game_id = Sanitize::paranoid($game_id);
-		if($_SESSION['ffgamedb']==null){
-			$_SESSION['ffgamedb'] = "ffgame";
+		if($this->ffgamedb==null){
+			$this->ffgamedb = "ffgame";
 		}
 		$rs = $this->Game->query("SELECT home_id,away_id,b.name AS home_name,c.name AS away_name 
-							FROM ".$_SESSION['ffgamedb'].".game_fixtures a
-							INNER JOIN ".$_SESSION['ffgamedb'].".master_team b
+							FROM ".$this->ffgamedb.".game_fixtures a
+							INNER JOIN ".$this->ffgamedb.".master_team b
 							ON a.home_id = b.uid
-							INNER JOIN ".$_SESSION['ffgamedb'].".master_team c
+							INNER JOIN ".$this->ffgamedb.".master_team c
 							ON a.away_id = c.uid
 							WHERE a.game_id='{$game_id}' AND a.session_id=2014
 							LIMIT 1;");
@@ -3128,7 +3128,7 @@ class ApiController extends AppController {
 													'po_number'=>$po_number));
 		
 		$body = mysql_escape_string($body);
-		$rs = $this->Game->query("INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".email_queue
+		$rs = $this->Game->query("INSERT IGNORE INTO ".$this->ffgamedb.".email_queue
 							(subject,email,plain_txt,html_text,queue_dt,n_status)
 							VALUES
 							('transaksi berhasil !','{$email}','{$body}','{$body}',NOW(),0) ;");
@@ -3356,7 +3356,7 @@ class ApiController extends AppController {
 	
 	private function apply_digital_perk($game_team_id,$perk_id,$unique=false){
 		$this->loadModel('MasterPerk');
-		$this->MasterPerk->useDbConfig = $_SESSION['ffgamedb'];
+		$this->MasterPerk->useDbConfig = $this->ffgamedb;
 		
 		$perk = $this->MasterPerk->findById($perk_id);
 		$perk['MasterPerk']['data'] = unserialize($perk['MasterPerk']['data']);
@@ -3411,7 +3411,7 @@ class ApiController extends AppController {
 	}
 	private function apply_free_player_perk($game_team_id,$player_id,$unique_id,$amount){
 		//check if the user has the player
-		$my_player = $this->Game->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_team_players a
+		$my_player = $this->Game->query("SELECT * FROM ".$this->ffgamedb.".game_team_players a
 							WHERE game_team_id={$game_team_id} 
 							AND player_id='{$player_id}'",false);
 		if(@$my_player[0]['a']['player_id'] == $player_id){
@@ -3420,7 +3420,7 @@ class ApiController extends AppController {
 			return $this->apply_money_perk($game_team_id,$unique_id,$amount);
 		}else{
 			CakeLog::write('apply_digital_perk',date("Y-m-d H:i:s").' - '.$game_team_id.' - '.$unique_id.' - free player : '.$player_id);
-			return $this->Game->query("INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_team_players
+			return $this->Game->query("INSERT IGNORE INTO ".$this->ffgamedb.".game_team_players
 								(game_team_id,player_id)
 								VALUES({$game_team_id},'{$player_id}')",false);
 		}
@@ -3429,7 +3429,7 @@ class ApiController extends AppController {
 	private function apply_jersey_perk($game_team_id,$perk_data){
 		$this->loadModel('DigitalPerk');
 
-		$this->DigitalPerk->useDbConfig = $_SESSION['ffgamedb'];
+		$this->DigitalPerk->useDbConfig = $this->ffgamedb;
 		$this->DigitalPerk->cache = false;
 
 
@@ -4080,7 +4080,7 @@ class ApiController extends AppController {
 						$val['coint'] = 0;
 					}
 
-					$sql = "INSERT INTO ".$_SESSION['ffgamedb'].".game_bets
+					$sql = "INSERT INTO ".$this->ffgamedb.".game_bets
 							(game_id,game_team_id,bet_name,home,away,coins,submit_dt)
 							VALUES
 							('{$game_id}',
@@ -4174,7 +4174,7 @@ class ApiController extends AppController {
 			$can_place_bet = false;
 		}
 		//check if the user can place the bet
-		$sql = "SELECT * FROM ".$_SESSION['ffgamedb'].".game_bets a
+		$sql = "SELECT * FROM ".$this->ffgamedb.".game_bets a
 				WHERE game_id='{$game_id}' AND game_team_id='{$game_team_id}' LIMIT 10;";
 
 		
@@ -4258,8 +4258,8 @@ class ApiController extends AppController {
 				if(sizeof($winners)>0){
 					foreach($winners as $n=>$v){
 						$game_user = $this->Game->query("
-									SELECT fb_id FROM ".$_SESSION['ffgamedb'].".game_users a
-									INNER JOIN ".$_SESSION['ffgamedb'].".game_teams b
+									SELECT fb_id FROM ".$this->ffgamedb.".game_users a
+									INNER JOIN ".$this->ffgamedb.".game_teams b
 									ON a.id = b.user_id WHERE b.id = {$v['game_team_id']}
 									LIMIT 1;");
 						$winners[$n]['game_team_id'] = null;
@@ -5269,6 +5269,33 @@ class ApiController extends AppController {
 			$tactics[] = array('id'=>$i,'name'=>$opts[$i]);
 		}
 		$this->set('response',array('status'=>1,'data'=>$tactics));
+		$this->render('default');
+	}
+	/*
+	* API for vieweing the request quota history
+	* 
+	* Response :JSON
+	*/
+	public function fixtures(){
+		$this->layout="ajax";
+		$rs  = $this->Game->query("SELECT a.*,b.name as home_name,c.name as away_name
+										FROM ".$this->ffgamedb.".game_fixtures a
+										INNER JOIN ".$this->ffgamedb.".master_team b
+										ON a.home_id = b.uid
+										INNER JOIN ".$this->ffgamedb.".master_team c
+										ON a.away_id = c.uid
+										WHERE a.competition_id=8 AND session_id=2014
+										ORDER BY a.matchday
+										LIMIT 380");
+		$fixture = array();
+		for($i=0;$i<sizeof($rs);$i++){
+			$p = $rs[$i]['a'];
+			$p['home'] = $rs[$i]['b']['home_name'];
+			$p['away'] = $rs[$i]['c']['away_name'];
+			$fixture[] = $p;
+
+		}	
+		$this->set('response',array('status'=>1,'data'=>$fixture,'s'=>""));
 		$this->render('default');
 	}
 	//--> end of tactics API

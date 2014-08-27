@@ -60,6 +60,28 @@
 						<h3 class="yellow">Bagaimana saya bisa menambah pemasukan tim saya?</h3>
 						<p>Anda akan mendapat bonus pemasukan jika tim yang Anda kelola juga meraih kemenangan di pertandingan sebenarnya. Selain itu, sebentar lagi Anda akan bisa mengambil banyak inisiatif seperti merekrut staff komersil seperti marketing director, PR manager, dll dimana mereka akan menjadwalkan kegiatan pemasaran untuk menghasilkan dana tambahan.</p>
 					</div><!-- end .row-3 -->
+
+
+					<div class="row-3">
+						<h3 class="yellow">Bagaimana jika mendaftar dengan email Yahoo?</h3>
+						<p>Kalau elo daftar dengan email Yahoo, pastikan login terlebih dahulu di Yahoo sebelum daftar. Untuk mengecek apakah Email Yahoo elo tidak di suspend.</p>
+					</div><!-- end .row-3 -->
+
+
+
+					<div class="row-3">
+						<h3 class="yellow">Bagaimana caranya jika saat daftar tidak mendapat activation Code?</h3>
+						<p>Cek terlebih dahulu di spam email lo jika di Inbox tidak ada.</p>
+						<p>Jika masih belum ada juga, silahkan kirim email ke noreplysupersoccer@gmail.com nanti akan dikirimkan activation code ke email lo secara manual.</p>
+					</div><!-- end .row-3 -->
+
+
+					<div class="row-3">
+						<h3 class="yellow">Apakah saat baru daftar langsung bisa melakukan transfer pemain?</h3>
+						<p> Kalau elo daftar dengan email yang pernah terverifikasi saat FM Super Soccer musim lalu atau saat Brazil Edition maka elo gak bisa mendapat bonus transfer pemain saat baru daftar.</p>
+						<p> Jika elo menggunakan email yang baru digunakan kali ini saja, maka lo dapet bonus free transfer selama 24 jam.</p>
+					</div><!-- end .row-3 -->
+
 				</div><!-- end #tabs-faq -->
 				<div id="tabs-point">
                     <div class="titlePage">
