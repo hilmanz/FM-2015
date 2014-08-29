@@ -21,7 +21,19 @@
             	<div class="row-2">
                     <h1 class="red">PROFIL SAYA</h1>
                     <p>Tampilan informasi seputar profil Fantasy Football League Anda. Selain melihat statistik personal, Anda juga dapat mengubah info dan foto kapan saja.</p>
-                    <!-- Link Upgrade Member -->
+                    <?php if($user['paid_member'] == 1 && $user['paid_member_status'] == 1): ?>
+                        <h3 class="fr yellow">Akun loe sudah di upgrade</h3>
+                    <?php elseif($user['paid_member'] == 1 && $user['paid_member_status'] == 0): ?>
+                        <p class="fr">
+                            <a class="button" href="<?=$this->Html->url('/upgrade/paymonthly')?>">
+                                Bayar Bulanan
+                            </a>
+                        </p>
+                    <?php else: ?>
+                        <p class="fr">
+                            <a class="button" href="<?=$this->Html->url('/upgrade/member')?>">Upgrade</a>
+                        </p>
+                    <?php endif; ?>
     			</div><!-- end .row-2 -->
                 <form class="theForm" action="<?=$this->Html->url('/profile/update')?>" 
                   enctype="multipart/form-data" method="post">

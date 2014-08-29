@@ -539,3 +539,8 @@ ADD INDEX `INDEX` (`uid` ASC);
 
 ALTER TABLE `fantasy`.`whitelist` 
 CHANGE COLUMN `log_dt` `log_dt` DATETIME NULL DEFAULT NULL ;
+
+ALTER TABLE `fantasy`.`membership_transactions` 
+ADD COLUMN `league` VARCHAR(5) NULL AFTER `details`,
+DROP INDEX `UNIQUE_TRANSACTION` ,
+ADD UNIQUE INDEX `UNIQUE_TRANSACTION` (`fb_id` ASC, `transaction_name` ASC, `league` ASC);
