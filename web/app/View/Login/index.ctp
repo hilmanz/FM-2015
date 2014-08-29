@@ -12,15 +12,15 @@
                 <input type="password" name="password" >
                 <a href="<?=$this->Html->url("/profile/forgot_password")?>">Lupa Password ?</a>
             </div>
-            <div class="row">
+            <div class="row-last">
                 <input value="Login" class="button" type="submit">
             </div>
             <p>Belum punya akun ? Klik <a href="<?=$this->Html->url('/login/register')?>">disini</a> untuk mendaftar</p>
         </form>
     </div>
-    <div  id="loginFB"  class="widgets tr" style="min-height:290px;">
-        <h4 style="margin:85px auto 10px;">Atau lo bisa login dengan menggunakan facebook</h4>
-        <a style="margin:0px 10px;" href="javascript:fb_login();" class="boxButton loginFacebook">&nbsp;</a>
+    <div  id="loginFB"  class="widgets tr">
+        <h4>Atau lo bisa login dengan menggunakan facebook</h4>
+        <a href="javascript:fb_login();" class="boxButton loginFacebook">&nbsp;</a>
     </div>
 </div>
 <!-- -->

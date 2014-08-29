@@ -9,6 +9,7 @@ Author: ACIT JAZZ
 @import url('jquery.jscrollpane.css');
 @import url('../fonts/colaborate.css');
 @import url('../fonts/bebas.css');
+@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700,900,300italic,400italic,700italic);
 
 *{outline:none;}
 body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,blockquote,th,td{margin:0;padding:0;}
@@ -29,9 +30,10 @@ body{
 	-ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/bg.jpg', sizingMethod='scale')";
 	margin:0;
 	padding:0;
-    font-family: 'ColaborateRegular';
+    font-family: 'Lato', Arial, sans-serif;
 	font-size:14px;
-	color:#fff;
+	font-weight:300;
+	color:#333;
 	line-height:1.4;
 	overflow-x:hidden;
 	 -webkit-font-smoothing: antialiased;
@@ -71,7 +73,7 @@ a:hover{
 .fl{ float:left;}
 .fr{ float:right;}
 .yellow{
-	color:#fdcb02;
+	color:#f33e07;
 }
 .red{
 	color:#F00;
@@ -101,7 +103,6 @@ a.download-appstore{
 }
 /*============= LAYOUT ===============*/
 #body{
-	background:url(../images/top-nav-bg.png) top repeat-x;
 }
 #effect{
 	width:100%; height:100%;
@@ -117,6 +118,8 @@ a.download-appstore{
 #header{
 	height:60px;
 	position:relative;
+	padding:30px 0;
+	overflow:hidden;
 }
 #header2{
 	height:120px;
@@ -124,19 +127,12 @@ a.download-appstore{
 }
 #container{
 	padding:20px;
-	background:url(../images/tr.png) repeat;
-	box-shadow:0 0 50px rgba(0,0,0,0.25) inset,0 0 10px rgba(0,0,0,0.7) inset;
-	-o-box-shadow:0 0 50px rgba(0,0,0,0.25) inset,0 0 10px rgba(0,0,0,0.7) inset;
-	border-radius:7px;
 	overflow:hidden;
 	clear:both;
 }
 #logo{
 	background:url(../images/logo.png) no-repeat;
 	width:680px; height:80px; display:block;
-	position:absolute;
-	top:-8px;
-	left:28px;
 	text-decoration:none;
 	float:left;
 }
@@ -152,12 +148,12 @@ a.download-appstore{
 }
 #user-info a.logout{
 	color:#000;
-    font-family: 'ColaborateRegular';
+    font-family: 'Lato', Arial, sans-serif;
 }
 #user-info span{
 	display:block;
 	float:left;
-	color:#fdcb02 !important;
+	color:#f33e07 !important;
 	padding:0 5px 0 0;
 }
 #user-info .entry{
@@ -371,10 +367,10 @@ a.download-appstore{
 #newsticker h3{
 	margin:0;
 	font-size:18px;
-	color:#fdcb02;
+	color:#f33e07;
 }
 #newsticker h3 a{
-	color:#fdcb02;
+	color:#f33e07;
 }
 /*============= colom ===============*/
 .box4{
@@ -451,7 +447,7 @@ a.download-appstore{
 	margin:0;
 }
 .widgets a{
-	color:#fdcb02;
+	color:#f33e07;
 }
 .widgets a:hover{
 	color:#FC0;
@@ -461,7 +457,7 @@ a.download-appstore{
 }
 .match-team h3{
 	font-size:12px;
-    font-family: 'ColaborateRegular';
+    font-family: 'Lato', Arial, sans-serif;
 	margin:5px 0 0 0;
 }
 .home-team,.stadion,.perform-team h3{
@@ -491,7 +487,7 @@ a.download-appstore{
 	width:auto;
 }
 .perform-team h4 .span2{
-	color:#fdcb02;
+	color:#f33e07;
 }
 .perform-team .span1{
 	width:115px;
@@ -532,14 +528,14 @@ a.download-appstore{
 	float:left;
 	width:50px;
 	text-align:left;
-    font-family: 'ColaborateRegular';
+    font-family: 'Lato', Arial, sans-serif;
 	font-size:12px;
 }
 .squad-team .player-name{
     font-family: 'ColaborateBoldRegular';
 }
 .squad-team .player-status{
-	color:#fdcb02;
+	color:#f33e07;
 }
 .player-list{
 	overflow:hidden;
@@ -548,7 +544,7 @@ a.download-appstore{
 	position:relative;
 	float:left;
 	width:70px;
-    font-family: 'ColaborateRegular';
+    font-family: 'Lato', Arial, sans-serif;
 }
 .match-point{
 	position:absolute;
@@ -572,14 +568,14 @@ a.download-appstore{
 	border:solid 1px #3d7100;
 }
 .bgyellow{
-	background:#fdcb02;
+	background:#f33e07;
 	color:#333;
 }
 .subtitution{
 	position: absolute;
 	bottom: -125px;
 	width: 435px;
-	border:solid 2px #fdcb02;
+	border:solid 2px #f33e07;
 	height: 120px;
 }
 .subtitution h3{
@@ -633,13 +629,12 @@ a.download-appstore{
 	margin:20px 0 0 0;
 }
 .button{
-	background:url(../images/bg_nav.jpg) repeat-x 0 -32px;
+	background:#f33e07;
 	display:inline-block;
 	line-height:32px;
-	color:#fff;
-	text-shadow:0 1px 1px #000;
-	border-radius:4px;
-	border:solid 1px #222222;
+	color:#fff !important;
+	border-radius:3px;
+	border:none;
 	padding:0 20px;
 	cursor:pointer;
 	-webkit-transition: all 0.3s ease-in-out;
@@ -649,8 +644,7 @@ a.download-appstore{
 	transition: all 0.3s ease-in-out;
 }
 .button:hover{
-	background:url(../images/bg_nav.jpg) repeat-x;
-	color:#ff0000;
+	background:#999;
 	text-decoration:none;
 }
 .prev,.next{
@@ -693,6 +687,7 @@ a.download-appstore{
 }
 .tr{
 	background:url(../images/tr.png) repeat;
+	background:rgba(0,0,0,0.3);
 }
 .tr2{
 	background:url(../images/tr2.png) repeat;
@@ -721,7 +716,7 @@ a.download-appstore{
 }
 #listBox h3{
 	font-size:22px;
-	color:#fdcb02;
+	color:#fff;
 }
 #listBox .box:last-child{
 	margin:0;
@@ -747,7 +742,6 @@ a.download-appstore{
 }
 #loginbox{
 	text-align:center;
-    float: right;
 }
 #loginbox h3{
 	margin:0;
@@ -809,7 +803,7 @@ a.download-appstore{
 }
 .row{
 	clear:both;
-	background:url(../images/dot.png) bottom repeat-x;
+	border-bottom:solid 1px #ddd;
 	padding:18px 0;
 	overflow:hidden;
 }
@@ -1268,15 +1262,19 @@ table td a.button,table td .buttons{
 }
 /*============= FOOTER ===============*/
 #footer{
-	border-top:solid 1px #8b3535;
+	border-top:solid 1px #ccc;
 	padding:20px 0 0 0;
 	height:100px;
 	margin:30px 0 0 0;
 	clear:both;
+	color:#666;
 }
 .copy{
 	margin:0;
 	float:left;
+}
+#footer a{
+	color:#666;
 }
 #footNav{
 	text-align:center;
@@ -1543,7 +1541,7 @@ table td a.button,table td .buttons{
 	text-align:right;
 }
 .salary{
-	color:#fdcb02;
+	color:#f33e07;
 }
 .fancybox-error{
 	color:#fff !important;
@@ -1693,7 +1691,7 @@ table td a.button,table td .buttons{
 }
 #maintenancePage h1{
 	font-size:40px;
-	color:#fdcb02;
+	color:#f33e07;
 	margin:0;
 }
 #maintenancePage h2{
@@ -1781,7 +1779,7 @@ a.statsbox{
 a.statsbox:hover{
 	background:#222;
 	text-decoration:none;
-	color:#fdcb02;
+	color:#f33e07;
 }
 .statsbox h4{
 	margin:0;
@@ -1802,7 +1800,7 @@ a.statsbox:hover{
 .club-info h4{
 	font-size:30px;
 	margin:0;
-	color:#fdcb02;
+	color:#f33e07;
 }
 .club-info p{
 	font-family:'BebasNeueRegular';
@@ -1812,7 +1810,7 @@ a.statsbox:hover{
 	font-size:30px;
 	line-height:70px;
 	margin:0;
-	color:#fdcb02;
+	color:#f33e07;
 }
 .club-money .buttons{
 	display:block;
@@ -1851,7 +1849,7 @@ h3.tabtitle{
 }
 .failure h1{
 	font-size:30px;
-	color:#fdcb02;
+	color:#f33e07;
 }
 #starterTeam .flex-viewport{
 	height:670px !important;
@@ -1986,10 +1984,10 @@ h3.tabtitle{
 }
 .RingkasanKlab strong{
 	font-weight:bold;
-	color:#fdcb02;
+	color:#f33e07;
 }
 .PertandinganLalu td a{
-	color:#fdcb02;
+	color:#f33e07;
 }
 .chartbox{
 	height:170px;
@@ -2054,7 +2052,7 @@ h3.tabtitle{
 	border-left:solid 1px #fff;
 }
 .matchScore{
-	color:#fdcb02;
+	color:#f33e07;
 	padding:0 10px;
 }
 .totalpoin{
@@ -2258,7 +2256,7 @@ table.dataTable{
 	margin:0;
 }
 .catalog-list a{
-	color:#fdcb02;
+	color:#f33e07;
 	display:block;
 	line-height:25px;
 }
@@ -2294,7 +2292,7 @@ table.dataTable{
 }
 .detailCatalog .price{
 	font-size:18px;
-	color:#fdcb02;
+	color:#f33e07;
 }
 .idrprice{
 	color:#fff;
@@ -2320,7 +2318,7 @@ table.dataTable{
 }
 .order-detail h4{
 	margin:0;
-	color:#fdcb02;
+	color:#f33e07;
 }
 .order-detail .price{
 	font-size:18px;
@@ -2337,7 +2335,7 @@ table.dataTable{
 .shipaddress h3{
 	font-size:24px;
 	margin:20px 0 0 0;
-	color:#fdcb02;
+	color:#f33e07;
 }
 #popup-verification{
 	position:absolute;
@@ -2443,11 +2441,11 @@ table.dataTable{
 	overflow:hidden;
 }
 .topManager li .points{
-	color:#fdcb02;
+	color:#f33e07;
 }
 #listBox .box h3{
 	font-size: 22px;
-	color: #fdcb02;
+	color: #f33e07;
 	margin: 0;
 }
 .gameNews li{
@@ -2476,11 +2474,11 @@ table.dataTable{
 	padding:0 5px 0 0;
 }
 #listBox .topManager h3 span.points{
-	color:#fdcb02;
+	color:#f33e07;
 	padding:0 0 0 5px;
 }
 #listBox .topPlayerWeek h3 span.points{
-	color:#fdcb02;
+	color:#f33e07;
 	line-height:20px;
 	display:block;
 }
@@ -2510,6 +2508,7 @@ table.dataTable{
 }
 .rowbox,.rowboxs{
 	padding:15px;
+	color:#fff;
 	border-radius:5px;
 }
 .rowboxs{
@@ -2521,15 +2520,15 @@ table.dataTable{
 }
 .rowboxs h3{
 	font-size:24px;
-	color:#fdcb02;
+	color:#fff;
 }
 .rowboxs h1{
 	font-size:30px;
-	color:#fdcb02;
+	color:#fff;
 	margin:10px 0;
 }
 .rowboxs h4{
-	color:#fdcb02;
+	color:#fff;
 }
 .flex-control-nav{
 	display:none;
@@ -2610,11 +2609,11 @@ table.dataTable{
 }
 #faqPage .howto-entry h3{
 	font-size: 14px;
-	color: #fdcb02;
+	color: #f33e07;
 	text-transform: uppercase;
 }
 .entry-home strong{
-	color:#fdcb02;
+	color:#fff;
 	font-weight:bold;
 }
 #formationBox{
@@ -2780,19 +2779,24 @@ a.btnCoin:hover,a.btnCoinMandiri:hover{
 
 #loginContainer{
     text-align: center;
+	color:#333;
+}
+#loginContainer h3{
+	font-size:30px;
+}
+#loginContainer .tr{
+	background:rgba(255,255,255,0.5);
+	box-shadow:1px 1px 3px rgba(0,0,0,0.2);
 }
 #login,#loginFB{
     margin: 0 10px;
     text-align: left;
     vertical-align: top;
-    width:280px; min-height: 220px;
+    width:40%; min-height: 320px;
     display: inline-block;
-    
+	position:relative;
     border-radius:5px;
-    padding:10px 20px;
-}
-#loginFB .loginFacebook{
-    margin: 85px auto 10px auto;
+    padding:10px 0;
 }
 #login #flashMessage{
     border: none;
@@ -2803,8 +2807,29 @@ a.btnCoin:hover,a.btnCoinMandiri:hover{
     color: #f00;
     margin: 0;
 }
-#login .row:last-child{
-    border:none;
+#login form .row{
+	padding:10px 0;
+}
+#login h4,#loginFB h4{
+	font-size: 18px;
+	background: #f33e07;
+	color: #fff;
+	padding: 0 20px;
+	line-height: 35px;
+	margin:10px 0;
+}
+#loginFB .loginFacebook{
+	position:absolute;
+	left:50%;
+	margin:0 0 0 -130px;
+	top:40%;
+}
+#login form{
+	padding:0 20px;
+}
+.row-last{
+	border:none;
+	padding:10px 0;
 }
 input[type=text], input[type="password"]{
 	background:#303030;
@@ -2815,6 +2840,7 @@ input[type=text], input[type="password"]{
 	box-shadow:0 2px 2px rgba(0,0,0,0.25) inset,1px 1px 1px rgba(255,125,124,0.2);
 	color:#fff;
 	height:20px;
+	margin:0 0 10px 0;
 }
 
 #pilih-liga{
