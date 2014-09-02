@@ -5,7 +5,7 @@
 */
 var mysql = require('mysql');
 var async = require('async');
-
+var S = require('string');
 var config = {};
 var pool = {};
 
@@ -92,8 +92,10 @@ function master_team(conn,data,done){
 	});
 }
 function master_players(conn,team_id,players,done){
-
-	async.eachSeries(players,
+	conn.query("UPDATE "+config.database.database+".master_player set team_id='t0' \
+				WHERE team_id=?",
+				[team_id],function(err,rs){
+					async.eachSeries(players,
 					function(player,next){
 						var stat = {};
 						for(var s in player.Stat){
@@ -118,9 +120,7 @@ function master_players(conn,team_id,players,done){
 								 real_position_side= VALUES(real_position_side),\
 								 join_date= VALUES(join_date),\
 								 country= VALUES(country),\
-								 team_id= VALUES(team_id)\
-								 ON DUPLICATE KEY UPDATE\
-								 team_id = VALUES(team_id);";
+								 team_id= VALUES(team_id);";
 						
 						var params = [
 							player.uID,
@@ -140,13 +140,19 @@ function master_players(conn,team_id,players,done){
 							team_id
 						];
 						conn.query(sql,params,function(err,rs){
-							console.log('players ',team_id,player.uID);
+							/*if(team_id=='t1'){
+								console.log(S(this.sql).collapseWhitespace().s);	
+							}*/
+							
+							console.log('players ',team_id,player.uID,player.Name);
 							next();
 						});
 					},
 					function(err){
 						done(err);
 					});
+				});
+	
 }
 exports.update_team_player_data = function(data,callback){
 	for(var i in data.SoccerFeed.SoccerDocument.Team){
