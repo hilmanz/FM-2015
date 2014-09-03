@@ -544,3 +544,8 @@ ALTER TABLE `fantasy`.`membership_transactions`
 ADD COLUMN `league` VARCHAR(5) NULL AFTER `details`,
 DROP INDEX `UNIQUE_TRANSACTION` ,
 ADD UNIQUE INDEX `UNIQUE_TRANSACTION` (`fb_id` ASC, `transaction_name` ASC, `league` ASC);
+
+
+ALTER TABLE `fantasy`.`member_billings` 
+ADD COLUMN `is_sevendays_notif` INT(1) NULL DEFAULT 0 AFTER `expire`,
+ADD COLUMN `is_threedays_notif` INT(1) NULL DEFAULT 0 AFTER `is_sevendays_notif`;

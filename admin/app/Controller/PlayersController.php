@@ -748,11 +748,12 @@ class PlayersController extends AppController {
 
 	}
 	private function get_player_statistics($player,$modifier){
+		$fm_session_id = Configure::read('FM_SESSION_ID');
 		$map = $this->getStatsCategories();
 
 		$sql = "SELECT player_id,stats_name,SUM(stats_value) AS total 
 				FROM ".$_SESSION['ffgamestatsdb'].".master_player_stats s
-				WHERE player_id='{$player['uid']}'
+				WHERE player_id='{$player['uid']}' AND DATE(last_update) > '{$fm_session_id}-08-01'
 				GROUP BY stats_name;";
 		$rs = $this->Game->query($sql);
 		$games = 0;

@@ -408,7 +408,7 @@ class Game extends AppModel {
 				}
 			}
 		}
-		//$matchday+=1;
+		$matchday+=1;
 		$nm = $matchday;
 		$response 	= $this->api_call('/livematches/'.$matchday);
 		$standings	= $this->api_call('/standings');

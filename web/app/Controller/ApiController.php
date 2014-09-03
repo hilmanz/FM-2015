@@ -601,6 +601,7 @@ class ApiController extends AppController {
 		//user's coin
 		//get recent cash
 		$response['coins'] = intval($this->Game->getCash($game_team['id']));
+		$response['game_team_id'] = intval($game_team['id']);
 
 		$this->set('response',array('status'=>1,'data'=>$response));
 		$this->render('default');
@@ -3157,10 +3158,20 @@ class ApiController extends AppController {
 		
 		$this->layout="ajax";
 
-		$param = unserialize(decrypt_param($this->request->data['param']));
+		$param = unserialize(decrypt_param(@$this->request->data['param']));
+		if(!isset($this->request->data['param'])){
+			$item_id = $this->request->data['item_id'];
+			$qty = $this->request->data['qty'];
+			$param = array();
+
+			for($i=0;$i<count($item_id);$i++){
+				$param[$i] = array('item_id' => $item_id[$i],
+									'qty' => $qty[$i]
+								);
+			}
+		}
 		$fb_id = intval($this->request->data['fb_id']);
 		CakeLog::write('debug','param '.json_encode($param));
-
 		$result = $this->pay_with_coins($fb_id,$game_team_id,$param);
 		CakeLog::write('debug',$game_team_id.'-team_id');
 		CakeLog::write('debug',$game_team_id,'data ->'.json_encode($this->request->data));
@@ -4563,6 +4574,14 @@ class ApiController extends AppController {
 				}
 
 				$need_password = ($rs_user['User']['password'] == "") ? 1 : 0;
+				$api_key = $this->Apikey->find('first');
+				$access_token = encrypt_param(serialize(array('fb_id'=>$rs_user['User']['fb_id'],
+															'api_key'=>$api_key['Apikey']['api_key'],
+															  'valid_until'=>time()+24*60*60)));
+				$this->redisClient->set($access_token,serialize(array('api_key'=>$api_key['Apikey']['api_key'],
+																		  'fb_id'=>$rs_user['User']['fb_id'])));
+				$this->redisClient->expire($access_token,24*60*60);//expires in 1 day
+
 				$profile = array(
 								'fb_id' => $rs_user['User']['fb_id'],
 								'name'	=> $rs_user['User']['name'],
@@ -4572,7 +4591,12 @@ class ApiController extends AppController {
 								'need_password' => $need_password
 							);
 
-				$this->set('response',array('status'=>1, 'data'=>array('profile'=>$profile,'team'=>$team,'coins'=>$cash)));
+				$this->set('response',array('status'=>1, 
+											'data'=>array('profile'=>$profile,
+															'team'=>$team,
+															'coins'=>$cash,
+															'access_token'=>$access_token)
+											));
 			}
 			else
 			{

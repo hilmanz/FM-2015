@@ -583,7 +583,6 @@ class ProfileController extends AppController {
 						Cakelog::write('error', 'Mohon maaf, akun email ini `'.Sanitize::html($this->request->data['email']).'` 
 										sudah terdaftar sebelumnya. Silahkan menggunakan alamat email yang lain !');
 
-						$this->Session->destroy();
 						$this->Session->setFlash('Mohon maaf, akun email ini `'.Sanitize::html($this->request->data['email']).'` 
 							sudah terdaftar sebelumnya. Silahkan menggunakan alamat email yang lain !');
 						//$this->redirect('/profile/error');
