@@ -5359,7 +5359,7 @@ class ApiController extends AppController {
 					(fb_id,cash)
 					SELECT fb_id,SUM(amount) AS cash 
 					FROM ".Configure::read('FRONTEND_SCHEMA').".game_transactions
-					WHERE fb_id = '{$fb_id}''
+					WHERE fb_id = '{$fb_id}'
 					GROUP BY fb_id
 					ON DUPLICATE KEY UPDATE
 					cash = VALUES(cash);";
