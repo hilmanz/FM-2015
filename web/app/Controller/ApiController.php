@@ -5323,4 +5323,47 @@ class ApiController extends AppController {
 		$this->render('default');
 	}
 	//--> end of tactics API
+
+	//add cash - remove cash
+	public function cash_transaction(){
+		$fb_id = $this->Request->data['fb_id'];
+		$transaction_name = $this->Request->data['transaction_name'];
+		$amount = intval($this->Request->data['amount']);
+		$details = $this->Request->data['details'];
+		$sql = "INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+					(fb_id,transaction_dt,transaction_name,amount,details)
+					VALUES
+					('{$fb_id}',NOW(),'{$transaction_name}',{$amount},'{$details}')
+					ON DUPLICATE KEY UPDATE
+					amount = VALUES(amount);";
+		$rs = $this->Game->query($sql,false);
+		if($rs){
+			$this->update_cash_summary($fb_id);
+			$status = 1;
+		}else{
+			$status = 0;
+		}
+		$this->set('response',array('status'=>$status,'data'=>array('fb_id'=>$fb_id,
+														'transaction_name'=>$transaction_name,
+														'amount'=>$amount,
+														'details'=>$details)));
+		$this->render('default');
+	}
+
+	
+
+	//updating the team's cash wallet by summing all cash amounts
+	private function update_cash_summary(fb_id){
+		$fb_id = $this->Request->data['fb_id'];
+		$sql = "INSERT INTO "+config.database.frontend_schema+".game_team_cash
+					(fb_id,cash)
+					SELECT fb_id,SUM(amount) AS cash 
+					FROM ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+					WHERE fb_id = '{$fb_id}''
+					GROUP BY fb_id
+					ON DUPLICATE KEY UPDATE
+					cash = VALUES(cash);";
+		$rs = $this->Game->query($sql,false);
+		return $rs;
+	}
 }

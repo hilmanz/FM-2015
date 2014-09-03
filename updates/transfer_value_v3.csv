@@ -1,596 +1,654 @@
-p154976;Adnan Januzaj;Midfielder;Manchester United;10000000;L
-p59846;Ander Herrera;Midfielder;Manchester United;10000000;M
-p39725;Anders Lindegaard;Goalkeeper;Manchester United;10000000;VL
-p27258;Anderson;Midfielder;Manchester United;10000000;L
-p20695;Antonio Valencia;Midfielder;Manchester United;10000000;L
-p18892;Ashley Young;Midfielder;Manchester United;10000000;L
-p51922;Ben Amos;Goalkeeper;Manchester United;10000000;VL
-p55909;Chris Smalling;Defender;Manchester United;10000000;L
-p50175;Danny Welbeck;Forward;Manchester United;10000000;M
-p14295;Darren Fletcher;Midfielder;Manchester United;10000000;L
-p51940;David de Gea;Goalkeeper;Manchester United;10000000;L
-p152015;Guillermo Varela;Defender;Manchester United;10000000;VL
-p112139;James Wilson;Forward;Manchester United;10000000;VL
-p43020;Javier Hernández;Forward;Manchester United;10000000;L
-p109322;Jesse Lingard;Midfielder;Manchester United;10000000;VL
-p37642;Jonny Evans;Defender;Manchester United;10000000;L
-p43670;Juan Mata;Midfielder;Manchester United;10000000;H
-p106760;Luke Shaw;Defender;Manchester United;10000000;M
-p58747;Marnick Vermijl;Defender;Manchester United;10000000;VL
-p41184;Marouane Fellaini;Midfielder;Manchester United;10000000;L
-p2404;Michael Carrick;Midfielder;Manchester United;10000000;L
-p106611;Michael Keane;Defender;Manchester United;10000000;VL
-p38530;Nani;Midfielder;Manchester United;10000000;L
-p82205;Nick Powell;Midfielder;Manchester United;10000000;VL
-p76359;Phil Jones;Defender;Manchester United;10000000;L
-p54772;Rafael;Defender;Manchester United;10000000;L
-p161076;Reece James;Defender;Manchester United;10000000;VL
-p12297;Robin van Persie;Forward;Manchester United;10000000;VH
-p101982;Sam Johnstone;Goalkeeper;Manchester United;10000000;VL
-p83090;Shinji Kagawa;Midfielder;Manchester United;10000000;L
-p43250;Tom Cleverley;Midfielder;Manchester United;10000000;L
-p154968;Tom Lawrence;Forward;Manchester United;10000000;VL
-p112133;Tyler Blackett;Defender;Manchester United;10000000;VL
-p13017;Wayne Rooney;Forward;Manchester United;10000000;VH
-p82403;Wilfried Zaha;Midfielder;Manchester United;10000000;VL
-p91126;Will Keane;Forward;Manchester United;10000000;VL
-p18267;Aiden McGeady;Midfielder;Everton;10000000;VL
-p43035;Antolin Alcaraz;Defender;Everton;10000000;VL
-p26921;Arouna Koné;Forward;Everton;10000000;L
-p77762;Bryan Oviedo;Defender;Everton;10000000;VL
-p153678;Chris Long;Forward;Everton;10000000;VL
-p153724;Conor Grant;Midfielder;Everton;10000000;VL
-p80181;Conor McAleny;Forward;Everton;10000000;VL
-p27707;Darron Gibson;Midfielder;Everton;10000000;VL
-p1632;Gareth Barry;Midfielder;Everton;10000000;L
-p114094;Hallam Hope;Forward;Everton;10000000;VL
-p50472;James McCarthy;Midfielder;Everton;10000000;VL
-p78315;Joel Robles;Goalkeeper;Everton;10000000;VL
-p97299;John Stones;Defender;Everton;10000000;VL
-p26901;Kevin Mirallas;Midfielder;Everton;10000000;M
-p12745;Leighton Baines;Defender;Everton;10000000;M
-p8378;Leon Osman;Midfielder;Everton;10000000;VL
-p80183;Luke Garbutt;Defender;Everton;10000000;VL
-p114093;Matthew Pennington;Defender;Everton;10000000;VL
-p87447;Muhamed Besic;Midfielder;Everton;10000000;VL
-p7645;Phil Jagielka;Defender;Everton;10000000;L
-p66749;Romelu Lukaku;Forward;Everton;10000000;M
-p88894;Ross Barkley;Midfielder;Everton;10000000;L
-p153675;Ryan Ledson;Midfielder;Everton;10000000;VL
-p59949;Seamus Coleman;Defender;Everton;10000000;L
-p61933;Shane Duffy;Defender;Everton;10000000;VL
-p18981;Steven Naismith;Forward;Everton;10000000;VL
-p7525;Steven Pienaar;Midfielder;Everton;10000000;VL
-p6219;Sylvain Distin;Defender;Everton;10000000;VL
-p15337;Tim Howard;Goalkeeper;Everton;10000000;L
-p9007;Tony Hibbert;Defender;Everton;10000000;VL
-p149468;Tyias Browning;Defender;Everton;10000000;VL
-p19714;Andy Wilkinson;Defender;Stoke City;10000000;VL
-p40349;Asmir Begovic;Goalkeeper;Stoke City;10000000;L
-p40276;Bojan;Forward;Stoke City;10000000;L
-p50067;Brek Shea;Midfielder;Stoke City;10000000;VL
-p18804;Cameron Jerome;Forward;Stoke City;10000000;VL
-p20208;Charlie Adam;Midfielder;Stoke City;10000000;VL
-p155706;Dionatan Teixeira;Defender;Stoke City;10000000;VL
-p39487;Erik Pieters;Defender;Stoke City;10000000;VL
-p50089;Geoff Cameron;Defender;Stoke City;10000000;VL
-p12150;Glenn Whelan;Midfielder;Stoke City;10000000;VL
-p105666;Jack Butland;Goalkeeper;Stoke City;10000000;VL
-p59305;Jamie Ness;Midfielder;Stoke City;10000000;VL
-p12813;Jonathan Walters;Forward;Stoke City;10000000;VL
-p61858;Mame Biram Diouf;Forward;Stoke City;10000000;VL
-p61595;Marc Muniesa;Defender;Stoke City;10000000;VL
-p32318;Marc Wilson;Defender;Stoke City;10000000;VL
-p41464;Marko Arnautovic;Forward;Stoke City;10000000;VL
-p3773;Peter Crouch;Forward;Stoke City;10000000;VL
-p26900;Peter Odemwingie;Forward;Stoke City;10000000;VL
-p17997;Phil Bardsley;Defender;Stoke City;10000000;VL
-p12413;Robert Huth;Defender;Stoke City;10000000;VL
-p37869;Ryan Shawcross;Defender;Stoke City;10000000;VL
-p45158;Ryan Shotton;Defender;Stoke City;10000000;VL
-p20481;Stephen Ireland;Midfielder;Stoke City;10000000;VL
-p11735;Steve Sidwell;Midfielder;Stoke City;10000000;VL
-p49323;Steven N'Zonzi;Midfielder;Stoke City;10000000;VL
-p1945;Thomas Sørensen;Goalkeeper;Stoke City;10000000;VL
-p34296;Wilson Palacios;Midfielder;Stoke City;10000000;VL
-p96782;Adam Smith;Goalkeeper;Leicester City;10000000;VL
-p13152;Andy King;Midfielder;Leicester City;10000000;VL
-p83543;Anthony Knockaert;Midfielder;Leicester City;10000000;VL
-p38038;Ben Hamer;Goalkeeper;Leicester City;10000000;VL
-p60689;Chris Wood;Forward;Leicester City;10000000;VL
-p18438;Conrad Logan;Goalkeeper;Leicester City;10000000;VL
-p61603;Daniel Drinkwater;Midfielder;Leicester City;10000000;VL
-p12744;David Nugent;Forward;Leicester City;10000000;VL
-p11848;Dean Hammond;Midfielder;Leicester City;10000000;VL
-p19273;Gary Taylor-Fletcher;Forward;Leicester City;10000000;VL
-p101668;Jamie Vardy;Forward;Leicester City;10000000;VL
-p86417;Jeffrey Schlupp;Defender;Leicester City;10000000;VL
-p17745;Kasper Schmeichel;Goalkeeper;Leicester City;10000000;VL
-p54316;Leonardo Ulloa;Forward;Leicester City;10000000;VL
-p86857;Liam Moore;Defender;Leicester City;10000000;VL
-p51938;Marc Albrighton;Midfielder;Leicester City;10000000;VL
-p37388;Marcin Wasilewski;Defender;Leicester City;10000000;VL
-p61604;Matthew James;Midfielder;Leicester City;10000000;VL
-p1640;Matthew Upson;Defender;Leicester City;10000000;VL
-p1413;Paul Konchesky;Defender;Leicester City;10000000;VL
-p46695;Ritchie de Laet;Defender;Leicester City;10000000;VL
-p103025;Riyad Mahrez;Midfielder;Leicester City;10000000;VL
-p111455;Tom Hopper;Forward;Leicester City;10000000;VL
-p15033;Wes Morgan;Defender;Leicester City;10000000;VL
-p39259;Zoumana Bakayogo;Defender;Leicester City;10000000;VL
-p39155;Adam Lallana;Midfielder;Liverpool;10000000;M
-p9631;Bradley Jones;Goalkeeper;Liverpool;10000000;VL
-p21094;Daniel Agger;Defender;Liverpool;10000000;L
-p40755;Daniel Sturridge;Forward;Liverpool;10000000;M
-p95463;Danny Ward;Goalkeeper;Liverpool;10000000;VL
-p38454;Dejan Lovren;Defender;Liverpool;10000000;M
-p112338;Emre Can;Midfielder;Liverpool;10000000;VL
-p77454;Fabio Borini;Forward;Liverpool;10000000;VL
-p9047;Glen Johnson;Defender;Liverpool;10000000;VL
-p83427;Jack Robinson;Defender;Liverpool;10000000;VL
-p109528;Javier Manquillo;Defender;Liverpool;10000000;VL
-p40555;Joe Allen;Midfielder;Liverpool;10000000;VL
-p91979;Jon Flanagan;Defender;Liverpool;10000000;VL
-p56979;Jordan Henderson;Midfielder;Liverpool;10000000;L
-p103912;Jordon Ibe;Forward;Liverpool;10000000;VL
-p26725;José Enrique;Defender;Liverpool;10000000;VL
-p12450;Kolo Touré;Defender;Liverpool;10000000;VL
-p99323;Lazar Markovic;Forward;Liverpool;10000000;VL
-p43191;Lucas Leiva;Midfielder;Liverpool;10000000;VL
-p40784;Mamadou Sakho;Defender;Liverpool;10000000;L
-p58786;Martin Kelly;Defender;Liverpool;10000000;VL
-p26793;Martin Skrtel;Defender;Liverpool;10000000;L
-p77305;Oussama Assaidi;Midfielder;Liverpool;10000000;VL
-p84583;Philippe Coutinho;Midfielder;Liverpool;10000000;M
-p103955;Raheem Sterling;Midfielder;Liverpool;10000000;L
-p11037;Rickie Lambert;Forward;Liverpool;10000000;VL
-p109009;Ryan McLaughlin;Defender;Liverpool;10000000;VL
-p78108;Sebastián Coates;Defender;Liverpool;10000000;VL
-p66797;Simon Mignolet;Goalkeeper;Liverpool;10000000;M
-p1814;Steven Gerrard;Midfielder;Liverpool;10000000;M
-p103953;Suso;Midfielder;Liverpool;10000000;VL
-p102548;Tiago Ilori;Defender;Liverpool;10000000;VL
-p18726;Artur Boruc;Goalkeeper;Southampton;10000000;VL
-p101135;Cody Cropper;Goalkeeper;Southampton;10000000;VL
-p62399;Dusan Tadic;Midfielder;Southampton;10000000;L
-p49596;Emmanuel Mayuka;Forward;Southampton;10000000;VL
-p40383;Fraser Forster;Goalkeeper;Southampton;10000000;L
-p78091;Gastón Ramírez;Midfielder;Southampton;10000000;VL
-p17784;Graziano Pellè;Forward;Southampton;10000000;VL
-p153366;Harrison Reed;Midfielder;Southampton;10000000;VL
-p40145;Jack Cork;Midfielder;Southampton;10000000;VL
-p88900;Jack Stephens;Defender;Southampton;10000000;VL
-p101178;James Ward-Prowse;Midfielder;Southampton;10000000;VL
-p44683;Jay Rodriguez;Forward;Southampton;10000000;L
-p15976;Jos Hooiveld;Defender;Southampton;10000000;VL
-p38580;Jose Fonte;Defender;Southampton;10000000;VL
-p3673;Kelvin Davis;Goalkeeper;Southampton;10000000;VL
-p101179;Lloyd Isgrove;Midfielder;Southampton;10000000;VL
-p169359;Matt Targett;Defender;Southampton;10000000;VL
-p80447;Maya Yoshida;Defender;Southampton;10000000;VL
-p42774;Morgan Schneiderlin;Midfielder;Southampton;10000000;M
-p57328;Nathaniel Clyne;Defender;Southampton;10000000;VL
-p102884;Paulo Gazzaniga;Goalkeeper;Southampton;10000000;VL
-p40146;Ryan Bertrand;Defender;Southampton;10000000;VL
-p153371;Sam Gallagher;Forward;Southampton;10000000;VL
-p153373;Sam McQueen;Midfielder;Southampton;10000000;VL
-p82752;Saphir Taïder;Midfielder;Southampton;10000000;VL
-p17339;Steven Davis;Midfielder;Southampton;10000000;VL
-p54756;Victor Wanyama;Midfielder;Southampton;10000000;L
-p55459;Aaron Cresswell;Defender;West Ham United;10000000;VL
-p60706;Adrián;Goalkeeper;West Ham United;10000000;VL
-p40142;Andy Carroll;Forward;West Ham United;10000000;L
-p146445;Blair Turgott;Midfielder;West Ham United;10000000;VL
-p80254;Carl Jenkinson;Defender;West Ham United;10000000;VL
-p12799;Carlton Cole;Forward;West Ham United;10000000;VL
-p55037;Cheikhou Kouyaté;Midfielder;West Ham United;10000000;VL
-p108411;Daniel Potts;Defender;West Ham United;10000000;VL
-p95322;Danny Whitehead;Midfielder;West Ham United;10000000;VL
-p103527;Diego Poyet;Midfielder;West Ham United;10000000;VL
-p149485;Elliot Lee;Forward;West Ham United;10000000;VL
-p148179;Enner Valencia;Forward;West Ham United;10000000;L
-p10356;Guy Demel;Defender;West Ham United;10000000;VL
-p108415;Jaanai Gordon;Forward;West Ham United;10000000;VL
-p8380;James Collins;Defender;West Ham United;10000000;VL
-p49413;James Tomkins;Defender;West Ham United;10000000;VL
-p19575;Joey O'Brien;Defender;West Ham United;10000000;VL
-p1344;Jussi Jääskeläinen;Goalkeeper;West Ham United;10000000;VL
-p5306;Kevin Nolan;Midfielder;West Ham United;10000000;VL
-p137951;Leo Chambers;Defender;West Ham United;10000000;VL
-p18073;Mark Noble;Midfielder;West Ham United;10000000;VL
-p18818;Matthew Jarvis;Midfielder;West Ham United;10000000;VL
-p129028;Matthias Fanimo;Midfielder;West Ham United;10000000;VL
-p49696;Mauro Zárate;Forward;West Ham United;10000000;VL
-p42954;Modibo Maiga;Forward;West Ham United;10000000;VL
-p28147;Mohamed Diamé;Midfielder;West Ham United;10000000;VL
-p90518;Ravel Morrison;Midfielder;West Ham United;10000000;VL
-p156658;Reece Burke;Defender;West Ham United;10000000;VL
-p17353;Ricardo Vaz Te;Forward;West Ham United;10000000;VL
-p88534;Sebastian Lletget;Midfielder;West Ham United;10000000;VL
-p12002;Stewart Downing;Midfielder;West Ham United;10000000;VL
-p48717;Winston Reid;Defender;West Ham United;10000000;VL
-p41792;Aaron Ramsey;Midfielder;Arsenal;10000000;M
-p81880;Alex Oxlade-Chamberlain;Midfielder;Arsenal;10000000;L
-p37265;Alexis Sánchez;Forward;Arsenal;10000000;H
-p101184;Calum Chambers;Defender;Arsenal;10000000;L
-p147675;Chuba Akpom;Forward;Arsenal;10000000;VL
-p98980;Damián Martinez;Goalkeeper;Arsenal;10000000;VL
-p48844;David Ospina;Goalkeeper;Arsenal;10000000;VL
-p56864;Francis Coquelin;Midfielder;Arsenal;10000000;VL
-p158870;Gedion Zelalem;Midfielder;Arsenal;10000000;VL
-p98745;Héctor Bellerín;Defender;Arsenal;10000000;VL
-p90801;Ignasi Miquel;Defender;Arsenal;10000000;VL
-p153127;Isaac Hayden;Defender;Arsenal;10000000;VL
-p54102;Jack Wilshere;Midfielder;Arsenal;10000000;H
-p99127;Joel Campbell;Forward;Arsenal;10000000;VL
-p42427;Kieran Gibbs;Defender;Arsenal;10000000;L
-p51507;Laurent Koscielny;Defender;Arsenal;10000000;M
-p17733;Lukas Podolski;Forward;Arsenal;10000000;M
-p27334;Mathieu Debuchy;Defender;Arsenal;10000000;L
-p18155;Mathieu Flamini;Midfielder;Arsenal;10000000;VL
-p37605;Mesut Özil;Midfielder;Arsenal;10000000;VH
-p8758;Mikel Arteta;Midfielder;Arsenal;10000000;VL
-p38411;Nacho Monreal;Defender;Arsenal;10000000;VL
-p44346;Olivier Giroud;Forward;Arsenal;10000000;M
-p17127;Per Mertesacker;Defender;Arsenal;10000000;L
-p92372;Ryo Miyaichi;Midfielder;Arsenal;10000000;VL
-p19524;Santiago Cazorla;Midfielder;Arsenal;10000000;M
-p133798;Serge Gnabry;Midfielder;Arsenal;10000000;VL
-p20467;Theo Walcott;Forward;Arsenal;10000000;M
-p8597;Tomas Rosicky;Midfielder;Arsenal;10000000;VL
-p28566;Vassiriki Abou Diaby;Midfielder;Arsenal;10000000;VL
-p59936;Wojciech Szczesny;Goalkeeper;Arsenal;10000000;M
-p80711;Yaya Sanogo;Forward;Arsenal;10000000;VL
-p44302;Adlène Guédioura;Midfielder;Crystal Palace;10000000;VL
-p20145;Adrian Mariappa;Defender;Crystal Palace;10000000;VL
-p59013;Barry Bannan;Midfielder;Crystal Palace;10000000;VL
-p15284;Brede Hangeland;Defender;Crystal Palace;10000000;VL
-p93856;Chris Kettings;Goalkeeper;Crystal Palace;10000000;VL
-p7906;Damien Delaney;Defender;Crystal Palace;10000000;VL
-p104547;Dwight Gayle;Forward;Crystal Palace;10000000;VL
-p28541;Fraizer Campbell;Forward;Crystal Palace;10000000;VL
-p20529;Glenn Murray;Forward;Crystal Palace;10000000;VL
-p130103;Hiram Boateng;Midfielder;Crystal Palace;10000000;VL
-p19197;Jason Puncheon;Midfielder;Crystal Palace;10000000;VL
-p12765;Jerome Thomas;Midfielder;Crystal Palace;10000000;VL
-p28145;Jimmy Kébé;Midfielder;Crystal Palace;10000000;VL
-p18805;Joe Ledley;Midfielder;Crystal Palace;10000000;VL
-p55494;Joel Ward;Defender;Crystal Palace;10000000;VL
-p103100;Jonathan Williams;Midfielder;Crystal Palace;10000000;VL
-p11554;Julian Speroni;Goalkeeper;Crystal Palace;10000000;VL
-p16230;Lewis Price;Goalkeeper;Crystal Palace;10000000;VL
-p15675;Marouane Chamakh;Forward;Crystal Palace;10000000;VL
-p59115;Mile Jedinak;Midfielder;Crystal Palace;10000000;VL
-p19527;Owen Garvan;Midfielder;Crystal Palace;10000000;VL
-p15274;Patrick McCarthy;Defender;Crystal Palace;10000000;VL
-p18146;Peter Ramage;Defender;Crystal Palace;10000000;VL
-p19188;Scott Dann;Defender;Crystal Palace;10000000;VL
-p53582;Stuart O'Keefe;Midfielder;Crystal Palace;10000000;VL
-p20066;Wayne Hennessey;Goalkeeper;Crystal Palace;10000000;VL
-p55452;Yannick Bolasie;Midfielder;Crystal Palace;10000000;VL
-p151069;Adil Nabi;Forward;West Bromwich Albion;10000000;VL
-p89088;Andre Wisdom;Defender;West Bromwich Albion;10000000;VL
-p9089;Ben Foster;Goalkeeper;West Bromwich Albion;10000000;VL
-p12086;Boaz Myhill;Goalkeeper;West Bromwich Albion;10000000;VL
-p153933;Bradley Garmston;Defender;West Bromwich Albion;10000000;VL
-p49958;Brown Ideye;Forward;West Bromwich Albion;10000000;L
-p15968;Chris Baird;Defender;West Bromwich Albion;10000000;VL
-p19151;Chris Brunt;Midfielder;West Bromwich Albion;10000000;VL
-p55829;Claudio Yacob;Midfielder;West Bromwich Albion;10000000;VL
-p60232;Craig Dawson;Defender;West Bromwich Albion;10000000;VL
-p28468;Craig Gardner;Midfielder;West Bromwich Albion;10000000;VL
-p77760;Cristian Gamboa;Defender;West Bromwich Albion;10000000;VL
-p19272;Gareth McAuley;Defender;West Bromwich Albion;10000000;VL
-p20141;Graham Dorrans;Midfielder;West Bromwich Albion;10000000;VL
-p18008;James Morrison;Midfielder;West Bromwich Albion;10000000;VL
-p80480;Jason Davidson;Defender;West Bromwich Albion;10000000;VL
-p7551;Joleon Lescott;Defender;West Bromwich Albion;10000000;VL
-p39253;Jonas Olsson;Defender;West Bromwich Albion;10000000;VL
-p98760;Kemar Roofe;Midfielder;West Bromwich Albion;10000000;VL
-p153475;Liam O'Neil;Defender;West Bromwich Albion;10000000;VL
-p38219;Luke Daniels;Goalkeeper;West Bromwich Albion;10000000;VL
-p91972;Saido Berahino;Forward;West Bromwich Albion;10000000;VL
-p42583;Sébastien Pocognoli;Defender;West Bromwich Albion;10000000;VL
-p34392;Stéphane Sessegnon;Midfielder;West Bromwich Albion;10000000;VL
-p28593;Victor Anichebe;Forward;West Bromwich Albion;10000000;VL
-p39895;Youssuf Mulumbu;Midfielder;West Bromwich Albion;10000000;VL
-p155511;Adam Armstrong;Forward;Newcastle United;10000000;VL
-p168580;Ayoze Pérez;Forward;Newcastle United;10000000;VL
-p28301;Cheick Tioté;Midfielder;Newcastle United;10000000;VL
-p124584;Curtis Good;Defender;Newcastle United;10000000;VL
-p52940;Daryl Janmaat;Defender;Newcastle United;10000000;VL
-p55604;Davide Santon;Defender;Newcastle United;10000000;VL
-p51621;Emmanuel Rivière;Forward;Newcastle United;10000000;VL
-p7933;Fabricio Coloccini;Defender;Newcastle United;10000000;VL
-p86527;Facundo Ferreyra;Forward;Newcastle United;10000000;VL
-p38429;Gabriel Obertan;Midfielder;Newcastle United;10000000;VL
-p87112;Gael Bigirimana;Midfielder;Newcastle United;10000000;VL
-p59304;Haris Vuckic;Midfielder;Newcastle United;10000000;VL
-p18753;Hatem Ben Arfa;Midfielder;Newcastle United;10000000;VL
-p58771;Jack Colback;Midfielder;Newcastle United;10000000;VL
-p106256;Jak Alnwick;Goalkeeper;Newcastle United;10000000;VL
-p21060;Jonás Gutiérrez;Midfielder;Newcastle United;10000000;VL
-p156257;Lubomir Satka;Defender;Newcastle United;10000000;VL
-p44488;Mapou Yanga-Mbiwa;Defender;Newcastle United;10000000;VL
-p92170;Massadio Haidara;Defender;Newcastle United;10000000;VL
-p98746;Mehdi Abeid;Midfielder;Newcastle United;10000000;VL
-p11378;Michael Williamson;Defender;Newcastle United;10000000;VL
-p45268;Moussa Sissoko;Midfielder;Newcastle United;10000000;L
-p42758;Papiss Demba Cissé;Forward;Newcastle United;10000000;VL
-p106618;Paul Dummett;Defender;Newcastle United;10000000;VL
-p149465;Remie Streete;Defender;Newcastle United;10000000;VL
-p66957;Rémy Cabella;Midfielder;Newcastle United;10000000;L
-p19838;Robert Elliot;Goalkeeper;Newcastle United;10000000;VL
-p155513;Rolando Aarons;Midfielder;Newcastle United;10000000;VL
-p14775;Ryan Taylor;Defender;Newcastle United;10000000;VL
-p97612;Sammy Ameobi;Forward;Newcastle United;10000000;VL
-p61944;Shane Ferguson;Defender;Newcastle United;10000000;VL
-p48773;Siem de Jong;Forward;Newcastle United;10000000;L
-p17974;Steven Taylor;Defender;Newcastle United;10000000;VL
-p20480;Tim Krul;Goalkeeper;Newcastle United;10000000;L
-p40799;Vurnon Anita;Midfielder;Newcastle United;10000000;VL
-p42727;Yoan Gouffran;Forward;Newcastle United;10000000;VL
-p42593;Aleksandar Kolarov;Defender;Manchester City;10000000;VL
-p42892;Álvaro Negredo;Forward;Manchester City;10000000;L
-p37748;Bacary Sagna;Defender;Manchester City;10000000;L
-p86814;Bruno Zuculini;Midfielder;Manchester City;10000000;VL
-p20664;David Silva;Midfielder;Manchester City;10000000;VH
-p80235;Dedryck Boyata;Defender;Manchester City;10000000;VL
-p42544;Edin Dzeko;Forward;Manchester City;10000000;M
-p57112;Eliaquim Mangala;Defender;Manchester City;10000000;M
-p27789;Fernandinho;Midfielder;Manchester City;10000000;H
-p52538;Fernando;Midfielder;Manchester City;10000000;L
-p2051;Frank Lampard;Midfielder;Manchester City;10000000;L
-p17336;Gaël Clichy;Defender;Manchester City;10000000;L
-p15157;James Milner;Midfielder;Manchester City;10000000;L
-p19534;Javi García;Midfielder;Manchester City;10000000;L
-p17740;Jesús Navas;Midfielder;Manchester City;10000000;M
-p15749;Joe Hart;Goalkeeper;Manchester City;10000000;L
-p82970;John Guidetti;Forward;Manchester City;10000000;VL
-p103040;Karim Rekik;Defender;Manchester City;10000000;VL
-p15312;Martín Demichelis;Defender;Manchester City;10000000;VL
-p84702;Matija Nastasic;Defender;Manchester City;10000000;M
-p20492;Micah Richards;Defender;Manchester City;10000000;VL
-p20658;Pablo Zabaleta;Defender;Manchester City;10000000;L
-p1101;Richard Wright;Goalkeeper;Manchester City;10000000;VL
-p28554;Samir Nasri;Midfielder;Manchester City;10000000;M
-p19688;Scott Sinclair;Midfielder;Manchester City;10000000;VL
-p37572;Sergio Agüero;Forward;Manchester City;10000000;VH
-p50442;Stevan Jovetic;Forward;Manchester City;10000000;M
-p17476;Vincent Kompany;Defender;Manchester City;10000000;H
-p20310;Willy Caballero;Goalkeeper;Manchester City;10000000;VL
-p14664;Yaya Touré;Midfielder;Manchester City;10000000;H
-p39765;Adel Taarabt;Midfielder;Queens Park Rangers;10000000;VL
-p67731;Alejandro Faurlin;Midfielder;Queens Park Rangers;10000000;VL
-p20488;Armand Traore;Defender;Queens Park Rangers;10000000;VL
-p4570;Bobby Zamora;Forward;Queens Park Rangers;10000000;VL
-p10589;Brian Murphy;Goalkeeper;Queens Park Rangers;10000000;VL
-p78356;Charlie Austin;Forward;Queens Park Rangers;10000000;VL
-p1216;Clint Hill;Defender;Queens Park Rangers;10000000;VL
-p40725;Danny Simpson;Defender;Queens Park Rangers;10000000;VL
-p10451;Jermaine Jenas;Midfielder;Queens Park Rangers;10000000;VL
-p15276;Joey Barton;Midfielder;Queens Park Rangers;10000000;VL
-p49438;Jordon Mutch;Midfielder;Queens Park Rangers;10000000;VL
-p19928;Julio César;Goalkeeper;Queens Park Rangers;10000000;VL
-p49806;Junior Hoilett;Midfielder;Queens Park Rangers;10000000;VL
-p10561;Karl Henry;Midfielder;Queens Park Rangers;10000000;VL
-p38419;Loïc Remy;Forward;Queens Park Rangers;10000000;L
-p50229;Matthew Phillips;Midfielder;Queens Park Rangers;10000000;VL
-p48852;Mauricio Isla;Defender;Queens Park Rangers;10000000;VL
-p87117;Max Ehmer;Defender;Queens Park Rangers;10000000;VL
-p92790;Michael Harriman;Defender;Queens Park Rangers;10000000;VL
-p167890;Michael Petrasso;Midfielder;Queens Park Rangers;10000000;VL
-p19053;Nedum Onuoha;Defender;Queens Park Rangers;10000000;VL
-p1764;Richard Dunne;Defender;Queens Park Rangers;10000000;VL
-p2034;Rio Ferdinand;Defender;Queens Park Rangers;10000000;VL
-p1243;Robert Green;Goalkeeper;Queens Park Rangers;10000000;VL
-p1212;Shaun Wright-Phillips;Midfielder;Queens Park Rangers;10000000;VL
-p68815;Steven Caulker;Defender;Queens Park Rangers;10000000;VL
-p77875;Yun Suk-Young;Defender;Queens Park Rangers;10000000;VL
-p19959;Adam Johnson;Midfielder;Sunderland;10000000;VL
-p49688;Alfred N'Diaye;Midfielder;Sunderland;10000000;VL
-p11467;Billy Jones;Defender;Sunderland;10000000;VL
-p43570;Cabral;Midfielder;Sunderland;10000000;VL
-p88601;Charalampos Mavrias;Midfielder;Sunderland;10000000;VL
-p59125;Connor Wickham;Forward;Sunderland;10000000;VL
-p56827;Costel Pantilimon;Goalkeeper;Sunderland;10000000;VL
-p15398;Danny Graham;Forward;Sunderland;10000000;VL
-p115854;Duncan Watmore;Forward;Sunderland;10000000;VL
-p55641;Emanuele Giaccherini;Midfielder;Sunderland;10000000;VL
-p49384;Jack Rodwell;Midfielder;Sunderland;10000000;L
-p3736;John O'Shea;Defender;Sunderland;10000000;VL
-p50023;Jordi Gómez;Midfielder;Sunderland;10000000;VL
-p41574;Jozy Altidore;Forward;Sunderland;10000000;VL
-p28448;Lee Cattermole;Midfielder;Sunderland;10000000;VL
-p49836;Liam Bridcutt;Midfielder;Sunderland;10000000;VL
-p114312;Mikael Mandron;Forward;Sunderland;10000000;VL
-p39453;Modibo Diakité;Defender;Sunderland;10000000;VL
-p74230;Patrick van Aanholt;Defender;Sunderland;10000000;VL
-p88372;Santiago Vergini;Defender;Sunderland;10000000;VL
-p19057;Sebastian Larsson;Midfielder;Sunderland;10000000;VL
-p18953;Steven Fletcher;Forward;Sunderland;10000000;VL
-p52828;Valentin Roberge;Defender;Sunderland;10000000;VL
-p20487;Vito Mannone;Goalkeeper;Sunderland;10000000;VL
-p1841;Wes Brown;Defender;Sunderland;10000000;VL
-p17349;Aaron Lennon;Midfielder;Tottenham Hotspur;10000000;L
-p60252;Andros Townsend;Midfielder;Tottenham Hotspur;10000000;VL
-p115556;Ben Davies;Defender;Tottenham Hotspur;10000000;L
-p28146;Benoit Assou-Ekotto;Defender;Tottenham Hotspur;10000000;VL
-p61887;Bongani Khumalo;Defender;Tottenham Hotspur;10000000;VL
-p1803;Brad Friedel;Goalkeeper;Tottenham Hotspur;10000000;VL
-p80607;Christian Eriksen;Midfielder;Tottenham Hotspur;10000000;M
-p101623;Cristian Ceballos;Midfielder;Tottenham Hotspur;10000000;VL
-p38290;Danny Rose;Defender;Tottenham Hotspur;10000000;VL
-p17500;Emmanuel Adebayor;Forward;Tottenham Hotspur;10000000;L
-p93264;Eric Dier;Defender;Tottenham Hotspur;10000000;VL
-p62974;Erik Lamela;Midfielder;Tottenham Hotspur;10000000;M
-p38439;Etienne Capoue;Midfielder;Tottenham Hotspur;10000000;VL
-p106603;Ezekiel Fryers;Defender;Tottenham Hotspur;10000000;VL
-p78830;Harry Kane;Forward;Tottenham Hotspur;10000000;VL
-p37915;Hugo Lloris;Goalkeeper;Tottenham Hotspur;10000000;L
-p39194;Jan Vertonghen;Defender;Tottenham Hotspur;10000000;L
-p58790;Jonathan Obika;Forward;Tottenham Hotspur;10000000;VL
-p49539;Kyle Naughton;Defender;Tottenham Hotspur;10000000;VL
-p58621;Kyle Walker;Defender;Tottenham Hotspur;10000000;L
-p49318;Lewis Holtby;Midfielder;Tottenham Hotspur;10000000;VL
-p12679;Michael Dawson;Defender;Tottenham Hotspur;10000000;VL
-p39215;Michel Vorm;Goalkeeper;Tottenham Hotspur;10000000;VL
-p153265;Milos Veljkovic;Defender;Tottenham Hotspur;10000000;VL
-p39104;Mousa Dembélé;Midfielder;Tottenham Hotspur;10000000;L
-p126407;Nabil Bentaleb;Midfielder;Tottenham Hotspur;10000000;VL
-p54908;Nacer Chadli;Midfielder;Tottenham Hotspur;10000000;VL
-p100534;Paulinho;Midfielder;Tottenham Hotspur;10000000;L
-p17926;Roberto Soldado;Forward;Tottenham Hotspur;10000000;L
-p81012;Ryan Fredericks;Defender;Tottenham Hotspur;10000000;VL
-p58791;Ryan Mason;Midfielder;Tottenham Hotspur;10000000;VL
-p52876;Sandro;Midfielder;Tottenham Hotspur;10000000;L
-p93464;Tom Carroll;Midfielder;Tottenham Hotspur;10000000;VL
-p62305;Vlad Chiriches;Defender;Tottenham Hotspur;10000000;L
-p37742;Younes Kaboul;Defender;Tottenham Hotspur;10000000;VL
-p15405;Alan Hutton;Defender;Aston Villa;10000000;VL
-p44354;Aly Cissokho;Defender;Aston Villa;10000000;VL
-p80979;Andreas Weimann;Forward;Aston Villa;10000000;VL
-p60551;Ashley Westwood;Midfielder;Aston Villa;10000000;VL
-p99168;Benjamin Siegrist;Goalkeeper;Aston Villa;10000000;VL
-p41705;Brad Guzan;Goalkeeper;Aston Villa;10000000;VL
-p171975;Callum Robinson;Forward;Aston Villa;10000000;VL
-p18737;Charles N'Zogbia;Midfielder;Aston Villa;10000000;VL
-p49493;Chris Herd;Midfielder;Aston Villa;10000000;VL
-p54861;Christian Benteke;Forward;Aston Villa;10000000;L
-p58845;Ciaran Clark;Defender;Aston Villa;10000000;VL
-p10738;Darren Bent;Forward;Aston Villa;10000000;VL
-p63426;Enda Stevens;Defender;Aston Villa;10000000;VL
-p41823;Fabian Delph;Midfielder;Aston Villa;10000000;VL
-p27450;Gabriel Agbonlahor;Forward;Aston Villa;10000000;VL
-p77800;Gary Gardner;Midfielder;Aston Villa;10000000;VL
-p106602;Graham Burke;Forward;Aston Villa;10000000;VL
-p114283;Jack Grealish;Midfielder;Aston Villa;10000000;VL
-p154936;Janoi Donacien;Defender;Aston Villa;10000000;VL
-p56981;Joe Bennett;Defender;Aston Villa;10000000;VL
-p2060;Joe Cole;Midfielder;Aston Villa;10000000;VL
-p80502;Jores Okore;Defender;Aston Villa;10000000;VL
-p39242;Karim El Ahmadi;Midfielder;Aston Villa;10000000;VL
-p15073;Kieran Richardson;Midfielder;Aston Villa;10000000;VL
-p74297;Leandro Bacuna;Defender;Aston Villa;10000000;VL
-p51950;Libor Kozák;Forward;Aston Villa;10000000;VL
-p68983;Matthew Lowton;Defender;Aston Villa;10000000;VL
-p52477;Nathan Baker;Defender;Aston Villa;10000000;VL
-p16854;Philippe Senderos;Defender;Aston Villa;10000000;VL
-p21095;Ron Vlaar;Defender;Aston Villa;10000000;VL
-p1822;Shay Given;Goalkeeper;Aston Villa;10000000;VL
-p66842;André Schürrle;Midfielder;Chelsea;10000000;M
-p135363;Andreas Christensen;Defender;Chelsea;10000000;F
-p41135;Branislav Ivanovic;Defender;Chelsea;10000000;L
-p41328;César Azpilicueta;Defender;Chelsea;10000000;M
-p104953;Christian Atsu;Midfielder;Chelsea;10000000;VL
-p12303;Didier Drogba;Forward;Chelsea;10000000;VL
-p18507;Diego Costa;Forward;Chelsea;10000000;H
-p42786;Eden Hazard;Midfielder;Chelsea;10000000;VH
-p14402;Fernando Torres;Forward;Chelsea;10000000;L
-p18595;Filipe Luis;Defender;Chelsea;10000000;L
-p17878;Francesc Fábregas;Midfielder;Chelsea;10000000;VH
-p19419;Gary Cahill;Defender;Chelsea;10000000;M
-p108132;Jamal Blackman;Goalkeeper;Chelsea;10000000;VL
-p28495;John Obi Mikel;Midfielder;Chelsea;10000000;VL
-p1718;John Terry;Defender;Chelsea;10000000;VL
-p88821;Joshua McEachran;Midfielder;Chelsea;10000000;VL
-p103192;Kurt Zouma;Defender;Chelsea;10000000;VL
-p82660;Marco Van Ginkel;Midfielder;Chelsea;10000000;VL
-p1827;Mark Schwarzer;Goalkeeper;Chelsea;10000000;VL
-p41450;Marko Marin;Midfielder;Chelsea;10000000;VL
-p68250;Matej Delac;Goalkeeper;Chelsea;10000000;VL
-p118748;Mohamed Salah;Midfielder;Chelsea;10000000;L
-p126184;Nathan Aké;Defender;Chelsea;10000000;VL
-p89085;Nathaniel Chalobah;Midfielder;Chelsea;10000000;VL
-p62398;Nemanja Matic;Midfielder;Chelsea;10000000;M
-p61262;Oscar;Midfielder;Chelsea;10000000;H
-p106617;Patrick Bamford;Forward;Chelsea;10000000;VL
-p11334;Petr Cech;Goalkeeper;Chelsea;10000000;L
-p53392;Ramires;Midfielder;Chelsea;10000000;M
-p140941;Stipe Perica;Forward;Chelsea;10000000;VL
-p60772;Thibaut Courtois;Goalkeeper;Chelsea;10000000;M
-p120449;Todd Kane;Defender;Chelsea;10000000;VL
-p71963;Uli Dávila;Midfielder;Chelsea;10000000;VL
-p49013;Victor Moses;Midfielder;Chelsea;10000000;VL
-p47431;Willian;Midfielder;Chelsea;10000000;H
-p148420;Adam King;Midfielder;Swansea City;10000000;VL
-p11883;Alan Tate;Defender;Swansea City;10000000;VL
-p42996;Angel Rangel;Defender;Swansea City;10000000;VL
-p73459;Ashley Richards;Defender;Swansea City;10000000;VL
-p19159;Ashley Williams;Defender;Swansea City;10000000;VL
-p37998;Bafétimbi Gomis;Forward;Swansea City;10000000;L
-p73983;Curtis Obeng;Defender;Swansea City;10000000;VL
-p60084;David Cornell;Goalkeeper;Swansea City;10000000;VL
-p39221;Dwight Tiendalli;Defender;Swansea City;10000000;VL
-p5288;Gerhard Tremmel;Goalkeeper;Swansea City;10000000;VL
-p120385;Gregor Zabret;Goalkeeper;Swansea City;10000000;VL
-p55422;Gylfi Sigurdsson;Midfielder;Swansea City;10000000;L
-p96305;Jay Fulton;Midfielder;Swansea City;10000000;VL
-p49195;Jefferson Montero;Midfielder;Swansea City;10000000;VL
-p50232;Jonjo Shelvey;Midfielder;Swansea City;10000000;L
-p80789;Jordi Amat;Defender;Swansea City;10000000;VL
-p86989;José Cañas;Midfielder;Swansea City;10000000;VL
-p76542;Ki Sung-Yueng;Midfielder;Swansea City;10000000;VL
-p59940;Kyle Bartley;Defender;Swansea City;10000000;VL
-p82055;Lee Lucas;Midfielder;Swansea City;10000000;VL
-p15114;Leon Britton;Midfielder;Swansea City;10000000;VL
-p37096;Lukasz Fabianski;Goalkeeper;Swansea City;10000000;VL
-p39270;Marvin Emnes;Forward;Swansea City;10000000;VL
-p21083;Nathan Dyer;Midfielder;Swansea City;10000000;VL
-p47390;Neil Taylor;Defender;Swansea City;10000000;VL
-p28690;Pablo Hernández;Midfielder;Swansea City;10000000;VL
-p89505;Rory Donnelly;Forward;Swansea City;10000000;VL
-p96306;Stephen Kingsley;Defender;Swansea City;10000000;VL
-p11829;Wayne Routledge;Midfielder;Swansea City;10000000;VL
-p57001;Wilfried Bony;Forward;Swansea City;10000000;L
-p37339;Ahmed Elmohamady;Midfielder;Hull City;10000000;VL
-p19687;Alex Bruce;Defender;Hull City;10000000;VL
-p12390;Allan McGregor;Goalkeeper;Hull City;10000000;VL
-p122798;Andrew Robertson;Defender;Hull City;10000000;VL
-p157652;Calaum Jahraldo-Martin;Forward;Hull City;10000000;VL
-p19115;Curtis Davies;Defender;Hull City;10000000;VL
-p53371;David Meyler;Midfielder;Hull City;10000000;VL
-p11974;Eldin Jakupovic;Goalkeeper;Hull City;10000000;VL
-p28244;George Boyd;Midfielder;Hull City;10000000;VL
-p95658;Harry Maguire;Defender;Hull City;10000000;VL
-p49944;Jake Livermore;Midfielder;Hull City;10000000;VL
-p43252;James Chester;Defender;Hull City;10000000;VL
-p15137;Liam Rosenior;Defender;Hull City;10000000;VL
-p34285;Maynor Figueroa;Defender;Hull City;10000000;VL
-p62419;Nikica Jelavic;Forward;Hull City;10000000;VL
-p17506;Paul McShane;Defender;Hull City;10000000;VL
-p90517;Robbie Brady;Midfielder;Hull City;10000000;VL
-p18987;Robert Snodgrass;Midfielder;Hull City;10000000;VL
-p20452;Shane Long;Forward;Hull City;10000000;VL
-p27503;Sone Aluko;Forward;Hull City;10000000;VL
-p20462;Stephen Quinn;Midfielder;Hull City;10000000;VL
-p1881;Steve Harper;Goalkeeper;Hull City;10000000;VL
-p15109;Tom Huddlestone;Midfielder;Hull City;10000000;VL
-p86176;Tom Ince;Midfielder;Hull City;10000000;VL
-p51627;Yannick Sagbo;Forward;Hull City;10000000;VL
-p55445;Alex Cisak;Goalkeeper;Burnley;10000000;VL
-p44699;Ashley Barnes;Forward;Burnley;10000000;VL
-p51927;Ben Mee;Defender;Burnley;10000000;VL
-p105692;Cameron Howieson;Midfielder;Burnley;10000000;VL
-p80788;Daniel Lafferty;Defender;Burnley;10000000;VL
-p84939;Danny Ings;Forward;Burnley;10000000;VL
-p19556;David Jones;Midfielder;Burnley;10000000;VL
-p15982;Dean Marney;Midfielder;Burnley;10000000;VL
-p151105;Jason Gilchrist;Forward;Burnley;10000000;VL
-p15706;Jason Shackell;Defender;Burnley;10000000;VL
-p41674;Kevin Long;Defender;Burnley;10000000;VL
-p77794;Kieran Trippier;Defender;Burnley;10000000;VL
-p34654;Lukas Jutkiewicz;Forward;Burnley;10000000;VL
-p55803;Luke O'Neill;Defender;Burnley;10000000;VL
-p66978;Marvin Sordell;Forward;Burnley;10000000;VL
-p8437;Matthew Gilks;Goalkeeper;Burnley;10000000;VL
-p3289;Matthew Taylor;Midfielder;Burnley;10000000;VL
-p2907;Michael Duff;Defender;Burnley;10000000;VL
-p15944;Michael Kightly;Midfielder;Burnley;10000000;VL
-p14161;Ross Wallace;Midfielder;Burnley;10000000;VL
-p40399;Sam Vokes;Forward;Burnley;10000000;VL
-p39158;Scott Arfield;Midfielder;Burnley;10000000;VL
-p105185;Steven Hewitt;Midfielder;Burnley;10000000;VL
-p3332;Steven Reid;Defender;Burnley;10000000;VL
-p124125;Tom Anderson;Defender;Burnley;10000000;VL
-p21205;Tom Heaton;Goalkeeper;Burnley;10000000;VL
+"p154976";"Adnan Januzaj";"Midfielder";"Manchester United";10000000;"L"
+"p59846";"Ander Herrera";"Midfielder";"Manchester United";10000000;"M"
+"p39725";"Anders Lindegaard";"Goalkeeper";"Manchester United";10000000;"VL"
+"p27258";"Anderson";"Midfielder";"Manchester United";10000000;"L"
+"p20695";"Antonio Valencia";"Midfielder";"Manchester United";10000000;"L"
+"p18892";"Ashley Young";"Midfielder";"Manchester United";10000000;"L"
+"p51922";"Ben Amos";"Goalkeeper";"Manchester United";10000000;"VL"
+"p55909";"Chris Smalling";"Defender";"Manchester United";10000000;"L"
+"p50175";"Danny Welbeck";"Forward";"Manchester United";10000000;"M"
+"p14295";"Darren Fletcher";"Midfielder";"Manchester United";10000000;"L"
+"p51940";"David de Gea";"Goalkeeper";"Manchester United";10000000;"L"
+"p152015";"Guillermo Varela";"Defender";"Manchester United";10000000;"VL"
+"p112139";"James Wilson";"Forward";"Manchester United";10000000;"VL"
+"p43020";"Javier Hernández";"Forward";"Manchester United";10000000;"L"
+"p109322";"Jesse Lingard";"Midfielder";"Manchester United";10000000;"VL"
+"p37642";"Jonny Evans";"Defender";"Manchester United";10000000;"L"
+"p43670";"Juan Mata";"Midfielder";"Manchester United";10000000;"H"
+"p106760";"Luke Shaw";"Defender";"Manchester United";10000000;"M"
+"p58747";"Marnick Vermijl";"Defender";"Manchester United";10000000;"VL"
+"p41184";"Marouane Fellaini";"Midfielder";"Manchester United";10000000;"L"
+"p2404";"Michael Carrick";"Midfielder";"Manchester United";10000000;"L"
+"p106611";"Michael Keane";"Defender";"Manchester United";10000000;"VL"
+"p38530";"Nani";"Midfielder";"Manchester United";10000000;"L"
+"p82205";"Nick Powell";"Midfielder";"Manchester United";10000000;"VL"
+"p76359";"Phil Jones";"Defender";"Manchester United";10000000;"L"
+"p54772";"Rafael";"Defender";"Manchester United";10000000;"L"
+"p161076";"Reece James";"Defender";"Manchester United";10000000;"VL"
+"p12297";"Robin van Persie";"Forward";"Manchester United";10000000;"VH"
+"p101982";"Sam Johnstone";"Goalkeeper";"Manchester United";10000000;"VL"
+"p83090";"Shinji Kagawa";"Midfielder";"Manchester United";10000000;"L"
+"p43250";"Tom Cleverley";"Midfielder";"Manchester United";10000000;"L"
+"p154968";"Tom Lawrence";"Forward";"Manchester United";10000000;"VL"
+"p112133";"Tyler Blackett";"Defender";"Manchester United";10000000;"VL"
+"p13017";"Wayne Rooney";"Forward";"Manchester United";10000000;"VH"
+"p82403";"Wilfried Zaha";"Midfielder";"Manchester United";10000000;"VL"
+"p91126";"Will Keane";"Forward";"Manchester United";10000000;"VL"
+"p18267";"Aiden McGeady";"Midfielder";"Everton";10000000;"VL"
+"p43035";"Antolin Alcaraz";"Defender";"Everton";10000000;"VL"
+"p26921";"Arouna Koné";"Forward";"Everton";10000000;"L"
+"p77762";"Bryan Oviedo";"Defender";"Everton";10000000;"VL"
+"p153678";"Chris Long";"Forward";"Everton";10000000;"VL"
+"p153724";"Conor Grant";"Midfielder";"Everton";10000000;"VL"
+"p80181";"Conor McAleny";"Forward";"Everton";10000000;"VL"
+"p27707";"Darron Gibson";"Midfielder";"Everton";10000000;"VL"
+"p1632";"Gareth Barry";"Midfielder";"Everton";10000000;"L"
+"p114094";"Hallam Hope";"Forward";"Everton";10000000;"VL"
+"p50472";"James McCarthy";"Midfielder";"Everton";10000000;"VL"
+"p78315";"Joel Robles";"Goalkeeper";"Everton";10000000;"VL"
+"p97299";"John Stones";"Defender";"Everton";10000000;"VL"
+"p26901";"Kevin Mirallas";"Midfielder";"Everton";10000000;"M"
+"p12745";"Leighton Baines";"Defender";"Everton";10000000;"M"
+"p8378";"Leon Osman";"Midfielder";"Everton";10000000;"VL"
+"p80183";"Luke Garbutt";"Defender";"Everton";10000000;"VL"
+"p114093";"Matthew Pennington";"Defender";"Everton";10000000;"VL"
+"p87447";"Muhamed Besic";"Midfielder";"Everton";10000000;"VL"
+"p7645";"Phil Jagielka";"Defender";"Everton";10000000;"L"
+"p66749";"Romelu Lukaku";"Forward";"Everton";10000000;"M"
+"p88894";"Ross Barkley";"Midfielder";"Everton";10000000;"L"
+"p153675";"Ryan Ledson";"Midfielder";"Everton";10000000;"VL"
+"p59949";"Seamus Coleman";"Defender";"Everton";10000000;"L"
+"p61933";"Shane Duffy";"Defender";"Everton";10000000;"VL"
+"p18981";"Steven Naismith";"Forward";"Everton";10000000;"VL"
+"p7525";"Steven Pienaar";"Midfielder";"Everton";10000000;"VL"
+"p6219";"Sylvain Distin";"Defender";"Everton";10000000;"VL"
+"p15337";"Tim Howard";"Goalkeeper";"Everton";10000000;"L"
+"p9007";"Tony Hibbert";"Defender";"Everton";10000000;"VL"
+"p149468";"Tyias Browning";"Defender";"Everton";10000000;"VL"
+"p19714";"Andy Wilkinson";"Defender";"Stoke City";10000000;"VL"
+"p40349";"Asmir Begovic";"Goalkeeper";"Stoke City";10000000;"L"
+"p40276";"Bojan";"Forward";"Stoke City";10000000;"L"
+"p50067";"Brek Shea";"Midfielder";"Stoke City";10000000;"VL"
+"p18804";"Cameron Jerome";"Forward";"Stoke City";10000000;"VL"
+"p20208";"Charlie Adam";"Midfielder";"Stoke City";10000000;"VL"
+"p155706";"Dionatan Teixeira";"Defender";"Stoke City";10000000;"VL"
+"p39487";"Erik Pieters";"Defender";"Stoke City";10000000;"VL"
+"p50089";"Geoff Cameron";"Defender";"Stoke City";10000000;"VL"
+"p12150";"Glenn Whelan";"Midfielder";"Stoke City";10000000;"VL"
+"p105666";"Jack Butland";"Goalkeeper";"Stoke City";10000000;"VL"
+"p59305";"Jamie Ness";"Midfielder";"Stoke City";10000000;"VL"
+"p12813";"Jonathan Walters";"Forward";"Stoke City";10000000;"VL"
+"p61858";"Mame Biram Diouf";"Forward";"Stoke City";10000000;"VL"
+"p61595";"Marc Muniesa";"Defender";"Stoke City";10000000;"VL"
+"p32318";"Marc Wilson";"Defender";"Stoke City";10000000;"VL"
+"p41464";"Marko Arnautovic";"Forward";"Stoke City";10000000;"VL"
+"p3773";"Peter Crouch";"Forward";"Stoke City";10000000;"VL"
+"p26900";"Peter Odemwingie";"Forward";"Stoke City";10000000;"VL"
+"p17997";"Phil Bardsley";"Defender";"Stoke City";10000000;"VL"
+"p12413";"Robert Huth";"Defender";"Stoke City";10000000;"VL"
+"p37869";"Ryan Shawcross";"Defender";"Stoke City";10000000;"VL"
+"p45158";"Ryan Shotton";"Defender";"Stoke City";10000000;"VL"
+"p20481";"Stephen Ireland";"Midfielder";"Stoke City";10000000;"VL"
+"p11735";"Steve Sidwell";"Midfielder";"Stoke City";10000000;"VL"
+"p49323";"Steven N'Zonzi";"Midfielder";"Stoke City";10000000;"VL"
+"p1945";"Thomas Sørensen";"Goalkeeper";"Stoke City";10000000;"VL"
+"p34296";"Wilson Palacios";"Midfielder";"Stoke City";10000000;"VL"
+"p96782";"Adam Smith";"Goalkeeper";"Leicester City";10000000;"VL"
+"p13152";"Andy King";"Midfielder";"Leicester City";10000000;"VL"
+"p83543";"Anthony Knockaert";"Midfielder";"Leicester City";10000000;"VL"
+"p38038";"Ben Hamer";"Goalkeeper";"Leicester City";10000000;"VL"
+"p60689";"Chris Wood";"Forward";"Leicester City";10000000;"VL"
+"p18438";"Conrad Logan";"Goalkeeper";"Leicester City";10000000;"VL"
+"p61603";"Daniel Drinkwater";"Midfielder";"Leicester City";10000000;"VL"
+"p12744";"David Nugent";"Forward";"Leicester City";10000000;"VL"
+"p11848";"Dean Hammond";"Midfielder";"Leicester City";10000000;"VL"
+"p19273";"Gary Taylor-Fletcher";"Forward";"Leicester City";10000000;"VL"
+"p101668";"Jamie Vardy";"Forward";"Leicester City";10000000;"VL"
+"p86417";"Jeffrey Schlupp";"Defender";"Leicester City";10000000;"VL"
+"p17745";"Kasper Schmeichel";"Goalkeeper";"Leicester City";10000000;"VL"
+"p54316";"Leonardo Ulloa";"Forward";"Leicester City";10000000;"VL"
+"p86857";"Liam Moore";"Defender";"Leicester City";10000000;"VL"
+"p51938";"Marc Albrighton";"Midfielder";"Leicester City";10000000;"VL"
+"p37388";"Marcin Wasilewski";"Defender";"Leicester City";10000000;"VL"
+"p61604";"Matthew James";"Midfielder";"Leicester City";10000000;"VL"
+"p1640";"Matthew Upson";"Defender";"Leicester City";10000000;"VL"
+"p1413";"Paul Konchesky";"Defender";"Leicester City";10000000;"VL"
+"p46695";"Ritchie de Laet";"Defender";"Leicester City";10000000;"VL"
+"p103025";"Riyad Mahrez";"Midfielder";"Leicester City";10000000;"VL"
+"p111455";"Tom Hopper";"Forward";"Leicester City";10000000;"VL"
+"p15033";"Wes Morgan";"Defender";"Leicester City";10000000;"VL"
+"p39259";"Zoumana Bakayogo";"Defender";"Leicester City";10000000;"VL"
+"p39155";"Adam Lallana";"Midfielder";"Liverpool";10000000;"M"
+"p9631";"Bradley Jones";"Goalkeeper";"Liverpool";10000000;"VL"
+"p21094";"Daniel Agger";"Defender";"Liverpool";10000000;"L"
+"p40755";"Daniel Sturridge";"Forward";"Liverpool";10000000;"M"
+"p95463";"Danny Ward";"Goalkeeper";"Liverpool";10000000;"VL"
+"p38454";"Dejan Lovren";"Defender";"Liverpool";10000000;"M"
+"p112338";"Emre Can";"Midfielder";"Liverpool";10000000;"VL"
+"p77454";"Fabio Borini";"Forward";"Liverpool";10000000;"VL"
+"p9047";"Glen Johnson";"Defender";"Liverpool";10000000;"VL"
+"p83427";"Jack Robinson";"Defender";"Liverpool";10000000;"VL"
+"p109528";"Javier Manquillo";"Defender";"Liverpool";10000000;"VL"
+"p40555";"Joe Allen";"Midfielder";"Liverpool";10000000;"VL"
+"p91979";"Jon Flanagan";"Defender";"Liverpool";10000000;"VL"
+"p56979";"Jordan Henderson";"Midfielder";"Liverpool";10000000;"L"
+"p103912";"Jordon Ibe";"Forward";"Liverpool";10000000;"VL"
+"p26725";"José Enrique";"Defender";"Liverpool";10000000;"VL"
+"p12450";"Kolo Touré";"Defender";"Liverpool";10000000;"VL"
+"p99323";"Lazar Markovic";"Forward";"Liverpool";10000000;"VL"
+"p43191";"Lucas Leiva";"Midfielder";"Liverpool";10000000;"VL"
+"p40784";"Mamadou Sakho";"Defender";"Liverpool";10000000;"L"
+"p58786";"Martin Kelly";"Defender";"Liverpool";10000000;"VL"
+"p26793";"Martin Skrtel";"Defender";"Liverpool";10000000;"L"
+"p77305";"Oussama Assaidi";"Midfielder";"Liverpool";10000000;"VL"
+"p84583";"Philippe Coutinho";"Midfielder";"Liverpool";10000000;"M"
+"p103955";"Raheem Sterling";"Midfielder";"Liverpool";10000000;"L"
+"p11037";"Rickie Lambert";"Forward";"Liverpool";10000000;"VL"
+"p109009";"Ryan McLaughlin";"Defender";"Liverpool";10000000;"VL"
+"p78108";"Sebastián Coates";"Defender";"Liverpool";10000000;"VL"
+"p66797";"Simon Mignolet";"Goalkeeper";"Liverpool";10000000;"M"
+"p1814";"Steven Gerrard";"Midfielder";"Liverpool";10000000;"M"
+"p103953";"Suso";"Midfielder";"Liverpool";10000000;"VL"
+"p102548";"Tiago Ilori";"Defender";"Liverpool";10000000;"VL"
+"p18726";"Artur Boruc";"Goalkeeper";"Southampton";10000000;"VL"
+"p101135";"Cody Cropper";"Goalkeeper";"Southampton";10000000;"VL"
+"p62399";"Dusan Tadic";"Midfielder";"Southampton";10000000;"L"
+"p49596";"Emmanuel Mayuka";"Forward";"Southampton";10000000;"VL"
+"p40383";"Fraser Forster";"Goalkeeper";"Southampton";10000000;"L"
+"p78091";"Gastón Ramírez";"Midfielder";"Southampton";10000000;"VL"
+"p17784";"Graziano Pellè";"Forward";"Southampton";10000000;"VL"
+"p153366";"Harrison Reed";"Midfielder";"Southampton";10000000;"VL"
+"p40145";"Jack Cork";"Midfielder";"Southampton";10000000;"VL"
+"p88900";"Jack Stephens";"Defender";"Southampton";10000000;"VL"
+"p101178";"James Ward-Prowse";"Midfielder";"Southampton";10000000;"VL"
+"p44683";"Jay Rodriguez";"Forward";"Southampton";10000000;"L"
+"p15976";"Jos Hooiveld";"Defender";"Southampton";10000000;"VL"
+"p38580";"Jose Fonte";"Defender";"Southampton";10000000;"VL"
+"p3673";"Kelvin Davis";"Goalkeeper";"Southampton";10000000;"VL"
+"p101179";"Lloyd Isgrove";"Midfielder";"Southampton";10000000;"VL"
+"p169359";"Matt Targett";"Defender";"Southampton";10000000;"VL"
+"p80447";"Maya Yoshida";"Defender";"Southampton";10000000;"VL"
+"p42774";"Morgan Schneiderlin";"Midfielder";"Southampton";10000000;"M"
+"p57328";"Nathaniel Clyne";"Defender";"Southampton";10000000;"VL"
+"p102884";"Paulo Gazzaniga";"Goalkeeper";"Southampton";10000000;"VL"
+"p40146";"Ryan Bertrand";"Defender";"Southampton";10000000;"VL"
+"p153371";"Sam Gallagher";"Forward";"Southampton";10000000;"VL"
+"p153373";"Sam McQueen";"Midfielder";"Southampton";10000000;"VL"
+"p82752";"Saphir Taïder";"Midfielder";"Southampton";10000000;"VL"
+"p17339";"Steven Davis";"Midfielder";"Southampton";10000000;"VL"
+"p54756";"Victor Wanyama";"Midfielder";"Southampton";10000000;"L"
+"p55459";"Aaron Cresswell";"Defender";"West Ham United";10000000;"VL"
+"p60706";"Adrián";"Goalkeeper";"West Ham United";10000000;"VL"
+"p40142";"Andy Carroll";"Forward";"West Ham United";10000000;"L"
+"p146445";"Blair Turgott";"Midfielder";"West Ham United";10000000;"VL"
+"p80254";"Carl Jenkinson";"Defender";"West Ham United";10000000;"VL"
+"p12799";"Carlton Cole";"Forward";"West Ham United";10000000;"VL"
+"p55037";"Cheikhou Kouyaté";"Midfielder";"West Ham United";10000000;"VL"
+"p108411";"Daniel Potts";"Defender";"West Ham United";10000000;"VL"
+"p95322";"Danny Whitehead";"Midfielder";"West Ham United";10000000;"VL"
+"p103527";"Diego Poyet";"Midfielder";"West Ham United";10000000;"VL"
+"p149485";"Elliot Lee";"Forward";"West Ham United";10000000;"VL"
+"p148179";"Enner Valencia";"Forward";"West Ham United";10000000;"L"
+"p10356";"Guy Demel";"Defender";"West Ham United";10000000;"VL"
+"p108415";"Jaanai Gordon";"Forward";"West Ham United";10000000;"VL"
+"p8380";"James Collins";"Defender";"West Ham United";10000000;"VL"
+"p49413";"James Tomkins";"Defender";"West Ham United";10000000;"VL"
+"p19575";"Joey O'Brien";"Defender";"West Ham United";10000000;"VL"
+"p1344";"Jussi Jääskeläinen";"Goalkeeper";"West Ham United";10000000;"VL"
+"p5306";"Kevin Nolan";"Midfielder";"West Ham United";10000000;"VL"
+"p137951";"Leo Chambers";"Defender";"West Ham United";10000000;"VL"
+"p18073";"Mark Noble";"Midfielder";"West Ham United";10000000;"VL"
+"p18818";"Matthew Jarvis";"Midfielder";"West Ham United";10000000;"VL"
+"p129028";"Matthias Fanimo";"Midfielder";"West Ham United";10000000;"VL"
+"p49696";"Mauro Zárate";"Forward";"West Ham United";10000000;"VL"
+"p42954";"Modibo Maiga";"Forward";"West Ham United";10000000;"VL"
+"p28147";"Mohamed Diamé";"Midfielder";"West Ham United";10000000;"VL"
+"p90518";"Ravel Morrison";"Midfielder";"West Ham United";10000000;"VL"
+"p156658";"Reece Burke";"Defender";"West Ham United";10000000;"VL"
+"p17353";"Ricardo Vaz Te";"Forward";"West Ham United";10000000;"VL"
+"p88534";"Sebastian Lletget";"Midfielder";"West Ham United";10000000;"VL"
+"p12002";"Stewart Downing";"Midfielder";"West Ham United";10000000;"VL"
+"p48717";"Winston Reid";"Defender";"West Ham United";10000000;"VL"
+"p41792";"Aaron Ramsey";"Midfielder";"Arsenal";10000000;"M"
+"p81880";"Alex Oxlade-Chamberlain";"Midfielder";"Arsenal";10000000;"L"
+"p37265";"Alexis Sánchez";"Forward";"Arsenal";10000000;"H"
+"p101184";"Calum Chambers";"Defender";"Arsenal";10000000;"L"
+"p147675";"Chuba Akpom";"Forward";"Arsenal";10000000;"VL"
+"p98980";"Damián Martinez";"Goalkeeper";"Arsenal";10000000;"VL"
+"p48844";"David Ospina";"Goalkeeper";"Arsenal";10000000;"VL"
+"p56864";"Francis Coquelin";"Midfielder";"Arsenal";10000000;"VL"
+"p158870";"Gedion Zelalem";"Midfielder";"Arsenal";10000000;"VL"
+"p98745";"Héctor Bellerín";"Defender";"Arsenal";10000000;"VL"
+"p90801";"Ignasi Miquel";"Defender";"Arsenal";10000000;"VL"
+"p153127";"Isaac Hayden";"Defender";"Arsenal";10000000;"VL"
+"p54102";"Jack Wilshere";"Midfielder";"Arsenal";10000000;"H"
+"p99127";"Joel Campbell";"Forward";"Arsenal";10000000;"VL"
+"p42427";"Kieran Gibbs";"Defender";"Arsenal";10000000;"L"
+"p51507";"Laurent Koscielny";"Defender";"Arsenal";10000000;"M"
+"p17733";"Lukas Podolski";"Forward";"Arsenal";10000000;"M"
+"p27334";"Mathieu Debuchy";"Defender";"Arsenal";10000000;"L"
+"p18155";"Mathieu Flamini";"Midfielder";"Arsenal";10000000;"VL"
+"p37605";"Mesut Özil";"Midfielder";"Arsenal";10000000;"VH"
+"p8758";"Mikel Arteta";"Midfielder";"Arsenal";10000000;"VL"
+"p38411";"Nacho Monreal";"Defender";"Arsenal";10000000;"VL"
+"p44346";"Olivier Giroud";"Forward";"Arsenal";10000000;"M"
+"p17127";"Per Mertesacker";"Defender";"Arsenal";10000000;"L"
+"p92372";"Ryo Miyaichi";"Midfielder";"Arsenal";10000000;"VL"
+"p19524";"Santiago Cazorla";"Midfielder";"Arsenal";10000000;"M"
+"p133798";"Serge Gnabry";"Midfielder";"Arsenal";10000000;"VL"
+"p20467";"Theo Walcott";"Forward";"Arsenal";10000000;"M"
+"p8597";"Tomas Rosicky";"Midfielder";"Arsenal";10000000;"VL"
+"p28566";"Vassiriki Abou Diaby";"Midfielder";"Arsenal";10000000;"VL"
+"p59936";"Wojciech Szczesny";"Goalkeeper";"Arsenal";10000000;"M"
+"p80711";"Yaya Sanogo";"Forward";"Arsenal";10000000;"VL"
+"p44302";"Adlène Guédioura";"Midfielder";"Crystal Palace";10000000;"VL"
+"p20145";"Adrian Mariappa";"Defender";"Crystal Palace";10000000;"VL"
+"p59013";"Barry Bannan";"Midfielder";"Crystal Palace";10000000;"VL"
+"p15284";"Brede Hangeland";"Defender";"Crystal Palace";10000000;"VL"
+"p93856";"Chris Kettings";"Goalkeeper";"Crystal Palace";10000000;"VL"
+"p7906";"Damien Delaney";"Defender";"Crystal Palace";10000000;"VL"
+"p104547";"Dwight Gayle";"Forward";"Crystal Palace";10000000;"VL"
+"p28541";"Fraizer Campbell";"Forward";"Crystal Palace";10000000;"VL"
+"p20529";"Glenn Murray";"Forward";"Crystal Palace";10000000;"VL"
+"p130103";"Hiram Boateng";"Midfielder";"Crystal Palace";10000000;"VL"
+"p19197";"Jason Puncheon";"Midfielder";"Crystal Palace";10000000;"VL"
+"p12765";"Jerome Thomas";"Midfielder";"Crystal Palace";10000000;"VL"
+"p28145";"Jimmy Kébé";"Midfielder";"Crystal Palace";10000000;"VL"
+"p18805";"Joe Ledley";"Midfielder";"Crystal Palace";10000000;"VL"
+"p55494";"Joel Ward";"Defender";"Crystal Palace";10000000;"VL"
+"p103100";"Jonathan Williams";"Midfielder";"Crystal Palace";10000000;"VL"
+"p11554";"Julian Speroni";"Goalkeeper";"Crystal Palace";10000000;"VL"
+"p16230";"Lewis Price";"Goalkeeper";"Crystal Palace";10000000;"VL"
+"p15675";"Marouane Chamakh";"Forward";"Crystal Palace";10000000;"VL"
+"p59115";"Mile Jedinak";"Midfielder";"Crystal Palace";10000000;"VL"
+"p19527";"Owen Garvan";"Midfielder";"Crystal Palace";10000000;"VL"
+"p15274";"Patrick McCarthy";"Defender";"Crystal Palace";10000000;"VL"
+"p18146";"Peter Ramage";"Defender";"Crystal Palace";10000000;"VL"
+"p19188";"Scott Dann";"Defender";"Crystal Palace";10000000;"VL"
+"p53582";"Stuart O'Keefe";"Midfielder";"Crystal Palace";10000000;"VL"
+"p20066";"Wayne Hennessey";"Goalkeeper";"Crystal Palace";10000000;"VL"
+"p55452";"Yannick Bolasie";"Midfielder";"Crystal Palace";10000000;"VL"
+"p151069";"Adil Nabi";"Forward";"West Bromwich Albion";10000000;"VL"
+"p89088";"Andre Wisdom";"Defender";"West Bromwich Albion";10000000;"VL"
+"p9089";"Ben Foster";"Goalkeeper";"West Bromwich Albion";10000000;"VL"
+"p12086";"Boaz Myhill";"Goalkeeper";"West Bromwich Albion";10000000;"VL"
+"p153933";"Bradley Garmston";"Defender";"West Bromwich Albion";10000000;"VL"
+"p49958";"Brown Ideye";"Forward";"West Bromwich Albion";10000000;"L"
+"p15968";"Chris Baird";"Defender";"West Bromwich Albion";10000000;"VL"
+"p19151";"Chris Brunt";"Midfielder";"West Bromwich Albion";10000000;"VL"
+"p55829";"Claudio Yacob";"Midfielder";"West Bromwich Albion";10000000;"VL"
+"p60232";"Craig Dawson";"Defender";"West Bromwich Albion";10000000;"VL"
+"p28468";"Craig Gardner";"Midfielder";"West Bromwich Albion";10000000;"VL"
+"p77760";"Cristian Gamboa";"Defender";"West Bromwich Albion";10000000;"VL"
+"p19272";"Gareth McAuley";"Defender";"West Bromwich Albion";10000000;"VL"
+"p20141";"Graham Dorrans";"Midfielder";"West Bromwich Albion";10000000;"VL"
+"p18008";"James Morrison";"Midfielder";"West Bromwich Albion";10000000;"VL"
+"p80480";"Jason Davidson";"Defender";"West Bromwich Albion";10000000;"VL"
+"p7551";"Joleon Lescott";"Defender";"West Bromwich Albion";10000000;"VL"
+"p39253";"Jonas Olsson";"Defender";"West Bromwich Albion";10000000;"VL"
+"p98760";"Kemar Roofe";"Midfielder";"West Bromwich Albion";10000000;"VL"
+"p153475";"Liam O'Neil";"Defender";"West Bromwich Albion";10000000;"VL"
+"p38219";"Luke Daniels";"Goalkeeper";"West Bromwich Albion";10000000;"VL"
+"p91972";"Saido Berahino";"Forward";"West Bromwich Albion";10000000;"VL"
+"p42583";"Sébastien Pocognoli";"Defender";"West Bromwich Albion";10000000;"VL"
+"p34392";"Stéphane Sessegnon";"Midfielder";"West Bromwich Albion";10000000;"VL"
+"p28593";"Victor Anichebe";"Forward";"West Bromwich Albion";10000000;"VL"
+"p39895";"Youssuf Mulumbu";"Midfielder";"West Bromwich Albion";10000000;"VL"
+"p155511";"Adam Armstrong";"Forward";"Newcastle United";10000000;"VL"
+"p168580";"Ayoze Pérez";"Forward";"Newcastle United";10000000;"VL"
+"p28301";"Cheick Tioté";"Midfielder";"Newcastle United";10000000;"VL"
+"p124584";"Curtis Good";"Defender";"Newcastle United";10000000;"VL"
+"p52940";"Daryl Janmaat";"Defender";"Newcastle United";10000000;"VL"
+"p55604";"Davide Santon";"Defender";"Newcastle United";10000000;"VL"
+"p51621";"Emmanuel Rivière";"Forward";"Newcastle United";10000000;"VL"
+"p7933";"Fabricio Coloccini";"Defender";"Newcastle United";10000000;"VL"
+"p86527";"Facundo Ferreyra";"Forward";"Newcastle United";10000000;"VL"
+"p38429";"Gabriel Obertan";"Midfielder";"Newcastle United";10000000;"VL"
+"p87112";"Gael Bigirimana";"Midfielder";"Newcastle United";10000000;"VL"
+"p59304";"Haris Vuckic";"Midfielder";"Newcastle United";10000000;"VL"
+"p18753";"Hatem Ben Arfa";"Midfielder";"Newcastle United";10000000;"VL"
+"p58771";"Jack Colback";"Midfielder";"Newcastle United";10000000;"VL"
+"p106256";"Jak Alnwick";"Goalkeeper";"Newcastle United";10000000;"VL"
+"p21060";"Jonás Gutiérrez";"Midfielder";"Newcastle United";10000000;"VL"
+"p156257";"Lubomir Satka";"Defender";"Newcastle United";10000000;"VL"
+"p44488";"Mapou Yanga-Mbiwa";"Defender";"Newcastle United";10000000;"VL"
+"p92170";"Massadio Haidara";"Defender";"Newcastle United";10000000;"VL"
+"p98746";"Mehdi Abeid";"Midfielder";"Newcastle United";10000000;"VL"
+"p11378";"Michael Williamson";"Defender";"Newcastle United";10000000;"VL"
+"p45268";"Moussa Sissoko";"Midfielder";"Newcastle United";10000000;"L"
+"p42758";"Papiss Demba Cissé";"Forward";"Newcastle United";10000000;"VL"
+"p106618";"Paul Dummett";"Defender";"Newcastle United";10000000;"VL"
+"p149465";"Remie Streete";"Defender";"Newcastle United";10000000;"VL"
+"p66957";"Rémy Cabella";"Midfielder";"Newcastle United";10000000;"L"
+"p19838";"Robert Elliot";"Goalkeeper";"Newcastle United";10000000;"VL"
+"p155513";"Rolando Aarons";"Midfielder";"Newcastle United";10000000;"VL"
+"p14775";"Ryan Taylor";"Defender";"Newcastle United";10000000;"VL"
+"p97612";"Sammy Ameobi";"Forward";"Newcastle United";10000000;"VL"
+"p61944";"Shane Ferguson";"Defender";"Newcastle United";10000000;"VL"
+"p48773";"Siem de Jong";"Forward";"Newcastle United";10000000;"L"
+"p17974";"Steven Taylor";"Defender";"Newcastle United";10000000;"VL"
+"p20480";"Tim Krul";"Goalkeeper";"Newcastle United";10000000;"L"
+"p40799";"Vurnon Anita";"Midfielder";"Newcastle United";10000000;"VL"
+"p42727";"Yoan Gouffran";"Forward";"Newcastle United";10000000;"VL"
+"p42593";"Aleksandar Kolarov";"Defender";"Manchester City";10000000;"VL"
+"p42892";"Álvaro Negredo";"Forward";"Manchester City";10000000;"L"
+"p37748";"Bacary Sagna";"Defender";"Manchester City";10000000;"L"
+"p86814";"Bruno Zuculini";"Midfielder";"Manchester City";10000000;"VL"
+"p20664";"David Silva";"Midfielder";"Manchester City";10000000;"VH"
+"p80235";"Dedryck Boyata";"Defender";"Manchester City";10000000;"VL"
+"p42544";"Edin Dzeko";"Forward";"Manchester City";10000000;"M"
+"p57112";"Eliaquim Mangala";"Defender";"Manchester City";10000000;"M"
+"p27789";"Fernandinho";"Midfielder";"Manchester City";10000000;"H"
+"p52538";"Fernando";"Midfielder";"Manchester City";10000000;"L"
+"p2051";"Frank Lampard";"Midfielder";"Manchester City";10000000;"L"
+"p17336";"Gaël Clichy";"Defender";"Manchester City";10000000;"L"
+"p15157";"James Milner";"Midfielder";"Manchester City";10000000;"L"
+"p19534";"Javi García";"Midfielder";"Manchester City";10000000;"L"
+"p17740";"Jesús Navas";"Midfielder";"Manchester City";10000000;"M"
+"p15749";"Joe Hart";"Goalkeeper";"Manchester City";10000000;"L"
+"p82970";"John Guidetti";"Forward";"Manchester City";10000000;"VL"
+"p103040";"Karim Rekik";"Defender";"Manchester City";10000000;"VL"
+"p15312";"Martín Demichelis";"Defender";"Manchester City";10000000;"VL"
+"p84702";"Matija Nastasic";"Defender";"Manchester City";10000000;"M"
+"p20492";"Micah Richards";"Defender";"Manchester City";10000000;"VL"
+"p20658";"Pablo Zabaleta";"Defender";"Manchester City";10000000;"L"
+"p1101";"Richard Wright";"Goalkeeper";"Manchester City";10000000;"VL"
+"p28554";"Samir Nasri";"Midfielder";"Manchester City";10000000;"M"
+"p19688";"Scott Sinclair";"Midfielder";"Manchester City";10000000;"VL"
+"p37572";"Sergio Agüero";"Forward";"Manchester City";10000000;"VH"
+"p50442";"Stevan Jovetic";"Forward";"Manchester City";10000000;"M"
+"p17476";"Vincent Kompany";"Defender";"Manchester City";10000000;"H"
+"p20310";"Willy Caballero";"Goalkeeper";"Manchester City";10000000;"VL"
+"p14664";"Yaya Touré";"Midfielder";"Manchester City";10000000;"H"
+"p39765";"Adel Taarabt";"Midfielder";"Queens Park Rangers";10000000;"VL"
+"p67731";"Alejandro Faurlin";"Midfielder";"Queens Park Rangers";10000000;"VL"
+"p20488";"Armand Traore";"Defender";"Queens Park Rangers";10000000;"VL"
+"p4570";"Bobby Zamora";"Forward";"Queens Park Rangers";10000000;"VL"
+"p10589";"Brian Murphy";"Goalkeeper";"Queens Park Rangers";10000000;"VL"
+"p78356";"Charlie Austin";"Forward";"Queens Park Rangers";10000000;"VL"
+"p1216";"Clint Hill";"Defender";"Queens Park Rangers";10000000;"VL"
+"p40725";"Danny Simpson";"Defender";"Queens Park Rangers";10000000;"VL"
+"p10451";"Jermaine Jenas";"Midfielder";"Queens Park Rangers";10000000;"VL"
+"p15276";"Joey Barton";"Midfielder";"Queens Park Rangers";10000000;"VL"
+"p49438";"Jordon Mutch";"Midfielder";"Queens Park Rangers";10000000;"VL"
+"p19928";"Julio César";"Goalkeeper";"Queens Park Rangers";10000000;"VL"
+"p49806";"Junior Hoilett";"Midfielder";"Queens Park Rangers";10000000;"VL"
+"p10561";"Karl Henry";"Midfielder";"Queens Park Rangers";10000000;"VL"
+"p38419";"Loïc Remy";"Forward";"Queens Park Rangers";10000000;"L"
+"p50229";"Matthew Phillips";"Midfielder";"Queens Park Rangers";10000000;"VL"
+"p48852";"Mauricio Isla";"Defender";"Queens Park Rangers";10000000;"VL"
+"p87117";"Max Ehmer";"Defender";"Queens Park Rangers";10000000;"VL"
+"p92790";"Michael Harriman";"Defender";"Queens Park Rangers";10000000;"VL"
+"p167890";"Michael Petrasso";"Midfielder";"Queens Park Rangers";10000000;"VL"
+"p19053";"Nedum Onuoha";"Defender";"Queens Park Rangers";10000000;"VL"
+"p1764";"Richard Dunne";"Defender";"Queens Park Rangers";10000000;"VL"
+"p2034";"Rio Ferdinand";"Defender";"Queens Park Rangers";10000000;"VL"
+"p1243";"Robert Green";"Goalkeeper";"Queens Park Rangers";10000000;"VL"
+"p1212";"Shaun Wright-Phillips";"Midfielder";"Queens Park Rangers";10000000;"VL"
+"p68815";"Steven Caulker";"Defender";"Queens Park Rangers";10000000;"VL"
+"p77875";"Yun Suk-Young";"Defender";"Queens Park Rangers";10000000;"VL"
+"p19959";"Adam Johnson";"Midfielder";"Sunderland";10000000;"VL"
+"p49688";"Alfred N'Diaye";"Midfielder";"Sunderland";10000000;"VL"
+"p11467";"Billy Jones";"Defender";"Sunderland";10000000;"VL"
+"p43570";"Cabral";"Midfielder";"Sunderland";10000000;"VL"
+"p88601";"Charalampos Mavrias";"Midfielder";"Sunderland";10000000;"VL"
+"p59125";"Connor Wickham";"Forward";"Sunderland";10000000;"VL"
+"p56827";"Costel Pantilimon";"Goalkeeper";"Sunderland";10000000;"VL"
+"p15398";"Danny Graham";"Forward";"Sunderland";10000000;"VL"
+"p115854";"Duncan Watmore";"Forward";"Sunderland";10000000;"VL"
+"p55641";"Emanuele Giaccherini";"Midfielder";"Sunderland";10000000;"VL"
+"p49384";"Jack Rodwell";"Midfielder";"Sunderland";10000000;"L"
+"p3736";"John O'Shea";"Defender";"Sunderland";10000000;"VL"
+"p50023";"Jordi Gómez";"Midfielder";"Sunderland";10000000;"VL"
+"p41574";"Jozy Altidore";"Forward";"Sunderland";10000000;"VL"
+"p28448";"Lee Cattermole";"Midfielder";"Sunderland";10000000;"VL"
+"p49836";"Liam Bridcutt";"Midfielder";"Sunderland";10000000;"VL"
+"p114312";"Mikael Mandron";"Forward";"Sunderland";10000000;"VL"
+"p39453";"Modibo Diakité";"Defender";"Sunderland";10000000;"VL"
+"p74230";"Patrick van Aanholt";"Defender";"Sunderland";10000000;"VL"
+"p88372";"Santiago Vergini";"Defender";"Sunderland";10000000;"VL"
+"p19057";"Sebastian Larsson";"Midfielder";"Sunderland";10000000;"VL"
+"p18953";"Steven Fletcher";"Forward";"Sunderland";10000000;"VL"
+"p52828";"Valentin Roberge";"Defender";"Sunderland";10000000;"VL"
+"p20487";"Vito Mannone";"Goalkeeper";"Sunderland";10000000;"VL"
+"p1841";"Wes Brown";"Defender";"Sunderland";10000000;"VL"
+"p17349";"Aaron Lennon";"Midfielder";"Tottenham Hotspur";10000000;"L"
+"p60252";"Andros Townsend";"Midfielder";"Tottenham Hotspur";10000000;"VL"
+"p115556";"Ben Davies";"Defender";"Tottenham Hotspur";10000000;"L"
+"p28146";"Benoit Assou-Ekotto";"Defender";"Tottenham Hotspur";10000000;"VL"
+"p61887";"Bongani Khumalo";"Defender";"Tottenham Hotspur";10000000;"VL"
+"p1803";"Brad Friedel";"Goalkeeper";"Tottenham Hotspur";10000000;"VL"
+"p80607";"Christian Eriksen";"Midfielder";"Tottenham Hotspur";10000000;"M"
+"p101623";"Cristian Ceballos";"Midfielder";"Tottenham Hotspur";10000000;"VL"
+"p38290";"Danny Rose";"Defender";"Tottenham Hotspur";10000000;"VL"
+"p17500";"Emmanuel Adebayor";"Forward";"Tottenham Hotspur";10000000;"L"
+"p93264";"Eric Dier";"Defender";"Tottenham Hotspur";10000000;"VL"
+"p62974";"Erik Lamela";"Midfielder";"Tottenham Hotspur";10000000;"M"
+"p38439";"Etienne Capoue";"Midfielder";"Tottenham Hotspur";10000000;"VL"
+"p106603";"Ezekiel Fryers";"Defender";"Tottenham Hotspur";10000000;"VL"
+"p78830";"Harry Kane";"Forward";"Tottenham Hotspur";10000000;"VL"
+"p37915";"Hugo Lloris";"Goalkeeper";"Tottenham Hotspur";10000000;"L"
+"p39194";"Jan Vertonghen";"Defender";"Tottenham Hotspur";10000000;"L"
+"p58790";"Jonathan Obika";"Forward";"Tottenham Hotspur";10000000;"VL"
+"p49539";"Kyle Naughton";"Defender";"Tottenham Hotspur";10000000;"VL"
+"p58621";"Kyle Walker";"Defender";"Tottenham Hotspur";10000000;"L"
+"p49318";"Lewis Holtby";"Midfielder";"Tottenham Hotspur";10000000;"VL"
+"p12679";"Michael Dawson";"Defender";"Tottenham Hotspur";10000000;"VL"
+"p39215";"Michel Vorm";"Goalkeeper";"Tottenham Hotspur";10000000;"VL"
+"p153265";"Milos Veljkovic";"Defender";"Tottenham Hotspur";10000000;"VL"
+"p39104";"Mousa Dembélé";"Midfielder";"Tottenham Hotspur";10000000;"L"
+"p126407";"Nabil Bentaleb";"Midfielder";"Tottenham Hotspur";10000000;"VL"
+"p54908";"Nacer Chadli";"Midfielder";"Tottenham Hotspur";10000000;"VL"
+"p100534";"Paulinho";"Midfielder";"Tottenham Hotspur";10000000;"L"
+"p17926";"Roberto Soldado";"Forward";"Tottenham Hotspur";10000000;"L"
+"p81012";"Ryan Fredericks";"Defender";"Tottenham Hotspur";10000000;"VL"
+"p58791";"Ryan Mason";"Midfielder";"Tottenham Hotspur";10000000;"VL"
+"p52876";"Sandro";"Midfielder";"Tottenham Hotspur";10000000;"L"
+"p93464";"Tom Carroll";"Midfielder";"Tottenham Hotspur";10000000;"VL"
+"p62305";"Vlad Chiriches";"Defender";"Tottenham Hotspur";10000000;"L"
+"p37742";"Younes Kaboul";"Defender";"Tottenham Hotspur";10000000;"VL"
+"p15405";"Alan Hutton";"Defender";"Aston Villa";10000000;"VL"
+"p44354";"Aly Cissokho";"Defender";"Aston Villa";10000000;"VL"
+"p80979";"Andreas Weimann";"Forward";"Aston Villa";10000000;"VL"
+"p60551";"Ashley Westwood";"Midfielder";"Aston Villa";10000000;"VL"
+"p99168";"Benjamin Siegrist";"Goalkeeper";"Aston Villa";10000000;"VL"
+"p41705";"Brad Guzan";"Goalkeeper";"Aston Villa";10000000;"VL"
+"p171975";"Callum Robinson";"Forward";"Aston Villa";10000000;"VL"
+"p18737";"Charles N'Zogbia";"Midfielder";"Aston Villa";10000000;"VL"
+"p49493";"Chris Herd";"Midfielder";"Aston Villa";10000000;"VL"
+"p54861";"Christian Benteke";"Forward";"Aston Villa";10000000;"L"
+"p58845";"Ciaran Clark";"Defender";"Aston Villa";10000000;"VL"
+"p10738";"Darren Bent";"Forward";"Aston Villa";10000000;"VL"
+"p63426";"Enda Stevens";"Defender";"Aston Villa";10000000;"VL"
+"p41823";"Fabian Delph";"Midfielder";"Aston Villa";10000000;"VL"
+"p27450";"Gabriel Agbonlahor";"Forward";"Aston Villa";10000000;"VL"
+"p77800";"Gary Gardner";"Midfielder";"Aston Villa";10000000;"VL"
+"p106602";"Graham Burke";"Forward";"Aston Villa";10000000;"VL"
+"p114283";"Jack Grealish";"Midfielder";"Aston Villa";10000000;"VL"
+"p154936";"Janoi Donacien";"Defender";"Aston Villa";10000000;"VL"
+"p56981";"Joe Bennett";"Defender";"Aston Villa";10000000;"VL"
+"p2060";"Joe Cole";"Midfielder";"Aston Villa";10000000;"VL"
+"p80502";"Jores Okore";"Defender";"Aston Villa";10000000;"VL"
+"p39242";"Karim El Ahmadi";"Midfielder";"Aston Villa";10000000;"VL"
+"p15073";"Kieran Richardson";"Midfielder";"Aston Villa";10000000;"VL"
+"p74297";"Leandro Bacuna";"Defender";"Aston Villa";10000000;"VL"
+"p51950";"Libor Kozák";"Forward";"Aston Villa";10000000;"VL"
+"p68983";"Matthew Lowton";"Defender";"Aston Villa";10000000;"VL"
+"p52477";"Nathan Baker";"Defender";"Aston Villa";10000000;"VL"
+"p16854";"Philippe Senderos";"Defender";"Aston Villa";10000000;"VL"
+"p21095";"Ron Vlaar";"Defender";"Aston Villa";10000000;"VL"
+"p1822";"Shay Given";"Goalkeeper";"Aston Villa";10000000;"VL"
+"p66842";"André Schürrle";"Midfielder";"Chelsea";10000000;"M"
+"p135363";"Andreas Christensen";"Defender";"Chelsea";10000000;"F"
+"p41135";"Branislav Ivanovic";"Defender";"Chelsea";10000000;"L"
+"p41328";"César Azpilicueta";"Defender";"Chelsea";10000000;"M"
+"p104953";"Christian Atsu";"Midfielder";"Chelsea";10000000;"VL"
+"p12303";"Didier Drogba";"Forward";"Chelsea";10000000;"VL"
+"p18507";"Diego Costa";"Forward";"Chelsea";10000000;"H"
+"p42786";"Eden Hazard";"Midfielder";"Chelsea";10000000;"VH"
+"p14402";"Fernando Torres";"Forward";"Chelsea";10000000;"L"
+"p18595";"Filipe Luis";"Defender";"Chelsea";10000000;"L"
+"p17878";"Francesc Fábregas";"Midfielder";"Chelsea";10000000;"VH"
+"p19419";"Gary Cahill";"Defender";"Chelsea";10000000;"M"
+"p108132";"Jamal Blackman";"Goalkeeper";"Chelsea";10000000;"VL"
+"p28495";"John Obi Mikel";"Midfielder";"Chelsea";10000000;"VL"
+"p1718";"John Terry";"Defender";"Chelsea";10000000;"VL"
+"p88821";"Joshua McEachran";"Midfielder";"Chelsea";10000000;"VL"
+"p103192";"Kurt Zouma";"Defender";"Chelsea";10000000;"VL"
+"p82660";"Marco Van Ginkel";"Midfielder";"Chelsea";10000000;"VL"
+"p1827";"Mark Schwarzer";"Goalkeeper";"Chelsea";10000000;"VL"
+"p41450";"Marko Marin";"Midfielder";"Chelsea";10000000;"VL"
+"p68250";"Matej Delac";"Goalkeeper";"Chelsea";10000000;"VL"
+"p118748";"Mohamed Salah";"Midfielder";"Chelsea";10000000;"L"
+"p126184";"Nathan Aké";"Defender";"Chelsea";10000000;"VL"
+"p89085";"Nathaniel Chalobah";"Midfielder";"Chelsea";10000000;"VL"
+"p62398";"Nemanja Matic";"Midfielder";"Chelsea";10000000;"M"
+"p61262";"Oscar";"Midfielder";"Chelsea";10000000;"H"
+"p106617";"Patrick Bamford";"Forward";"Chelsea";10000000;"VL"
+"p11334";"Petr Cech";"Goalkeeper";"Chelsea";10000000;"L"
+"p53392";"Ramires";"Midfielder";"Chelsea";10000000;"M"
+"p140941";"Stipe Perica";"Forward";"Chelsea";10000000;"VL"
+"p60772";"Thibaut Courtois";"Goalkeeper";"Chelsea";10000000;"M"
+"p120449";"Todd Kane";"Defender";"Chelsea";10000000;"VL"
+"p71963";"Uli Dávila";"Midfielder";"Chelsea";10000000;"VL"
+"p49013";"Victor Moses";"Midfielder";"Chelsea";10000000;"VL"
+"p47431";"Willian";"Midfielder";"Chelsea";10000000;"H"
+"p148420";"Adam King";"Midfielder";"Swansea City";10000000;"VL"
+"p11883";"Alan Tate";"Defender";"Swansea City";10000000;"VL"
+"p42996";"Angel Rangel";"Defender";"Swansea City";10000000;"VL"
+"p73459";"Ashley Richards";"Defender";"Swansea City";10000000;"VL"
+"p19159";"Ashley Williams";"Defender";"Swansea City";10000000;"VL"
+"p37998";"Bafétimbi Gomis";"Forward";"Swansea City";10000000;"L"
+"p73983";"Curtis Obeng";"Defender";"Swansea City";10000000;"VL"
+"p60084";"David Cornell";"Goalkeeper";"Swansea City";10000000;"VL"
+"p39221";"Dwight Tiendalli";"Defender";"Swansea City";10000000;"VL"
+"p5288";"Gerhard Tremmel";"Goalkeeper";"Swansea City";10000000;"VL"
+"p120385";"Gregor Zabret";"Goalkeeper";"Swansea City";10000000;"VL"
+"p55422";"Gylfi Sigurdsson";"Midfielder";"Swansea City";10000000;"L"
+"p96305";"Jay Fulton";"Midfielder";"Swansea City";10000000;"VL"
+"p49195";"Jefferson Montero";"Midfielder";"Swansea City";10000000;"VL"
+"p50232";"Jonjo Shelvey";"Midfielder";"Swansea City";10000000;"L"
+"p80789";"Jordi Amat";"Defender";"Swansea City";10000000;"VL"
+"p86989";"José Cañas";"Midfielder";"Swansea City";10000000;"VL"
+"p76542";"Ki Sung-Yueng";"Midfielder";"Swansea City";10000000;"VL"
+"p59940";"Kyle Bartley";"Defender";"Swansea City";10000000;"VL"
+"p82055";"Lee Lucas";"Midfielder";"Swansea City";10000000;"VL"
+"p15114";"Leon Britton";"Midfielder";"Swansea City";10000000;"VL"
+"p37096";"Lukasz Fabianski";"Goalkeeper";"Swansea City";10000000;"VL"
+"p39270";"Marvin Emnes";"Forward";"Swansea City";10000000;"VL"
+"p21083";"Nathan Dyer";"Midfielder";"Swansea City";10000000;"VL"
+"p47390";"Neil Taylor";"Defender";"Swansea City";10000000;"VL"
+"p28690";"Pablo Hernández";"Midfielder";"Swansea City";10000000;"VL"
+"p89505";"Rory Donnelly";"Forward";"Swansea City";10000000;"VL"
+"p96306";"Stephen Kingsley";"Defender";"Swansea City";10000000;"VL"
+"p11829";"Wayne Routledge";"Midfielder";"Swansea City";10000000;"VL"
+"p57001";"Wilfried Bony";"Forward";"Swansea City";10000000;"L"
+"p37339";"Ahmed Elmohamady";"Midfielder";"Hull City";10000000;"VL"
+"p19687";"Alex Bruce";"Defender";"Hull City";10000000;"VL"
+"p12390";"Allan McGregor";"Goalkeeper";"Hull City";10000000;"VL"
+"p122798";"Andrew Robertson";"Defender";"Hull City";10000000;"VL"
+"p157652";"Calaum Jahraldo-Martin";"Forward";"Hull City";10000000;"VL"
+"p19115";"Curtis Davies";"Defender";"Hull City";10000000;"VL"
+"p53371";"David Meyler";"Midfielder";"Hull City";10000000;"VL"
+"p11974";"Eldin Jakupovic";"Goalkeeper";"Hull City";10000000;"VL"
+"p28244";"George Boyd";"Midfielder";"Hull City";10000000;"VL"
+"p95658";"Harry Maguire";"Defender";"Hull City";10000000;"VL"
+"p49944";"Jake Livermore";"Midfielder";"Hull City";10000000;"VL"
+"p43252";"James Chester";"Defender";"Hull City";10000000;"VL"
+"p15137";"Liam Rosenior";"Defender";"Hull City";10000000;"VL"
+"p34285";"Maynor Figueroa";"Defender";"Hull City";10000000;"VL"
+"p62419";"Nikica Jelavic";"Forward";"Hull City";10000000;"VL"
+"p17506";"Paul McShane";"Defender";"Hull City";10000000;"VL"
+"p90517";"Robbie Brady";"Midfielder";"Hull City";10000000;"VL"
+"p18987";"Robert Snodgrass";"Midfielder";"Hull City";10000000;"VL"
+"p20452";"Shane Long";"Forward";"Hull City";10000000;"VL"
+"p27503";"Sone Aluko";"Forward";"Hull City";10000000;"VL"
+"p20462";"Stephen Quinn";"Midfielder";"Hull City";10000000;"VL"
+"p1881";"Steve Harper";"Goalkeeper";"Hull City";10000000;"VL"
+"p15109";"Tom Huddlestone";"Midfielder";"Hull City";10000000;"VL"
+"p86176";"Tom Ince";"Midfielder";"Hull City";10000000;"VL"
+"p51627";"Yannick Sagbo";"Forward";"Hull City";10000000;"VL"
+"p55445";"Alex Cisak";"Goalkeeper";"Burnley";10000000;"VL"
+"p44699";"Ashley Barnes";"Forward";"Burnley";10000000;"VL"
+"p51927";"Ben Mee";"Defender";"Burnley";10000000;"VL"
+"p105692";"Cameron Howieson";"Midfielder";"Burnley";10000000;"VL"
+"p80788";"Daniel Lafferty";"Defender";"Burnley";10000000;"VL"
+"p84939";"Danny Ings";"Forward";"Burnley";10000000;"VL"
+"p19556";"David Jones";"Midfielder";"Burnley";10000000;"VL"
+"p15982";"Dean Marney";"Midfielder";"Burnley";10000000;"VL"
+"p151105";"Jason Gilchrist";"Forward";"Burnley";10000000;"VL"
+"p15706";"Jason Shackell";"Defender";"Burnley";10000000;"VL"
+"p41674";"Kevin Long";"Defender";"Burnley";10000000;"VL"
+"p77794";"Kieran Trippier";"Defender";"Burnley";10000000;"VL"
+"p34654";"Lukas Jutkiewicz";"Forward";"Burnley";10000000;"VL"
+"p55803";"Luke O'Neill";"Defender";"Burnley";10000000;"VL"
+"p66978";"Marvin Sordell";"Forward";"Burnley";10000000;"VL"
+"p8437";"Matthew Gilks";"Goalkeeper";"Burnley";10000000;"VL"
+"p3289";"Matthew Taylor";"Midfielder";"Burnley";10000000;"VL"
+"p2907";"Michael Duff";"Defender";"Burnley";10000000;"VL"
+"p15944";"Michael Kightly";"Midfielder";"Burnley";10000000;"VL"
+"p14161";"Ross Wallace";"Midfielder";"Burnley";10000000;"VL"
+"p40399";"Sam Vokes";"Forward";"Burnley";10000000;"VL"
+"p39158";"Scott Arfield";"Midfielder";"Burnley";10000000;"VL"
+"p105185";"Steven Hewitt";"Midfielder";"Burnley";10000000;"VL"
+"p3332";"Steven Reid";"Defender";"Burnley";10000000;"VL"
+"p124125";"Tom Anderson";"Defender";"Burnley";10000000;"VL"
+"p21205";"Tom Heaton";"Goalkeeper";"Burnley";10000000;"VL"
+"p42824";"Carlos Sánchez";;"Aston Villa";"10000000";"VL"
+"p154566";"Dominic Solanke";;"Chelsea";"10000000";"VL"
+"p138003";"Jerome Williams";;"Crystal Palace";"10000000";"VL"
+"p50471";"James McArthur";;"Crystal Palace";"10000000";"VL"
+"p138006";"Jake Gray";;"Crystal Palace";"10000000";"VL"
+"p20450";"Kevin Doyle";;"Crystal Palace";"10000000";"VL"
+"p138009";"Sullay Kaikai";;"Crystal Palace";"10000000";"VL"
+"p179100";"Jindrich Stanek";;"Everton";"10000000";"VL"
+"p108824";"Brendan Galloway";;"Everton";"10000000";"VL"
+"p8438";"Samuel Eto'o";;"Everton";"10000000";"VL"
+"p112138";"Sam Byrne";;"Everton";"10000000";"VL"
+"p171982";"Brian Lenihan";;"Hull City";"10000000";"VL"
+"p59856";"Abel Hernández";;"Hull City";"10000000";"VL"
+"p100059";"Alberto Moreno";;"Liverpool";"10000000";"L"
+"p42493";"Mario Balotelli";;"Liverpool";"10000000";"L"
+"p58893";"Marcos Rojo";;"Manchester United";"10000000";"L"
+"p160817";"Patrick McNair";;"Manchester United";"10000000";"VL"
+"p170929";"Saidy Janko";;"Manchester United";"10000000";"VL"
+"p106612";"Tom Thorpe";;"Manchester United";"10000000";"VL"
+"p58877";"Daley Blind";;"Manchester United";"10000000";"L"
+"p46497";"Ángel Di María";;"Manchester United";"10000000";"VH"
+"p156689";"Andreas Pereira";;"Manchester United";"10000000";"VL"
+"p48847";"Falcao";;"Manchester United";"10000000";"VH"
+"p55605";"Toby Alderweireld";;"Southampton";"10000000";"VL"
+"p84395";"Florin Gardos";;"Southampton";"10000000";"VL"
+"p110979";"Sadio Mane";;"Southampton";"10000000";"VL"
+"p160901";"Oliver Shenton";;"Stoke City";"10000000";"VL"
+"p86444";"Ricardo Álvarez";;"Sunderland";"10000000";"VL"
+"p49853";"William Buckley";;"Sunderland";"10000000";"VL"
+"p149015";"Martin Smith";;"Sunderland";"10000000";"VL"
+"p114311";"Liam Agnew";;"Sunderland";"10000000";"VL"
+"p57145";"Federico Fernández";;"Swansea City";"10000000";"VL"
+"p184400";"Josh Sheehan";;"Swansea City";"10000000";"VL"
+"p40792";"Federico Fazio";;"Tottenham Hotspur";"10000000";"VL"
+"p80710";"Benjamin Stambouli";;"Tottenham Hotspur";"10000000";"VL"
+"p55820";"Sebastián Blanco";;"West Bromwich Albion";"10000000";"VL"
+"p112517";"Mani O'Sullivan";;"West Bromwich Albion";"10000000";"VL"
+"p38685";"Silvestre Varela";;"West Bromwich Albion";"10000000";"VL"
+"p10866";"Georgios Samaras";;"West Bromwich Albion";"10000000";"VL"
+"p82257";"Raphael Spiegel";;"West Ham United";"10000000";"VL"
+"p173792";"Reece Oxford";;"West Ham United";"10000000";"VL"
+"p156336";"Lewis Page";;"West Ham United";"10000000";"VL"
+"p37962";"Morgan Amalfitano";;"West Ham United";"10000000";"VL"
+"p21091";"Alexandre Song";;"West Ham United";"10000000";"VL"
+"p93557";"Paul McCallum";;"West Ham United";"10000000";"VL"
+"p73889";"Diafra Sakho";;"West Ham United";"10000000";"VL"
+"p40616";"Stephen Ward";;"Burnley";"10000000";"VL"
+"p151099";"Cameron Dummigan";;"Burnley";"10000000";"VL"
+"p167869";"James Pearson";;"Leicester City";"10000000";"VL"
+"p114699";"Kris Scott";;"Leicester City";"10000000";"VL"
+"p13919";"Esteban Cambiasso";;"Leicester City";"10000000";"VL"
+"p112134";"Jack Barmby";;"Leicester City";"10000000";"VL"
+"p167866";"Michael Cain";;"Leicester City";"10000000";"VL"
+"p58376";"Alex McCarthy";;"Queens Park Rangers";"10000000";"VL"
+"p28097";"Niko Kranjcar";;"Queens Park Rangers";"10000000";"VL"
+"p49277";"Leroy Fer";;"Queens Park Rangers";"10000000";"VL"
+"p92789";"Michael Doughty";;"Queens Park Rangers";"10000000";"VL"
+"p105835";"Eduardo Vargas";;"Queens Park Rangers";"10000000";"VL"
