@@ -348,18 +348,26 @@ class ProfileController extends AppController {
 
 
 			$result = $this->Game->create_team($data);
-
+			CakeLog::write('create_team',json_encode($data).' - result : '.json_encode($result));
 			$this->loadModel('User');			
 			$user = $this->User->findByFb_id($userData['fb_id']);
+			
+			$step1_ok = false;
+			$step2_ok = false;
 
+			$all_ok = false;
+			
 			if(isset($result['error'])){
-				$this->User->id = $user['User']['id'];
+				CakeLog::write('create_team',$data['fb_id'].'-failed creating game_user and game_team');
+				/*$this->User->id = $user['User']['id'];
 				$this->User->set('register_completed',1);
-				$rs = $this->User->save();
-
+				$rs = $this->User->save();*/
+				
 				$this->Session->setFlash('Maaf, Anda tidak dapat membentuk tim lagi. Nampaknya Anda sudah melakukan pembentukan tim sebelumnya.');
 				$this->redirect('/profile/team_error');
 			}else{
+				CakeLog::write('create_team',$data['fb_id'].'-success creating game_user and game_team');
+				$step1_ok = true;
 				$userData['team'] = $this->Game->getTeam(Sanitize::paranoid($userData['fb_id']));
 				$this->loadModel('Team');
 				$this->Team->create();
@@ -370,15 +378,36 @@ class ProfileController extends AppController {
 					'league'=>$_SESSION['league']
 				));
 
+				if($InsertTeam){
+					$check_team = $this->Team->findByUser_id($user['User']['id']);
+					if($check_team['Team']['user_id']==$user['User']['id']){
+						CakeLog::write('create_team',$data['fb_id'].'-success creating fantasy.teams '.json_encode($InsertTeam));
+						$step2_ok = true;
+					}else{
+						CakeLog::write('create_team',$data['fb_id'].'- data not exists in fantasy.teams '.json_encode($check_team));
+					}
+					
+				}
+				
+			}
+			
+			if($step1_ok == true && $step2_ok==true){
+				$all_ok = true;
+			}
+
+			if($all_ok){
 				$this->User->id = $user['User']['id'];
 				$this->User->set('register_completed',1);
 				$rs = $this->User->save();
-
-
 				$this->Session->write('Userlogin.info',$userData);
 				$this->Session->write('TeamRegister',null);
 				$this->Session->setFlash('Congratulations, Your team is ready !');
 				$this->redirect('/profile/register_staff');
+
+			}else{
+				$this->Session->setFlash('Maaf, Anda tidak dapat membentuk tim. Silahkan coba kembali nanti.');
+				CakeLog::write('create_team',$data['fb_id'].'- failed to save data to all tables ');
+				$this->redirect('/profile/team_error');
 			}
 		}
 	}

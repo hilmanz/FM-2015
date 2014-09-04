@@ -152,7 +152,15 @@ class AppController extends Controller {
 					)
 				);
 				$this->userDetail = $this->User->findByFb_id($this->userData['fb_id']);
-				
+					
+				/*
+				if($this->userDetail['User']['n_status']==1 && 
+					$this->userDetail['User']['register_completed']==1 &&
+					$this->userDetail['Team']['id']==null && $this->request->params['controller']!='profile'){
+					$this->Session->setFlash("Mohon maaf, team loe tidak dapat diakses. Silahkan laporkan ke noreplysupersoccer@gmail.com");
+					$this->redirect('/profile/error');
+					die();
+				}*/
 				$point = $this->Point->find('first',
 									array('conditions'=>array('Point.team_id'=>@$this->userDetail['Team']['id'],
 															 'Point.league'=>$_SESSION['league'])));
