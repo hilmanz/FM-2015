@@ -2544,6 +2544,160 @@ class ApiController extends AppController {
 
 		$this->render('default');
 	}
+
+	//online catalog API for mobile apps
+	public function m_catalog(){
+		$this->loadModel('MerchandiseItem');
+		$this->loadModel('MerchandiseCategory');
+		$this->loadModel('MerchandiseOrder');
+
+		if(isset($this->request->query['ctoken'])){
+			$catalog_token = unserialize(decrypt_param($this->request->query['ctoken']));	
+		}else{
+			$catalog_token = '';
+		}
+		
+		$user_fb_id = Sanitize::clean(@$catalog_token['fb_id']);
+
+		$since_id = intval(@$this->request->query['since_id']);
+
+		$start = intval(@$this->request->query['start']);
+		$total = intval(@$this->request->query['total']);
+
+		if($total > 10){
+			$total = 15;
+		}
+
+		$response = array();
+
+		if(isset($this->request->query['cid'])){
+			$category_id = intval($this->request->query['cid']);
+		}else{
+			$category_id = 0;
+		}
+		
+		$merchandise = $this->MerchandiseItem->find('count',array('conditions'=>array('merchandise_type'=>0,'n_status'=>1)));
+
+		if($merchandise > 0){
+			$response['has_merchandise'] = true;
+		}else{
+			$response['has_merchandise'] = false;
+		}
+		
+
+		//bind the model's association first.
+		//i'm too lazy to create a new Model Class :P
+		$this->MerchandiseItem->bindModel(array(
+			'belongsTo'=>array('MerchandiseCategory')
+		));
+
+		//we need to populate the category
+		$categories = $this->getCatalogMainCategories();
+		$response['main_categories'] = $categories;
+
+		$total_rows = 0;
+		//if category is set, we filter the query by category_id
+		if($category_id != 0){
+			$category_ids = array($category_id);
+			//check for child ids, and add it into category_ids
+			$category_ids = $this->getChildCategoryIds($category_id,$category_ids);
+			$options = array('conditions'=>array(
+									'price_credit' => '<> 0',
+									'merchandise_category_id'=>$category_ids,
+									'MerchandiseItem.parent_id'=>0,
+									'merchandise_type'=>0,'n_status'=>1),
+									'offset'=>$start,
+									'limit'=>$total,
+									'order'=>array('MerchandiseItem.id'=>'DESC')
+									);
+
+
+
+			//maybe the category has children in it.
+			//so we try to populate it
+			$child_categories = $this->getChildCategories($category_id);
+			$response['child_categories'] = $child_categories;
+
+			//we need to know the category details
+			$category = $this->MerchandiseCategory->findById($category_id);
+			$response['current_category'] = $category['MerchandiseCategory'];
+			
+
+		}else{
+			//if doesnt, we query everything.
+			$options = array(
+						'conditions'=>array('merchandise_type'=>0,'MerchandiseItem.parent_id'=>0,
+											'price_credit != 0','n_status'=>1),
+						'offset'=>$start,
+						'limit'=>$total,
+						'order'=>array('MerchandiseItem.id'=>'DESC')
+						);
+		}
+
+		//retrieve the results.
+		$rs = $this->MerchandiseItem->find('all',$options);
+
+		//retrieve the total rows
+		unset($options['limit']);
+		unset($options['offset']);
+		$total_rows = $this->MerchandiseItem->find('count',$options);
+		
+		//check the stock for each items
+		for($i=0;$i<sizeof($rs);$i++){
+			//get the available stock
+			
+			
+			$rs[$i]['MerchandiseItem']['available'] = $rs[$i]['MerchandiseItem']['stock'];
+
+			//prepare the picture url
+			$pic = Configure::read('avatar_web_url').
+										"merchandise/thumbs/0_".
+										$rs[$i]['MerchandiseItem']['pic'];
+			$rs[$i]['MerchandiseItem']['picture'] = $pic;
+
+			//check if the item has child_items
+			$opts = array('conditions'=>array('parent_id'=>$rs[$i]['MerchandiseItem']['id']));
+			$child_items = $this->MerchandiseItem->find('count',$opts);
+			
+			if($child_items > 0){
+				$rs[$i]['has_child'] = 1;
+			}else{
+				$rs[$i]['has_child'] = 0;
+			}
+
+		}
+		//assign it.
+		
+		$response['items'] = $rs;
+
+		//setup new offset pointers
+		if(sizeof($rs) > 0){
+			$next_offset = $start + $total;
+		}else{
+			$next_offset = $start;
+		}
+		
+		$previous_offset = $start - $total;
+		if($previous_offset < 0){
+			$previous_offset = 0;
+		}
+		//-->
+
+
+		//and here's the JSON output
+		$this->layout="ajax";
+		$this->set('response',array('status'=>1,
+									'data'=>$response,
+									'offset'=>$start,
+									'limit'=>$total,
+									'next_offset'=>$next_offset,
+									'previous_offset'=>$previous_offset,
+									'total_rows'=>$total_rows));
+
+
+		$this->render('default');
+	}
+
 	///api for displaying the catalog's item
 	public function catalog_item($item_id){
 		$this->loadModel('MerchandiseItem');
@@ -5326,23 +5480,27 @@ class ApiController extends AppController {
 
 	//add cash - remove cash
 	public function cash_transaction(){
-		$fb_id = $this->Request->data['fb_id'];
-		$transaction_name = $this->Request->data['transaction_name'];
-		$amount = intval($this->Request->data['amount']);
-		$details = $this->Request->data['details'];
-		$sql = "INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+		$fb_id = $this->request->data['fb_id'];
+		$transaction_name = $this->request->data['transaction_name'];
+		$amount = intval($this->request->data['amount']);
+		$details = $this->request->data['details'];
+
+		try{
+			$sql = "INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
 					(fb_id,transaction_dt,transaction_name,amount,details)
 					VALUES
 					('{$fb_id}',NOW(),'{$transaction_name}',{$amount},'{$details}')
 					ON DUPLICATE KEY UPDATE
 					amount = VALUES(amount);";
-		$rs = $this->Game->query($sql,false);
-		if($rs){
+			$rs = $this->Game->query($sql,false);
 			$this->update_cash_summary($fb_id);
 			$status = 1;
-		}else{
+
+		}catch(Exception $e){
+			Cakelog::write('error', 'api.cash_transaction message'.$e->getMessage());
 			$status = 0;
 		}
+		
 		$this->set('response',array('status'=>$status,'data'=>array('fb_id'=>$fb_id,
 														'transaction_name'=>$transaction_name,
 														'amount'=>$amount,
@@ -5353,9 +5511,8 @@ class ApiController extends AppController {
 	
 
 	//updating the team's cash wallet by summing all cash amounts
-	private function update_cash_summary(fb_id){
-		$fb_id = $this->Request->data['fb_id'];
-		$sql = "INSERT INTO "+config.database.frontend_schema+".game_team_cash
+	private function update_cash_summary($fb_id){
+		$sql = "INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_team_cash
 					(fb_id,cash)
 					SELECT fb_id,SUM(amount) AS cash 
 					FROM ".Configure::read('FRONTEND_SCHEMA').".game_transactions
