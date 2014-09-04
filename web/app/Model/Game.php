@@ -79,8 +79,8 @@ class Game extends AppModel {
 			return $response['officials'];
 		}
 	}
-	public function getCash($team_id){
-		$response = $this->api_call('/cash/'.$team_id);
+	public function getCash($fb_id){
+		$response = $this->api_call('/cash/'.$fb_id);
 		if($response['status']==1){
 			return $response['cash'];
 		}

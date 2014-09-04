@@ -600,7 +600,7 @@ class ApiController extends AppController {
 
 		//user's coin
 		//get recent cash
-		$response['coins'] = intval($this->Game->getCash($game_team['id']));
+		$response['coins'] = intval($this->Game->getCash($fb_id));
 		$response['game_team_id'] = intval($game_team['id']);
 
 		$this->set('response',array('status'=>1,'data'=>$response));
@@ -4211,7 +4211,7 @@ class ApiController extends AppController {
 			$coin_ok = false;
 
 			//make sure that the coin is sufficient
-			$cash = $this->Game->getCash($game_team_id);
+			$cash = $this->Game->getCash($fb_id);
 			CakeLog::write("debug",json_encode($cash));
 
 			$total_bets = 0;
@@ -4723,7 +4723,7 @@ class ApiController extends AppController {
 
 				$cash = 0;
 				if(isset($team['id'])){
-					$cash = $this->Game->getCash($team['id']);
+					$cash = $this->Game->getCash($rs_user['User']['fb_id']);
 					CakeLog::write('debug', 'Cash :'.json_encode($cash));
 				}
 
