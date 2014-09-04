@@ -5480,31 +5480,54 @@ class ApiController extends AppController {
 
 	//add cash - remove cash
 	public function cash_transaction(){
-		$fb_id = $this->request->data['fb_id'];
-		$transaction_name = $this->request->data['transaction_name'];
-		$amount = intval($this->request->data['amount']);
-		$details = $this->request->data['details'];
 
-		try{
-			$sql = "INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
-					(fb_id,transaction_dt,transaction_name,amount,details)
-					VALUES
-					('{$fb_id}',NOW(),'{$transaction_name}',{$amount},'{$details}')
-					ON DUPLICATE KEY UPDATE
-					amount = VALUES(amount);";
-			$rs = $this->Game->query($sql,false);
-			$this->update_cash_summary($fb_id);
-			$status = 1;
+		$status = 0;
+		$message = '';
+		if($this->request->is("post"))
+		{
+			$fb_id = $this->request->data['fb_id'];
+			$transaction_name = $this->request->data['transaction_name'];
+			$amount = intval($this->request->data['amount']);
+			$details = $this->request->data['details'];
 
-		}catch(Exception $e){
-			Cakelog::write('error', 'api.cash_transaction message'.$e->getMessage());
-			$status = 0;
+			try{
+				//cek is fb_id has registered
+				$rs_user = $this->User->findByFb_id($fb_id);
+
+				if(count($rs_user) == 0)
+				{
+					throw new Exception("User Not Found");
+				}
+
+				$sql = "INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+						(fb_id,transaction_dt,transaction_name,amount,details)
+						VALUES
+						('{$fb_id}',NOW(),'{$transaction_name}',{$amount},'{$details}')
+						ON DUPLICATE KEY UPDATE
+						amount = VALUES(amount)";
+				$rs = $this->Game->query($sql,false);
+				$this->update_cash_summary($fb_id);
+				$status = 1;
+			}catch(Exception $e){
+				$message = $e->getMessage();
+				Cakelog::write('error', 'api.cash_transaction message'.$e->getMessage());
+				$status = 0;
+			}
+			
+			$this->set('response',array('status'=>$status,
+										'data'=>array('fb_id'=>$fb_id,
+															'transaction_name'=>$transaction_name,
+															'amount'=>$amount,
+															'details'=>$details),
+										'message'=>$message
+										));
 		}
-		
-		$this->set('response',array('status'=>$status,'data'=>array('fb_id'=>$fb_id,
-														'transaction_name'=>$transaction_name,
-														'amount'=>$amount,
-														'details'=>$details)));
+		else
+		{
+			Cakelog::write('error', 'api.cash_transaction message: not post request');
+			$this->set('response',array('status'=>$status,'data'=> 'null','message'=>'not post request'));
+		}
+
 		$this->render('default');
 	}
 
