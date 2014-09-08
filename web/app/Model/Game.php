@@ -65,7 +65,7 @@ class Game extends AppModel {
 	public function get_team_players($fb_id){
 		$response = $this->api_call('/team/get/'.$fb_id);
 		
-		if(intval($response['id'])>0){
+		if(intval(@$response['id'])>0){
 			$team_id = intval($response['id']);
 			$team = $this->api_call('/team/list/'.$team_id);
 			if(sizeof($team)>0){

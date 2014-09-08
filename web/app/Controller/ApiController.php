@@ -510,16 +510,16 @@ class ApiController extends AppController {
 		//best match
 		$best_match = $this->Game->getBestMatch($game_team['id']);
 		$team_id = $game_team['team_id'];
-		
+		$against = "";
 		if($best_match['status']==0){
 			$this->set('best_match','N/A');
 			$response['stats']['best_match'] = 'N/A';
 		}else{
 			$best_match['data']['points'] = ceil($best_match['data']['points']);
-			if($best_match['data']['match']['home_id']==$team_id){
-				$against = $best_match['data']['match']['away_name'];
-			}else if($best_match['data']['match']['away_id']==$team_id){
-				$against = $best_match['data']['match']['home_name'];
+			if(@$best_match['data']['match']['home_id']==$team_id){
+				$against = @$best_match['data']['match']['away_name'];
+			}else if(@$best_match['data']['match']['away_id']==$team_id){
+				$against = @$best_match['data']['match']['home_name'];
 			}
 			
 			$response['stats']['best_match'] = "VS. {$against} (+{$best_match['data']['points']})";
@@ -5647,5 +5647,91 @@ class ApiController extends AppController {
 
 		$this->set('response',array('status'=>1));
 		$this->render('default');
+	}
+
+	public function create_team(){
+		$api_session = $this->readAccessToken();
+		//$fb_id = $api_session['fb_id'];
+		$fb_id = $this->request->data['fb_id'];
+		$team_id = $this->request->data['team_id'];
+
+		$user = $this->User->findByFb_id($fb_id);
+		$userData = $user['User'];
+		
+		if(@$userData['register_completed']!=1 || $userData['Team']==null){
+			
+			$data = array(
+				'team_id'=>Sanitize::paranoid($team_id),
+				'fb_id'=>Sanitize::paranoid($userData['fb_id'])
+			);
+			
+			$players_selected = $this->Game->getMasterTeam($team_id);
+			$players = array();
+			foreach($players_selected as $p){
+				$players[] = $p['uid'];
+			}
+
+			$data['players'] = json_encode($players);
+			
+			$result = $this->Game->create_team($data);
+			
+			CakeLog::write('create_team',json_encode($data).' - result : '.json_encode($result));
+			$this->loadModel('User');			
+			$user = $this->User->findByFb_id($fb_id);
+			
+			$step1_ok = false;
+			$step2_ok = false;
+
+			$all_ok = false;
+			
+			if(isset($result['error'])){
+				CakeLog::write('create_team',$data['fb_id'].'-failed creating game_user and game_team');
+				$results = array('status'=>0,'error'=>'failed creating the team');
+			}else{
+				CakeLog::write('create_team',$data['fb_id'].'-success creating game_user and game_team');
+				$step1_ok = true;
+				$userData['team'] = $this->Game->getTeam(Sanitize::paranoid($fb_id));
+				$this->loadModel('Team');
+				$this->Team->create();
+				$InsertTeam = $this->Team->save(array(
+					'user_id'=>$user['User']['id'],
+					'team_id'=>Sanitize::paranoid($team_id),
+					'team_name'=>Sanitize::clean($this->request->data['team_name']),
+					'league'=>$this->league
+				));
+
+				if($InsertTeam){
+					$check_team = $this->Team->findByUser_id($user['User']['id']);
+					if($check_team['Team']['user_id']==$user['User']['id']){
+						CakeLog::write('create_team',$data['fb_id'].'-success creating fantasy.teams '.json_encode($InsertTeam));
+						$step2_ok = true;
+					}else{
+						CakeLog::write('create_team',$data['fb_id'].'- data not exists in fantasy.teams '.json_encode($check_team));
+					}
+					
+				}
+				
+			}
+			
+			if($step1_ok == true && $step2_ok==true){
+				$all_ok = true;
+			}
+
+			if($all_ok){
+				$this->User->id = $user['User']['id'];
+				$this->User->set('register_completed',1);
+				$rs = $this->User->save();
+				
+				$results = array('status'=>1,'data'=>array('team_id'=>$data['team_id'],
+															'fb_id'=>$data['fb_id'],
+															'team_name'=>$this->request->data['team_name']));
+			}else{
+				
+				CakeLog::write('create_team',$data['fb_id'].'- failed to save data to all tables ');
+				$results = array('status'=>0,'error'=>'cannot save all team data');
+			}
+			$this->set('response',$results);
+			$this->render('default');
+		}
 	}
 }
