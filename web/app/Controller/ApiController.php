@@ -395,6 +395,13 @@ class ApiController extends AppController {
 		//list of players
 		$players = $this->Game->get_team_players($fb_id);
 
+		if($players == null)
+		{
+			$this->set('response', array('status'=>1,'data'=> $response));
+			$this->render('default');
+			return ;
+		}
+
 		foreach($players as $n=>$p){
 			$last_performance = floatval($p['last_performance']);
 			$performance_bonus = getTransferValueBonus($last_performance,intval($p['transfer_value']));
@@ -4777,19 +4784,26 @@ class ApiController extends AppController {
 		$this->layout="ajax";
 		$data = $this->request->data;
 
-		CakeLog::write('debug', 'datanya :'.json_encode($data));
+		CakeLog::write('debug', 'api.register_supersoccer datanya :'.json_encode($data));
 
 		$fb_id = $data['fb_id'];
+		$fb_id_ori = $data['fb_id'];
+
+		$secret		= '';
+		$user_pass 	= '';
+
 		if($fb_id == "")
 		{
 			$fb_id = date("Ymdhis").rand(1000, 9999);
+			$fb_id_ori = NULL;
+
+			$secret		= md5(date("Ymdhis"));
+			$passHasher = new PasswordHash(8, true);
+			$user_pass 	= $passHasher->HashPassword($data['password'].$secret);
+
 		}
 
-		$secret		= md5(date("Ymdhis"));
-		$passHasher = new PasswordHash(8, true);
-		$user_pass 	= $passHasher->HashPassword($data['password'].$secret);
-
-		$data_save = array('fb_id_ori'=>NULL,
+		$data_save = array('fb_id_ori'=>$fb_id_ori,
 					  'fb_id'=>$fb_id,
 					  'name'=>$data['name'],
 					  'email'=>$data['email'],
@@ -4799,10 +4813,10 @@ class ApiController extends AppController {
 					  'phone_number'=>$data['phone_number'],
 					  'register_date'=>date("Y-m-d H:i:s"),
 					  'survey_about'=>$data['hearffl'],
-					  'survey_daily_email'=>$data['daylyemail'],
-					  'survey_daily_sms'=>@$data['daylysms'],
+					  'survey_daily_email'=>0,
+					  'survey_daily_sms'=>0,
 					  'survey_has_play'=>$data['firstime'],
-					  'faveclub'=>Sanitize::clean($data['faveclub']),
+					  'faveclub'=>Sanitize::clean(@$data['faveclub']),
 					  'birthdate'=>$data['birthdate'],
 					  'n_status'=>0,
 					  'register_completed'=>0,
@@ -4814,14 +4828,14 @@ class ApiController extends AppController {
 		//make sure that the email is not registered yet.
 		$check2 = $this->User->findByEmail($data['email']);
 
-		if(isset($check['User']) && $check2['User']['register_completed'] != 0)
+		if(isset($check['User']) && @$check2['User']['register_completed'] != 0)
 		{
 			$this->set('response',array('status'=>0, 
 					'message' => 'Mohon maaf, akun kamu sudah terdaftar sebelumnya. !'));
 		}
 		else if(isset($check2['User']) 
-					|| $check2['User']['email'] == $data['email']
-					|| $check2['User']['register_completed'] != 0)
+					|| @$check2['User']['email'] == $data['email']
+					|| @$check2['User']['register_completed'] != 0)
 		{
 
 			$this->set('response',array('status'=>0, 
@@ -4831,21 +4845,51 @@ class ApiController extends AppController {
 		else
 		{
 			if(!isset($check2['User'])){
-				$this->User->create();
-				$rs = $this->User->save($data_save);
-				$user_data = $rs['User'];
+				try{
+					$dataSource = $this->User->getDataSource();
+					$dataSource->begin();
+					$this->User->create();
+
+					$rs = $this->User->save($data_save);
+					$user_data = $rs['User'];
+
+					$this->User->query("INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+										(fb_id,transaction_dt,transaction_name,amount,details)
+										VALUES
+										('{$fb_id}',NOW(),'START',0,'START')
+										ON DUPLICATE KEY UPDATE
+										amount = VALUES(amount)");
+
+					$this->User->query("INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_team_cash
+										(fb_id,cash)
+										SELECT fb_id,SUM(amount) AS cash 
+										FROM ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+										WHERE fb_id = '{$fb_id}'
+										GROUP BY fb_id
+										ON DUPLICATE KEY UPDATE
+										cash = VALUES(cash)");
+					$dataSource->commit();
+				}catch(Exception $e){
+					$dataSource->rollback();
+					Cakelog::write('error', 'api.register_supersoccer insert error msg: '.$e->getMessage());
+				}
+
 			}
 			
 			if(isset($rs['User']) || isset($check2['User'])){
 				//register user into gameAPI.
 				//$this->loadModel('ProfileModel');
 				$response = $this->api_post('/user/register',$data_save);
-				CakeLog::write('debug', json_encode($response));
 
-				if($response['status']==1 || $check2['User']['register_completed'] == 0)
+				CakeLog::write('error', 
+					'api.register_supersoccer /user/register data'.json_encode($response));
+
+				if($response['status']==1 || @$check2['User']['register_completed'] == 0)
 				{
 					if(@$rs['User']['n_status'] == 0 || $user_data['n_status'] == 0)
 					{
+						unset($rs['User']['password']);
+						unset($rs['User']['secret']);
 						$this->set('response',
 									array('status'=>1, 
 										'profile' => $rs['User']
@@ -4853,6 +4897,8 @@ class ApiController extends AppController {
 					}
 					else
 					{
+						unset($check2['User']['password']);
+						unset($check2['User']['secret']);
 						$this->set('response',
 									array('status'=>1, 
 										'profile' => $check2['User']
@@ -4861,7 +4907,8 @@ class ApiController extends AppController {
 				}
 				else
 				{
-					$this->User->delete($this->User->id);
+					CakeLog::write('error', 
+					'api.register_supersoccer /user/register data'.json_encode($response));
 					$this->set('response',
 									array('status'=>0, 
 										'message' => 'Terjadi Kesalahan, Silahkan coba beberapa saat lagi'
@@ -5491,6 +5538,8 @@ class ApiController extends AppController {
 			$details = $this->request->data['details'];
 
 			try{
+				$dataSource = $this->Game->getDataSource();
+				$dataSource->begin();
 				//cek is fb_id has registered
 				$rs_user = $this->User->findByFb_id($fb_id);
 
@@ -5505,10 +5554,15 @@ class ApiController extends AppController {
 						('{$fb_id}',NOW(),'{$transaction_name}',{$amount},'{$details}')
 						ON DUPLICATE KEY UPDATE
 						amount = VALUES(amount)";
-				$rs = $this->Game->query($sql,false);
-				$this->update_cash_summary($fb_id);
+				$this->Game->query($sql,false);
+				$rs = $this->update_cash_summary($fb_id);
+				if(!$rs){
+					throw new Exception("coin is insufficient");
+				}
 				$status = 1;
+				$dataSource->commit();
 			}catch(Exception $e){
+				$dataSource->rollback();
 				$message = $e->getMessage();
 				Cakelog::write('error', 'api.cash_transaction message'.$e->getMessage());
 				$status = 0;
@@ -5531,10 +5585,37 @@ class ApiController extends AppController {
 		$this->render('default');
 	}
 
+	public function get_coin($fb_id = "")
+	{
+		$message = '';
+		$rs_user = $this->User->findByFb_id($fb_id);
+		if(count($rs_user) == 0)
+		{
+			$message = 'User Not Found';
+			$this->set('response',array('status'=>0,'data'=> 'null','message'=>$message));
+		}
+		else
+		{
+			$coin = intval($this->Game->getCash($fb_id));
+			$this->set('response',array('status'=>1,'data'=> array('amount' => $coin),'message'=>$message));
+		}
+		$this->render('default');
+	}
+
 	
 
 	//updating the team's cash wallet by summing all cash amounts
 	private function update_cash_summary($fb_id){
+
+		$rs_amount = $this->Game->query("SELECT fb_id, SUM(amount) AS cash 
+					FROM ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+					WHERE fb_id = '{$fb_id}'
+					GROUP BY fb_id");
+		if($rs_amount[0][0]['cash'] < 0)
+		{
+			return false;
+		}
+
 		$sql = "INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_team_cash
 					(fb_id,cash)
 					SELECT fb_id,SUM(amount) AS cash 
@@ -5544,6 +5625,27 @@ class ApiController extends AppController {
 					ON DUPLICATE KEY UPDATE
 					cash = VALUES(cash);";
 		$rs = $this->Game->query($sql,false);
-		return $rs;
+
+		return true;
+	}
+
+	//temporary function
+	public function remove_user($fb_id)
+	{
+		$rs_user = $this->User->findByFb_id($fb_id);
+		$rs_game_user = $this->User->query("SELECT * FROM 
+			ffgame.game_users WHERE fb_id='{$fb_id}' LIMIT 1");
+
+		$this->layout="ajax";
+		$this->User->query("DELETE FROM fantasy.users WHERE fb_id='{$fb_id}'");
+		$this->User->query("DELETE FROM ffgame.game_users WHERE fb_id='{$fb_id}'");
+		$this->User->query("DELETE FROM fantasy.game_transactions WHERE fb_id='{$fb_id}'");
+		$this->User->query("DELETE FROM fantasy.game_team_cash WHERE fb_id='{$fb_id}'");
+
+		$this->User->query("DELETE FROM ffgame.game_teams WHERE user_id='{$rs_user['User']['id']}'");
+		$this->User->query("DELETE FROM fantasy.teams WHERE user_id='{$rs_game_user[0]['game_users']['id']}'");
+
+		$this->set('response',array('status'=>1));
+		$this->render('default');
 	}
 }
