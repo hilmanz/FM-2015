@@ -5648,7 +5648,21 @@ class ApiController extends AppController {
 		$this->set('response',array('status'=>1));
 		$this->render('default');
 	}
+	public function check_team_name(){
+	
+		$team_name = Sanitize::clean($this->request->query['team_name']);
 
+		$this->loadModel('Team');
+		
+		$club = $this->Team->findByTeam_name($team_name);
+		if(isset($club['Team'])){
+			$response = array("status"=>1);
+		}else{
+			$response = array("status"=>0);
+		}
+		$this->set('response',$response);
+		$this->render('default');
+	}
 	public function create_team(){
 		$api_session = $this->readAccessToken();
 		//$fb_id = $api_session['fb_id'];
@@ -5658,7 +5672,7 @@ class ApiController extends AppController {
 		$user = $this->User->findByFb_id($fb_id);
 		$userData = $user['User'];
 		
-		if(@$userData['register_completed']!=1 || $userData['Team']==null){
+		if(@$userData['register_completed']!=1 || $user['Team']==null){
 			
 			$data = array(
 				'team_id'=>Sanitize::paranoid($team_id),
@@ -5674,7 +5688,7 @@ class ApiController extends AppController {
 			$data['players'] = json_encode($players);
 			
 			$result = $this->Game->create_team($data);
-			
+
 			CakeLog::write('create_team',json_encode($data).' - result : '.json_encode($result));
 			$this->loadModel('User');			
 			$user = $this->User->findByFb_id($fb_id);
@@ -5730,8 +5744,13 @@ class ApiController extends AppController {
 				CakeLog::write('create_team',$data['fb_id'].'- failed to save data to all tables ');
 				$results = array('status'=>0,'error'=>'cannot save all team data');
 			}
-			$this->set('response',$results);
-			$this->render('default');
+			
+		}else{
+			$results = array('status'=>0,'error'=>'the user already has a team');
+			
 		}
+		$this->set('response',$results);
+		$this->render('default');	
+		
 	}
 }
