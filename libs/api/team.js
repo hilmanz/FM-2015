@@ -171,6 +171,7 @@ function create(data,callback){
 					
 					if(user==null || (typeof user === 'undefined')){
 						console.log(user);
+						console.log('CREATE_TEAM','GAME_USER NOT FOUND, WE RECREATE IT');
 						recreate_game_user(conn,data.fb_id,function(err,rs){
 							callback(err,rs);
 						});
@@ -180,6 +181,7 @@ function create(data,callback){
 				},
 				function(user,callback){
 					if(user==null){
+						console.log('CREATE_TEAM','GAME_USER STILL NOT FOUND');
 						callback(new Error('user not found'),null);
 					}else{
 						console.log(user);
@@ -187,9 +189,9 @@ function create(data,callback){
 								(user_id,team_id,created_date,n_status)\
 								VALUES\
 								(?,?,NOW(),1);",[user.id,data.team_id],function(err,rs){
-									console.log(S(this.sql).collapseWhitespace().s);
+									console.log('CREATE_TEAM',S(this.sql).collapseWhitespace().s);
 									if(err){
-										console.log(err.message);
+										console.log('CREATE_TEAM',err.message);
 									}
 									callback(err,rs);
 								});
@@ -212,7 +214,7 @@ function create(data,callback){
 							d.push(data.players[i]);
 						}
 						conn.query(sql,d,function(err,rs){
-							console.log(S(this.sql).collapseWhitespace().s);
+							console.log('CREATE_TEAM',S(this.sql).collapseWhitespace().s);
 							callback(err,result.insertId);
 						});
 					}else{
@@ -227,7 +229,7 @@ function create(data,callback){
 							 VALUES(?,?)"
 						,[game_team_id,initial_money],
 						function(err,rs){
-							console.log(S(this.sql).collapseWhitespace().s);
+							console.log('CREATE_TEAM',S(this.sql).collapseWhitespace().s);
 							callback(err,game_team_id);
 						});
 					}else{
@@ -264,8 +266,8 @@ function recreate_game_user(conn,fb_id,done){
 			conn.query("SELECT id FROM "+config.database.database+".game_users WHERE fb_id=? LIMIT 1",
 			[fb_id],
 			function(err,rs){
-				//console.log(this.sql);
-				console.log(S(this.sql).collapseWhitespace().s);
+				
+				console.log('CREATE_TEAM','RECREATE',S(this.sql).collapseWhitespace().s);
 				cb(err,rs[0]);
 			});
 		}

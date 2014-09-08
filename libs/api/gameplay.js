@@ -473,7 +473,7 @@ function getTeamPlayerDetail(game_team_id,player_id,callback){
 			a.country,team_id AS original_team_id,\
 			b.name AS original_team_name,a.salary,a.transfer_value\
 			FROM "+config.database.database+".master_player a\
-			INNER JOIN "+config.database.database+".master_team b\
+			LEFT JOIN "+config.database.database+".master_team b\
 			ON a.team_id = b.uid\
 			WHERE a.uid IN (\
 				SELECT player_id FROM "+config.database.database+".game_team_players \

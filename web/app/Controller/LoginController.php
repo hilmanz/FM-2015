@@ -177,7 +177,7 @@ class LoginController extends AppController {
 											'username'=>'',
 											'name'=>$me['name'],
 											'birthday'=>$me['birthday'],
-											'email'=>$me['email'],
+											'email'=>@$me['email'],
 											'location'=> array('name', $me['location']['name']),
 											'role'=>1,
 											'access_token'=>$this->getAccessToken()));
