@@ -64,7 +64,6 @@ class MerchandisesController extends AppController {
 	* the index page will display all available (in-stock) merchandises.
 	*/
 	public function index(){
-		
 		if(isset($this->request->query['cid'])){
 			$category_id = intval($this->request->query['cid']);
 		}else{
@@ -326,6 +325,7 @@ class MerchandisesController extends AppController {
 
 
 		$this->set('item',$item);
+		$this->set('user_detail', $this->userDetail);
 
 		$category = $this->MerchandiseCategory->findById($item['MerchandiseItem']['merchandise_category_id']);
 		$this->set('category_name',h($category['MerchandiseCategory']['name']));
@@ -542,6 +542,21 @@ class MerchandisesController extends AppController {
 
 		//get the item detail
 		$item = $this->MerchandiseItem->findById($item_id);
+		$user_detail = $this->userDetail;
+
+		if($item['MerchandiseItem']['is_pro_item'] == 1 && 
+			$user_detail['User']['paid_member'] == 1 &&
+			$user_detail['User']['paid_member_status'] == 0)
+		{
+
+			$this->redirect('/merchandises/bayar_bulanan');
+		}
+		else if($item['MerchandiseItem']['is_pro_item'] == 1 && 
+										$user_detail['User']['paid_member'] == 0 &&
+										$user_detail['User']['paid_member'] == 0)
+		{
+			$this->redirect('/merchandises/upgrade_member');
+		}
 
 		//if its digital item, we need to make sure that these 
 		if($item['MerchandiseItem']['merchandise_type'] == 1){
@@ -1785,6 +1800,16 @@ class MerchandisesController extends AppController {
 
 	}
 	public function offline(){
+
+	}
+
+	public function upgrade_member()
+	{
+
+	}
+
+	public function bayar_bulanan()
+	{
 
 	}
 

@@ -305,6 +305,26 @@
 		</tr>
 		<tr>
 			<td valign="top">
+				Pro Item
+			</td>
+			<td>
+				<select name="is_pro_item">
+					<?php
+						$yes = '';
+						$no = 'selected="selected"';
+						if($rs['MerchandiseItem']['is_pro_item'] == 1)
+						{
+							$yes = 'selected="selected"';
+							$no = '';
+						}
+					?>
+					<option <?=$no?> value="0">Tidak</option>
+					<option <?=$yes?> value="1">Ya</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
 				Button Label
 			</td>
 			<td>

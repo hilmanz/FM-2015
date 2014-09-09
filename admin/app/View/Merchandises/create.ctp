@@ -252,6 +252,17 @@
 		</tr>
 		<tr>
 			<td valign="top">
+				Pro Item
+			</td>
+			<td>
+				<select name="is_pro_item">
+					<option value="0">Tidak</option>
+					<option value="1">Ya</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
 				Button Label
 			</td>
 			<td>

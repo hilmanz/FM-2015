@@ -115,7 +115,7 @@
                         <li>
                             <a href="<?=$this->Html->url('/merchandises')?>">Online Catalog</a>
                         </li>
-                        <!--<li><a href="<?=$this->Html->url('/pages/faq')?>">Bantuan & FAQ</a></li>-->
+                        <li><a href="<?=$this->Html->url('/pages/faq')?>">Bantuan & FAQ</a></li>
                     </ul>
                 </div>
             <?php else:?>

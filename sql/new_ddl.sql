@@ -549,3 +549,6 @@ ADD UNIQUE INDEX `UNIQUE_TRANSACTION` (`fb_id` ASC, `transaction_name` ASC, `lea
 ALTER TABLE `fantasy`.`member_billings` 
 ADD COLUMN `is_sevendays_notif` INT(1) NULL DEFAULT 0 AFTER `expire`,
 ADD COLUMN `is_threedays_notif` INT(1) NULL DEFAULT 0 AFTER `is_sevendays_notif`;
+
+ALTER TABLE `fantasy`.`merchandise_items` 
+ADD COLUMN `is_pro_item` INT(1) NULL DEFAULT 0 AFTER `enable_ongkir`;

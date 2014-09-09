@@ -56,7 +56,28 @@ if(isset($category_name)){
 							<?php
 							if($can_update_formation):
 							?>
-							<a class="buyBtn button" href="<?=$buy_url?>">BUY</a>
+								<?php
+									if($item['MerchandiseItem']['is_pro_item'] == 1 && 
+										$user_detail['User']['paid_member'] == 1 &&
+										$user_detail['User']['paid_member_status'] == 0):
+								?>
+									<p class="price">
+								    	Loe belum bayar bulanan, klik <a href="<?=$this->Html->url('/upgrade/paymonthly')?>">disini</a> untuk loe bayar bulanan
+								    </p>
+									
+								<?php
+									elseif($item['MerchandiseItem']['is_pro_item'] == 1 && 
+										$user_detail['User']['paid_member'] == 0 &&
+										$user_detail['User']['paid_member'] == 0):
+								?>
+									<p class="price">
+										Item ini hanya untuk pro member, klik <a href="<?=$this->Html->url('/upgrade/member')?>">disini</a> untuk menjadi pro member
+									</p>
+								<?php else: ?>
+									<a class="buyBtn button" href="<?=$buy_url?>">
+										BUY
+									</a>
+								<?php endif; ?>
 							<?php else:?>
 							Maaf, Tidak dapat membeli ketika pertandingan sedang berlangsung.
 							<?php endif;?>
