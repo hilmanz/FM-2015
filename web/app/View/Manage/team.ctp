@@ -117,7 +117,21 @@ endif;
 ?>
 
 
-
+<?php
+    if($popup_setformation && $can_update_formation):
+?>
+<div id="bgPopup"></div>
+<div id="popupWelcome">
+    <a href="#" class="closebtn"><span class="icon-close"></span></a>
+    <div class="popup-content">
+        <h3>PEMBERITAHUAN</h3>
+       
+        <img src="http://widgets-images.s3.amazonaws.com/football/team/badges_65/<?=str_replace('t','',$club['team_id'])?>.png"/>
+        <h4><?=h($club['team_name'])?></h4>
+        <h3><span class="red">JANGAN LUPA UNTUK PASANG FORMASI SEBELUM FORMASI DITUTUP</span></h3>
+    </div><!-- end .popup-content -->
+</div><!-- end #popupWelcome -->
+<?php endif; ?>
 
 <?php
  $home_logo = "http://widgets-images.s3.amazonaws.com/football/team/badges_65/".str_replace('t','',@$next_match['home_id']).".png";

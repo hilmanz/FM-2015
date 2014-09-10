@@ -67,7 +67,7 @@ function getLineup(redisClient,game_team_id,callback){
 					if(cachedData!=null){
 						callback(null,cachedData);	
 					}else{
-						conn.query("SELECT a.player_id,a.position_no,\
+						conn.query("SELECT a.matchday,a.player_id,a.position_no,\
 						b.name,b.position,b.known_name \
 						FROM "+config.database.database+".game_team_lineups a\
 						INNER JOIN "+config.database.database+".master_player b\

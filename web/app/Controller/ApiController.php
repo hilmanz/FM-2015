@@ -13,7 +13,7 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @copyright     Copyright (cd) Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP(tm) Project
  * @package       app.Controller
  * @since         CakePHP(tm) v 0.2.9
@@ -2456,7 +2456,9 @@ class ApiController extends AppController {
 			$options = array('conditions'=>array(
 									'merchandise_category_id'=>$category_ids,
 									'MerchandiseItem.parent_id'=>0,
-									'merchandise_type'=>0,'n_status'=>1),
+									'merchandise_type'=>0,
+									'is_pro_item'=>0,
+									'n_status'=>1),
 									'offset'=>$start,
 									'limit'=>$total,
 									'order'=>array('MerchandiseItem.id'=>'DESC')
@@ -2477,7 +2479,9 @@ class ApiController extends AppController {
 		}else{
 			//if doesnt, we query everything.
 			$options = array(
-						'conditions'=>array('merchandise_type'=>0,'MerchandiseItem.parent_id'=>0,
+						'conditions'=>array('merchandise_type'=>0,
+											'is_pro_item'=>0,
+											'MerchandiseItem.parent_id'=>0,
 											'price_money > 0','n_status'=>1),
 						'offset'=>$start,
 						'limit'=>$total,
@@ -2551,6 +2555,55 @@ class ApiController extends AppController {
 
 		$this->render('default');
 	}
+
+	///api for displaying the catalog's item
+	public function catalog_item($item_id){
+		$this->loadModel('MerchandiseItem');
+		$this->loadModel('MerchandiseCategory');
+		$this->loadModel('MerchandiseOrder');
+
+
+		//we need to populate the category
+		$categories = $this->getCatalogMainCategories();
+		$response['main_categories'] = $categories;
+
+		
+		//parno mode.
+		$item_id = intval(Sanitize::clean($item_id));
+
+
+		$where = array('conditions'=>array('id'=> $item_id, 'is_pro_item'=>0, 'n_status'=>1));
+		//get the item detail
+		$item = $this->MerchandiseItem->find('first', $where);
+		
+		
+			
+		$item['MerchandiseItem']['available'] = $item['MerchandiseItem']['stock'];
+
+		//prepare the picture url
+		$pic = Configure::read('avatar_web_url').
+									"merchandise/thumbs/0_".
+									$item['MerchandiseItem']['pic'];
+		$item['MerchandiseItem']['picture'] = $pic;
+
+		$response['item'] = $item['MerchandiseItem'];
+		
+
+		$category = $this->MerchandiseCategory->findById($item['MerchandiseItem']['merchandise_category_id']);
+		$response['current_category'] = $category['MerchandiseCategory'];
+
+		$child_opts = array('conditions'=>array('parent_id'=>$item['MerchandiseItem']['id'],
+												'n_status'=>1),
+							'limit'=>100,
+							'order'=>'MerchandiseItem.id');
+
+		$response['children'] = $this->MerchandiseItem->find('all',$child_opts);
+		$response['parent'] = $this->MerchandiseItem->findById($item['MerchandiseItem']['parent_id']);
+		$this->layout="ajax";
+		$this->set('response',array('status'=>1,'data'=>$response));
+		$this->render('default');
+	}
+
 
 	//online catalog API for mobile apps
 	public function m_catalog(){
@@ -2706,7 +2759,7 @@ class ApiController extends AppController {
 	}
 
 	///api for displaying the catalog's item
-	public function catalog_item($item_id){
+	public function m_catalog_item($item_id){
 		$this->loadModel('MerchandiseItem');
 		$this->loadModel('MerchandiseCategory');
 		$this->loadModel('MerchandiseOrder');

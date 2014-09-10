@@ -452,8 +452,7 @@ class ManageController extends AppController {
 		$this->set('weekly_salaries',$total_weekly_salary);
 	}
 	public function team(){
-		
-		
+
 		$club = $this->club;
 		$userData = $this->userData;
 		
@@ -516,6 +515,7 @@ class ManageController extends AppController {
 
 		//banners
 		$sidebar_banner = $this->getBanners('INSIDE_SIDEBAR',2,true);
+		$this->set('popup_setformation', $this->popup_setformation());
 		$this->set('sidebar_banner',$sidebar_banner);
 	}
 	public function player($player_id){
@@ -824,6 +824,19 @@ class ManageController extends AppController {
 
 		//instruction points
 		$this->set('INSTRUCTION_POINTS',$instruction_points);
+	}
+
+	private function popup_setformation()
+	{
+		$userData = $this->userData;
+		$lineup = $this->Game->getLineup($userData['team']['id']);
+		$next_match =  $this->Game->getNextMatch(@$this->userData['team']['team_id']);
+		if(intval(@$lineup['lineup'][0]['matchday']) == $next_match['match']['matchday'])
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	private function saveTactics($next_match,$instruction_points,$upcoming_matchday){
