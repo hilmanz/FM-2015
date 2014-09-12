@@ -32,7 +32,7 @@
 			<td><strong>Total Coin</strong></td>
 			<td>
 				<?=number_format($cash)?>
-				<a href="<?=$this->Html->url('/players/transaction/'.$user['User']['id'].'/'.$team_data['b']['id'])?>">
+				<a href="<?=$this->Html->url('/players/transaction/'.$user['User']['id'].'/'.$user['User']['fb_id'])?>">
 					View Transaction
 				</a>
 			</td>

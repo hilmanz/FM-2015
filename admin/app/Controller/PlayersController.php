@@ -88,7 +88,7 @@ class PlayersController extends AppController {
 
 		$squad = $this->Game->get_team_players($user['User']['fb_id']);*/
 
-		$cash = $this->Game->getCash($team_data[0]['b']['id']);
+		$cash = $this->Game->getCash($user['User']['fb_id']);
 
 		/*foreach($squad as $n=>$v){
 		
@@ -209,10 +209,10 @@ class PlayersController extends AppController {
 		$this->set('extra_points', $rs_extra_point);
 	}
 
-	public function transaction($user_id, $game_team_id)
+	public function transaction($user_id, $fb_id)
 	{
-		$rs_transaction = $this->Game->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_transactions 
-											WHERE game_team_id='{$game_team_id}' ORDER BY id DESC
+		$rs_transaction = $this->Game->query("SELECT * FROM game_transactions 
+											WHERE fb_id='{$fb_id}' ORDER BY id DESC
 											LIMIT 1000");
 		$this->set('user_id', $user_id);
 		$this->set('rs_transaction', $rs_transaction);
