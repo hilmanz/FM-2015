@@ -918,9 +918,9 @@ function getMatchInfo(conn,game_id,cb){
 function getCurrentMatchday(conn,done){
 	conn.query("SELECT matchday FROM \
 				ffgame.game_fixtures \
-				WHERE is_processed = 0 AND session_id=2014 \
+				WHERE is_processed = 0 AND session_id=? \
 				ORDER BY id ASC LIMIT 1;",
-				[],function(err,rs){
+				[config.competition.year],function(err,rs){
 					if(rs!=null&&rs.length==1){
 						console.log('getCurrentMatchday',rs);
 						done(err,rs[0].matchday);					

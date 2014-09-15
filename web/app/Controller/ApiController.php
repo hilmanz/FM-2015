@@ -5062,6 +5062,95 @@ class ApiController extends AppController {
 		$this->render('default');
 	}
 
+		/*
+	* API for login user from send_activation
+	* POST :  /api/send_activation/
+	* PostData : ?fb_id=[s]&email=[s]
+	* Response :JSON
+	*/
+	public function send_activation_mobile()
+	{
+		if($this->request->is("post"))
+		{
+			$this->loadModel('User');
+			$fb_id = Sanitize::clean($this->request->data['fb_id']);
+			$email = Sanitize::clean($this->request->data['email']);
+
+			$this->User->query("UPDATE users SET email='{$email}' WHERE fb_id='{$fb_id}'");
+			$rs_user = $this->User->findByFb_id($fb_id);
+			if(count($rs_user) != 0)
+			{
+				$data_request['email'] = $rs_user['User']['email'];
+				$data_request['activation_code'] = $rs_user['User']['activation_code'];
+
+				$send_mail = $this->requestAction(
+													array(
+														'controller' => 'profile',
+														'action' => 'send_mail'
+													),
+													array('data_request' => $data_request)
+												);
+				if($send_mail)
+				{
+					$this->set('response', array('status'=>1));
+				}
+				else
+				{
+					$this->set('response', array('status'=>0));
+				}
+			}
+			else
+			{
+				$this->set('response', array('status'=>0));
+			}
+		}
+		else
+		{
+			$this->set('response', array('status'=>0));
+		}
+		$this->render('default');
+	}
+
+
+	/*
+	* API for login user from activation_user
+	* POST :  /api/activation_user/
+	* PostData : ?email=[s]&activation_code=[n]
+	* Response :JSON
+	*/
+	public function activation_user_mobile()
+	{
+		if($this->request->is("post"))
+		{
+			$this->loadModel('User');
+			$email = trim(Sanitize::clean($this->request->data['email']));
+			$activation_code = trim(Sanitize::clean($this->request->data['activation_code']));
+
+			$rs_user = $this->User->findByEmail($email);
+			if(count($rs_user) != 0)
+			{
+				if($rs_user['User']['activation_code'] == $activation_code)
+				{
+					$this->User->query("UPDATE users SET n_status = 1 WHERE email='{$email}'");
+					$this->set('response', array('status'=>1));
+				}
+				else
+				{
+					$this->set('response', array('status'=>0));
+				}
+			}
+			else
+			{
+				$this->set('response', array('status'=>0));
+			}
+		}
+		else
+		{
+			$this->set('response', array('status'=>0));
+		}
+		$this->render('default');
+	}
+
 	public function get_quiz()
 	{
 		try{

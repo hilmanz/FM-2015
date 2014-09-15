@@ -73,11 +73,11 @@ class PlayersController extends AppController {
 										WHERE game_team_id={$team_data[0]['b']['id']})
 										a LIMIT 100;");
 
-		$matches = $this->User->query("SELECT COUNT(game_id) AS total_matches FROM 
+		/*$matches = $this->User->query("SELECT COUNT(game_id) AS total_matches FROM 
 										(SELECT game_id 
 											FROM ".$_SESSION['ffgamestatsdb'].".game_match_player_points 
 											WHERE game_team_id={$team_data[0]['b']['id']} 
-											GROUP BY game_id) a LIMIT 100;");
+											GROUP BY game_id) a LIMIT 100;");*/
 		
 		/*$squad = $this->User->query("SELECT b.* FROM ".$_SESSION['ffgamedb'].".game_team_players a
 										INNER JOIN ".$_SESSION['ffgamedb'].".master_player b
@@ -106,7 +106,7 @@ class PlayersController extends AppController {
 		$previous_matches = $this->getPreviousMatches($team_data[0]['b']['id'],$team_data[0]['b']['team_id']);
 		$this->set('previous_matches',$previous_matches);
 		$this->set('budget',$budget[0][0]['current_budget']);
-		$this->set('total_matches',$matches[0][0]['total_matches']);
+		$this->set('total_matches',count($previous_matches));
 		$this->set('team_data',$team_data[0]);
 		$this->set('user',$user);
 		$this->set('point',@$point['Point']);

@@ -82,9 +82,9 @@ pool.getConnection(function(err,conn){
 function getCurrentMatchday(conn,done){
 	conn.query("SELECT matchday FROM \
 				ffgame.game_fixtures \
-				WHERE is_processed = 0 AND session_id=2014 \
+				WHERE is_processed = 0 AND session_id=? \
 				ORDER BY id ASC LIMIT 1;",
-				[],function(err,rs){
+				[config.competition.year],function(err,rs){
 					if(rs!=null&&rs.length==1){
 						done(err,rs[0].matchday);					
 					}else{
@@ -96,9 +96,9 @@ function getCurrentMatchday(conn,done){
 function getGameIdsByMatchday(conn,matchday,done){
 	conn.query("SELECT game_id,period FROM \
 				ffgame.game_fixtures \
-				WHERE matchday = ? AND session_id=2014\
+				WHERE matchday = ? AND session_id=? \
 				ORDER BY match_date ASC LIMIT 40;",
-				[matchday],function(err,rs){
+				[matchday,config.competition.year],function(err,rs){
 					if(rs != null
 						 && rs.length > 0){
 						done(err,matchday,rs);					
@@ -426,8 +426,8 @@ function storeMatchInfoToRedis(conn,matchday,done){
 						ON a.home_team = b.uid\
 						INNER JOIN optadb.master_team c\
 						ON a.away_team = c.uid\
-						WHERE a.matchday=? AND a.season_id=2014 LIMIT 20;",
-						[matchday],
+						WHERE a.matchday=? AND a.season_id=? LIMIT 20;",
+						[matchday,config.competition.year],
 						function(err,rs){
 							console.log(S(this.sql).collapseWhitespace().s);
 							console.log(rs);
@@ -548,11 +548,11 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 		},
 		function(cb){
 			//save the goal stats into redis cache
-			conn.query("SELECT a.time,a.team_id,a.player_id,b.name \
+			conn.query("SELECT a.time,a.team_id,a.player_id,a.goal_type,b.name \
 						FROM optadb.goals a\
 						INNER JOIN optadb.master_player b \
 						ON a.player_id = b.uid\
-						WHERE game_id = ? AND  goal_type='Goal' LIMIT 20;",
+						WHERE game_id = ? LIMIT 20;",
 						[game_id],function(err,rs){
 							cb(err,rs);
 						});
