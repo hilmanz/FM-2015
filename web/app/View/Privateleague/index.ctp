@@ -10,6 +10,11 @@
             	<div class="row-2">
                     <h1 class="red">Daftar Private League</h1>
                     <p>Lorem ipsum dolor sit amet...</p>
+                    <?php if($join_button): ?>
+                        <a class="button fr" href="<?=$this->Html->url('/privateleague/join_confirmation')?>">
+                            Join Private League
+                        </a> 
+                    <?php endif; ?>
                     <a class="button fr" href="<?=$this->Html->url('/privateleague/create')?>">
                         Create Private League
                     </a>

@@ -552,3 +552,7 @@ ADD COLUMN `is_threedays_notif` INT(1) NULL DEFAULT 0 AFTER `is_sevendays_notif`
 
 ALTER TABLE `fantasy`.`merchandise_items` 
 ADD COLUMN `is_pro_item` INT(1) NULL DEFAULT 0 AFTER `enable_ongkir`;
+
+ALTER TABLE `fantasy`.`league_member` 
+DROP INDEX `UNIQUE` ,
+ADD UNIQUE INDEX `UNIQUE` (`team_id` ASC, `league` ASC);

@@ -45,6 +45,16 @@ class PrivateleagueController extends AppController {
 		$rs_user = $this->User->findByFb_id($userData['fb_id']);
 		$team_id 	= $rs_user['Team']['id'];
 
+		$join_button = false;
+
+		//check if user has create private league or user has joined private league
+		$result = $this->League->checkUser($userData['email'], $team_id, $this->league);
+		if($result['has_invited'] == 1 && $result['has_joined'] != 1)
+		{
+			$join_button = true;	
+		}
+
+		$this->set('join_button', $join_button);
 		$rs = $this->League->getLeague($team_id, $this->league);
 		$this->set('rs', $rs);
 		$this->set('user_id', $rs_user['User']['id']);
