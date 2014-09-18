@@ -49,6 +49,7 @@ function fixtures(done){
 				LIMIT 1000;",
 				[config.competition.year],
 				function(err,match){
+					console.log(S(this.sql).collapseWhitespace().s);
 					conn.release();
 					done(err,match);						
 					

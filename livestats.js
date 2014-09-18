@@ -15,6 +15,20 @@ var player_stats_category = require(path.resolve('./libs/game_config')).player_s
 var S = require('string');
 var argv = require('optimist').argv;
 
+
+if(typeof argv.league !== 'undefined'){
+	switch(argv.league){
+		case 'ita':
+			console.log('Serie A Activated');
+			config = require('./config.ita').config;
+		break;
+		default:
+			console.log('EPL Activated');
+			config = require('./config').config;
+		break;
+	}
+}
+
 var pool  = mysql.createPool({
    host     : config.database.host,
    user     : config.database.username,
@@ -43,6 +57,7 @@ pool.getConnection(function(err,conn){
 				getGameIdsByMatchday(conn,matchday,cb);
 			},
 			function(matchday,game_id,cb){
+
 				console.log('match',game_id);
 				//foreach game_ids, retrieve the playerstats
 				//and populate it into ffgame_stats.master_player_progress
@@ -81,10 +96,10 @@ pool.getConnection(function(err,conn){
 
 function getCurrentMatchday(conn,done){
 	conn.query("SELECT matchday FROM \
-				ffgame.game_fixtures \
-				WHERE is_processed = 0 AND session_id=? \
+				"+config.database.database+".game_fixtures \
+				WHERE is_processed = 0 AND competition_id = ? AND session_id=? \
 				ORDER BY id ASC LIMIT 1;",
-				[config.competition.year],function(err,rs){
+				[config.competition.id,config.competition.year],function(err,rs){
 					if(rs!=null&&rs.length==1){
 						done(err,rs[0].matchday);					
 					}else{
@@ -95,10 +110,11 @@ function getCurrentMatchday(conn,done){
 
 function getGameIdsByMatchday(conn,matchday,done){
 	conn.query("SELECT game_id,period FROM \
-				ffgame.game_fixtures \
-				WHERE matchday = ? AND session_id=? \
+				"+config.database.database+".game_fixtures \
+				WHERE matchday = ? AND competition_id = ? AND session_id=? \
 				ORDER BY match_date ASC LIMIT 40;",
-				[matchday,config.competition.year],function(err,rs){
+				[matchday,config.competition.id,config.competition.year],function(err,rs){
+
 					if(rs != null
 						 && rs.length > 0){
 						done(err,matchday,rs);					
@@ -426,8 +442,8 @@ function storeMatchInfoToRedis(conn,matchday,done){
 						ON a.home_team = b.uid\
 						INNER JOIN optadb.master_team c\
 						ON a.away_team = c.uid\
-						WHERE a.matchday=? AND a.season_id=? LIMIT 20;",
-						[matchday,config.competition.year],
+						WHERE a.matchday=? AND a.competition_id = ? AND a.season_id=? LIMIT 20;",
+						[matchday,'c'+config.competition.id,config.competition.year],
 						function(err,rs){
 							console.log(S(this.sql).collapseWhitespace().s);
 							console.log(rs);

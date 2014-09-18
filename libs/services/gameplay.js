@@ -80,7 +80,7 @@ exports.setLineup = function(req,res){
 exports.fixtures = function(req,res){
 	gameplay.match.fixtures(function(err,rs){
 		if(err){
-			
+			console.log(err.message);
 			handleError(res);
 		}else{
 			if(rs!=null){

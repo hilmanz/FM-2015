@@ -13,6 +13,7 @@ class Service extends AppModel {
 	public function request($strReq,$timeout = 15){
 		App::import("Vendor","common");
 		$stats_service_url = Configure::read('stats_service_url');
+		
 		return json_decode(curlGet($stats_service_url.$strReq,array(),null,$timeout),true);
 	}
 }

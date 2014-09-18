@@ -362,5 +362,5 @@ Configure::write('INITIAL_BUDGET','100000000');
 Configure::write('opta_file_folder','/home/duf/node_workspace/fantasy/data/');
 Configure::write('worker_api','http://localhost:3080/');
 Configure::write('optadb','optadb');
-Configure::write('season_id','2013');
+Configure::write('season_id','2014');
 Configure::write('competition_id','c8');

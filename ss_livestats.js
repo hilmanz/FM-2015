@@ -18,6 +18,20 @@ var argv = require('optimist').argv;
 var request = require('request');
 var url = require('url');
 
+
+
+if(typeof argv.league !== 'undefined'){
+	switch(argv.league){
+		case 'ita':
+			console.log('Serie A Activated');
+			config = require('./config.ita').config;
+		break;
+		default:
+			console.log('EPL Activated');
+			config = require('./config').config;
+		break;
+	}
+}
 var pool  = mysql.createPool({
    host     : config.database.host,
    user     : config.database.username,
@@ -917,10 +931,10 @@ function getMatchInfo(conn,game_id,cb){
 }
 function getCurrentMatchday(conn,done){
 	conn.query("SELECT matchday FROM \
-				ffgame.game_fixtures \
-				WHERE is_processed = 0 AND session_id=? \
+				"+config.database.database+".game_fixtures \
+				WHERE is_processed = 0 AND competition_id = ? AND session_id=? \
 				ORDER BY id ASC LIMIT 1;",
-				[config.competition.year],function(err,rs){
+				[config.competition.id,config.competition.year],function(err,rs){
 					if(rs!=null&&rs.length==1){
 						console.log('getCurrentMatchday',rs);
 						done(err,rs[0].matchday);					
@@ -932,7 +946,7 @@ function getCurrentMatchday(conn,done){
 
 function getGameIdsByMatchday(conn,matchday,done){
 	conn.query("SELECT game_id,period FROM \
-				ffgame.game_fixtures \
+				"+config.database.database+".game_fixtures \
 				WHERE competition_id = ? AND session_id = ? AND matchday = ? \
 				ORDER BY id ASC LIMIT 40;",
 				[config.competition.id,config.competition.year,matchday],function(err,rs){

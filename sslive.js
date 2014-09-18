@@ -67,7 +67,10 @@ app.get('/', function(req,res){
 	res.send(200,{status:1});
 });
 app.get('/fixtures',[],function(req,res){
-	getFixtures(function(err,rs){
+	if(typeof req.query['league'] === 'undefined'){
+		req.query['league'] = 'epl';
+	}
+	getFixtures(req.query['league'],function(err,rs){
 		res.send(200,{status:1,data:rs});
 	});
 });
@@ -325,10 +328,16 @@ function resetData(done){
 		});
 	});
 }
-function getFixtures(done){
+function getFixtures(league,done){
+	var dbname = '';
+	if(league=='ita'){
+		dbname = 'ffgame_ita';
+	}else{
+		dbname = 'ffgame';
+	}
 	pool.getConnection(function(err,conn){
 		conn.query("SELECT game_id,home_id,away_id,home_score,away_score,period,matchday,match_date \
-					FROM ffgame.game_fixtures\
+					FROM "+dbname+".game_fixtures\
 					LIMIT 1000;",[],function(err,rs){
 						conn.release();
 						done(err,rs);

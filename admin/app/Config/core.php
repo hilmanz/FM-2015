@@ -364,7 +364,7 @@ Configure::write('AVATAR_URL','http://localhost/fantasy/files/');
 Configure::write('optadb','optadb');
 Configure::write('season_id','2013');
 Configure::write('competition_id','c8');
-Configure::write('stats_service_url','http://localhost/fantasy_stats/');
+Configure::write('stats_service_url','http://localhost/ff_stats_2014/');
 Configure::write('avatar_img_dir','/home/duf/node_workspace/fantasy_fork/web/app/webroot/files/');
 Configure::write('avatar_web_dir','/files/');
 Configure::write('avatar_web_url','http://localhost/fm_wc/files/');
