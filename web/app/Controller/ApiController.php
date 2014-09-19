@@ -2275,7 +2275,7 @@ class ApiController extends AppController {
 	public function livematches(){
 		//first we have to know our current
 		$matchday = 1;
-		$response = $this->Game->livematches($matchday);
+		$response = $this->Game->livematches($this->league);
 		$this->set('response',$response);
 		$this->set('raw',true);
 		$this->render('default');

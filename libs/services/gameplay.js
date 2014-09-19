@@ -570,8 +570,13 @@ exports.livematches = function(req,res){
 	});
 }
 exports.standings = function(req,res){
+	var key = 'standings_epl';
+	if(req.params.league == 'ita'){
+		key = 'standings_ita';
+	}
+	
 	var client = req.redisClient;
-	client.get('standings',function(err,rs){
+	client.get(key,function(err,rs){
 
 		if(!err){
 			console.log('standings',JSON.parse(rs));

@@ -9,7 +9,7 @@
         	<div class="content">
             	<div class="row-2">
                     <h1 class="red">Create Private League</h1>
-                    <p>Lorem Ipsum dolor sit amet.....</p>
+                    <p>Lengkapi data di bawah ini, selanjutnya loe bisa undang temen loin untuk bergabung ke private league yang loe buat</p>
     			</div><!-- end .row-2 -->
                 <form class="theForm" action="<?=$this->Html->url('/privateleague/create')?>" 
                   enctype="multipart/form-data" method="post">

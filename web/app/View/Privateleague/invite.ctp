@@ -9,7 +9,7 @@
         	<div class="content">
             	<div class="row-2">
                     <h1 class="red">Invite Friend by Email</h1>
-                    <p>Lorem Ipsum dolor sit amet.....</p>
+                    <p>Undang temen loe untuk gabung di private league yang baru aja loe buat (maksimal 30)</p>
                     <a id="add_email" href="javascript:;" class="fr yellow">
                       Tambah email
                     </a>

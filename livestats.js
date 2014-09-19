@@ -60,7 +60,7 @@ pool.getConnection(function(err,conn){
 
 				console.log('match',game_id);
 				//foreach game_ids, retrieve the playerstats
-				//and populate it into ffgame_stats.master_player_progress
+				//and populate it into "+config.database.statsdb+".master_player_progress
 				//console.log(game_id);
 				if(game_id.length > 0){
 					populateIntoMasterPlayerProgress(conn,matchday,game_id,cb);
@@ -247,7 +247,7 @@ function populateData(conn,modifiers,game_id,done){
 
 			async.each(items,function(item,next){
 				conn.query("INSERT INTO \
-							ffgame_stats.master_player_progress\
+							"+config.database.statsdb+".master_player_progress\
 							(game_id,player_id,points,atk,def,error,ts,dt)\
 							VALUES\
 							(?,?,?,?,?,?,UNIX_TIMESTAMP(NOW()),NOW())\
@@ -354,7 +354,7 @@ function getModifiers(conn,done){
 				d AS defender,\
 				m AS midfielder,\
 				f AS forward \
-				FROM ffgame.game_matchstats_modifier \
+				FROM "+config.database.database+".game_matchstats_modifier \
 				LIMIT 1000;",
 				[],
 				function(err,rs){
@@ -463,9 +463,9 @@ function storeMatchInfoToRedis(conn,matchday,done){
 						a.t_position as group_position,\
 						a.group_name\
 					FROM\
-					    ffgame.master_standings a\
+					    "+config.database.database+".master_standings a\
 					INNER JOIN\
-					    ffgame.master_team b ON a.team_id = b.uid\
+					    "+config.database.database+".master_team b ON a.team_id = b.uid\
 					ORDER BY\
 						group_name,group_position LIMIT 100;",[],
 			function(err,rs){
@@ -476,14 +476,40 @@ function storeMatchInfoToRedis(conn,matchday,done){
 			});
 		},
 		function(matches,standings,cb){
+
 			redisClient.set('standings',JSON.stringify(standings),function(err,rs){
 				if(!err){
 					console.log('match','standings successfully stored');
 				}else{
 					console.log('match','Error',err.message);
 				}
-				cb(err,matches);
 			});
+			if(typeof argv.league !== 'undefined'){
+				console.log('liga',argv.league);
+				switch(argv.league){
+					case 'ita':
+						redisClient.set('standings_ita',JSON.stringify(standings),function(err,rs){
+							if(!err){
+								console.log('match','standings successfully stored');
+							}else{
+								console.log('match','Error',err.message);
+							}
+							//cb(err,matches);
+						});
+					break;
+					default:
+						redisClient.set('standings_epl',JSON.stringify(standings),function(err,rs){
+							if(!err){
+								console.log('match','standings successfully stored');
+							}else{
+								console.log('match','Error',err.message);
+							}
+							//cb(err,matches);
+						});
+					break;
+				}
+			}
+			cb(matches);
 		},
 		function(matches,cb){
 			console.log('match','storing matchinfo',matches);
@@ -515,7 +541,7 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 			conn.query("SELECT a.game_id,a.player_id,a.points,\
 						a.atk,a.def,a.error,\
 						a.ts,b.name,b.team_id \
-						FROM ffgame_stats.master_player_progress a\
+						FROM "+config.database.statsdb+".master_player_progress a\
 						INNER JOIN optadb.master_player b\
 						ON a.player_id = b.uid \
 						WHERE game_id = ? LIMIT 10000;",

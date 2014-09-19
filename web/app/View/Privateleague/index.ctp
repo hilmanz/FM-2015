@@ -9,7 +9,10 @@
         	<div class="content">
             	<div class="row-2">
                     <h1 class="red">Daftar Private League</h1>
-                    <p>Lorem ipsum dolor sit amet...</p>
+                    <p>Private League adalah tempat elo membuat liga elo sendiri, dan elo bisa mengajak teman-teman elo.
+                    Disini satu akun hanya bisa membuat satu private league saja.
+                    Dan satu akun hanya bisa ikut satu private league saja.
+                    </p>
                     <?php if($join_button): ?>
                         <a class="button fr" href="<?=$this->Html->url('/privateleague/join_confirmation')?>">
                             Join Private League

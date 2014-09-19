@@ -386,7 +386,7 @@ class Game extends AppModel {
 		return $response;	
 	}
 	
-	public function livematches(){
+	public function livematches($league = 'epl'){
 		$rs = $this->api_call('/fixtures');
 		$fixtures = $rs['matches'];
 		
@@ -411,7 +411,7 @@ class Game extends AppModel {
 		$matchday+=1;
 		$nm = $matchday;
 		$response 	= $this->api_call('/livematches/'.$matchday);
-		$standings	= $this->api_call('/standings');
+		$standings	= $this->api_call('/standings/'.$league);
 		$is_live = 1;
 		$show_stats = 0;
 		if(sizeof($response['data'])==0){
