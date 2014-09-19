@@ -67,6 +67,22 @@ var xmlparser = require('xml2json');
 var async = require('async');
 var mysql = require('mysql');
 
+var argv = require('optimist').argv;
+
+
+if(typeof argv.league !== 'undefined'){
+	switch(argv.league){
+		case 'ita':
+			console.log('Serie A Activated');
+			config = require('./config.ita').config;
+		break;
+		default:
+			console.log('EPL Activated');
+			config = require('./config').config;
+		break;
+	}
+}
+
 var FILE_PREFIX = config.updater_file_prefix+config.competition.id+'-'+config.competition.year;
 
 var conn = mysql.createConnection({
@@ -128,7 +144,7 @@ function update_data(team,group_name,done){
 	var team_id = team.TeamRef;
 	
 	
-	conn.query("INSERT INTO ffgame.master_standings\
+	conn.query("INSERT INTO "+config.database.database+".master_standings\
 				(\
 				team_id,\
 				t_against,\
@@ -218,6 +234,7 @@ function update_data(team,group_name,done){
 				if(!err){
 					console.log('updating #',team_id,' OK');
 				}else{
+					console.log(err.message);
 					console.log('updating #',team_id,' FAILED');
 				}
 				done(err,rs);
