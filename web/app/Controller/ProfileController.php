@@ -931,6 +931,32 @@ class ProfileController extends AppController {
 		
 	}
 
+	public function send_link_activation($data = array())
+	{
+		$view = new View($this, false);
+
+		if(isset($this->request->data_request))
+		{
+			$data = $this->request->data_request;
+		}
+
+		$body = $view->element('email_link_activation',array(
+										'url'=> $data['url'],
+									));
+
+		$Email = new CakeEmail('smtp');
+		$Email->from(array('noreply@sg.supersoccer.co.id' => 'supersoccer'));
+		$Email->to(trim($data['email']));
+		$Email->subject('Kode Aktivasi');
+		$Email->emailFormat('html');
+		if($Email->send($body))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 
 	private function curlPost($url,$params,$cookie_file='',$timeout=15){
 	  $ch = curl_init();
