@@ -12,8 +12,11 @@
 */
 var path = require('path');
 var config = {};
+var league = '';
 
-
+exports.setLeague = function(l){
+	league = l;
+}
 exports.setConfig = function(c){
 	config = c;
 }
@@ -51,7 +54,7 @@ exports.execute_punishment = function(conn,game_id,game_team_id,team_id,callback
 			[game_team_id],
 			function(err,rs){
 				try{
-					console.log(sqlOut(this.sql));
+					console.log('execute punishment',sqlOut(this.sql));
 					if(rs!=null && rs.length > 0){
 						cb(err,rs);
 					}else{
@@ -376,7 +379,7 @@ function add_rules(conn,game_id,game_team_id,game_type,done){
 }
 
 function doPunish(conn,game_id,game_team_id,team_id,item,cb){
-	console.log(game_team_id,item,team_id);
+	console.log('doPunish',game_team_id,item,team_id);
 	var async = require('async');
 	var t = {};
 
@@ -549,9 +552,9 @@ function sendNotification(conn,game_id,game_team_id,type,callback){
 			<br/>\
 			Ben Dover<br/>";
 			conn.query("INSERT INTO "+config.database.frontend_schema+".notifications\
-						(content,url,dt,game_team_id)\
+						(content,url,dt,game_team_id,league)\
 						VALUES\
-						(?,'#',NOW(),?)",[msg,game_team_id],function(err,rs){
+						(?,'#',NOW(),?,?)",[msg,game_team_id,league],function(err,rs){
 							console.log(sqlOut(this.sql));
 							callback(err);
 				});
@@ -566,9 +569,9 @@ function sendNotification(conn,game_id,game_team_id,type,callback){
 				Chris P. Nutts<br/>\
 				Inspektur Polisi";
 				conn.query("INSERT INTO "+config.database.frontend_schema+".notifications\
-						(content,url,dt,game_team_id)\
+						(content,url,dt,game_team_id,league)\
 						VALUES\
-						(?,'#',NOW(),?)",[msg,game_team_id],function(err,rs){
+						(?,'#',NOW(),?,?)",[msg,game_team_id,league],function(err,rs){
 							console.log(sqlOut(this.sql));
 							callback(err);
 				});
@@ -587,9 +590,9 @@ function sendNotification(conn,game_id,game_team_id,type,callback){
 				Head of legal division<br/>\
 				";
 				conn.query("INSERT INTO "+config.database.frontend_schema+".notifications\
-						(content,url,dt,game_team_id)\
+						(content,url,dt,game_team_id,league)\
 						VALUES\
-						(?,'#',NOW(),?)",[msg,game_team_id],function(err,rs){
+						(?,'#',NOW(),?,?)",[msg,game_team_id,league],function(err,rs){
 							console.log(sqlOut(this.sql));
 							callback(err);
 				});

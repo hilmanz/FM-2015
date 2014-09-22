@@ -68,7 +68,7 @@ exports.update = function(conn,since_id,until_id,update_rank,game_id,done){
 					LIMIT ?;",
 					[league,since_id,until_id,limit],
 					function(err,rs){
-						console.log(S(this.sql).collapseWhitespace().s);
+						console.log('update_rank',S(this.sql).collapseWhitespace().s);
 						if(rs.length>0){
 							populate(conn,rs,matchday,function(err){
 								console.log('DONE POPULATING');
@@ -85,7 +85,7 @@ exports.update = function(conn,since_id,until_id,update_rank,game_id,done){
 			function(matchday,cb){
 				
 				if(update_rank){
-					console.log('NOW WE RECALCULATE THE RANKS');
+					console.log('update_rank','NOW WE RECALCULATE THE RANKS');
 					recalculate_ranks(conn,function(err){
 						update_rank_history(conn,function(e){
 							cb(err,matchday);
@@ -93,7 +93,7 @@ exports.update = function(conn,since_id,until_id,update_rank,game_id,done){
 						
 					});
 				}else{
-					console.log('Not need to recalculate the ranks');
+					console.log('update_rank','Not need to recalculate the ranks');
 					cb(null,matchday);
 				}
 			},
@@ -189,7 +189,7 @@ function populate(conn,teams,matchday,done){
 	async.eachSeries(teams,function(team,next){
 		//console.log(team.fb_id);
 		getUserTeamPoints(conn,team.fb_id,matchday,function(err,stats){
-			//console.log(stats);
+			console.log('update_rank','RESULT',team,stats);
 			updatePoints(conn,team,stats,function(err){
 				next();	
 			});
@@ -214,7 +214,7 @@ function populate(conn,teams,matchday,done){
 	
 }
 function updatePoints(conn,team,stats,done){
-
+	console.log('update_rank','updatePoints',team,stats);
 	async.waterfall([
 		function(cb){
 			if(typeof stats !== 'undefined'){
@@ -239,7 +239,7 @@ function updatePoints(conn,team,stats,done){
 						          extra_points = VALUES(extra_points);",
 						          [team.team_id,points,extra_points,league],
 						          function(err,rs){
-						          	console.log(S(this.sql).collapseWhitespace().s);
+						          	console.log('update_rank',S(this.sql).collapseWhitespace().s);
 						          	cb(err);
 						          });
 				}else{
@@ -294,41 +294,44 @@ function updateWeeklyPoints(conn,team_id,game_points,done){
 	var sql = "INSERT INTO "+frontend_schema+".weekly_points\
 	                (team_id,game_id,matchday,matchdate,points,extra_points,league)\
 	                VALUES ?";
-
-	if(game_points.length > 0){
-		var bulks = [];
-		for(var i in game_points){
-			var params = [];
-			var weekly = game_points[i];
-			params.push(team_id);
-			console.log(weekly);
-			params.push(weekly.game_id);
-			params.push(weekly.matchday);
-			params.push(weekly.match_date);
-			params.push(weekly.total_points);
-			params.push(weekly.extra_points);
-			params.push(league);
-			bulks.push(params);
+	try{
+		if(game_points.length > 0){
+			var bulks = [];
+			for(var i in game_points){
+				var params = [];
+				var weekly = game_points[i];
+				params.push(team_id);
+				console.log(weekly);
+				params.push(weekly.game_id);
+				params.push(weekly.matchday);
+				params.push(weekly.match_date);
+				params.push(weekly.total_points);
+				params.push(weekly.extra_points);
+				params.push(league);
+				bulks.push(params);
+			}
+			console.log(bulks);
+			sql+=" \
+				 ON DUPLICATE KEY UPDATE\
+		        points = VALUES(points),\
+		        matchdate = VALUES(matchdate),\
+		        extra_points = VALUES(extra_points);";
+			
+				conn.query(sql,
+			                [bulks],
+			                function(err,rs){
+			                	console.log(S(this.sql).collapseWhitespace().s);
+			                	console.log("updating #",team_id," week #",weekly.matchday,'--->',weekly.total_points);
+			                	done(err);
+			                });
+		}else{
+			done(null);
 		}
-		console.log(bulks);
-		sql+=" \
-			 ON DUPLICATE KEY UPDATE\
-	        points = VALUES(points),\
-	        matchdate = VALUES(matchdate),\
-	        extra_points = VALUES(extra_points);";
-		
-			conn.query(sql,
-		                [bulks],
-		                function(err,rs){
-		                	console.log(S(this.sql).collapseWhitespace().s);
-		                	console.log("updating #",team_id," week #",weekly.matchday,'--->',weekly.total_points);
-		                	done(err);
-		                });
-	}else{
+
+	}catch(e){
+		console.log('error',e.message,'team#',team_id,game_points,'no weekly points for these team');
 		done(null);
 	}
-	
-	
 	
 }
 
@@ -348,6 +351,7 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 							WHERE a.fb_id = ?;",
 							[fb_id],
 							function(err,rs){
+								console.log('getUserTeamPoints','1',S(this.sql).collapseWhitespace().s);
 								if(rs!=null){
 									callback(null,rs[0]);
 								}else{
@@ -363,12 +367,15 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 					conn.query("SELECT SUM(extra_points) AS extra_point \
 								FROM "+config.database.statsdb+".game_team_extra_points \
 								WHERE game_team_id=?;",[rs.id],function(err,r){
+									console.log('getUserTeamPoints','2',S(this.sql).collapseWhitespace().s);
 									if(!err){
 										if(r!=null){
 											//rs.points += r[0].extra_point;
 
 											rs.extra_points = r[0].extra_point;
 										}
+									}else{
+										console.log('getUserTeamPoints','3',S(this.sql).collapseWhitespace().s);
 									}
 									callback(err,original_team_id,rs);
 					});
@@ -377,6 +384,7 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 				}
 			},
 			function(original_team_id,rs,callback){
+				console.log('getUserTeamPoints','2a',original_team_id,rs);
 				if(rs!=null){
 					//get per game stats
 					if(rs.id!=null){
@@ -392,7 +400,7 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 									GROUP BY a.game_id LIMIT 400;",
 									[rs.id,matchday],
 									function(err,result){
-										console.log(S(this.sql).collapseWhitespace().s);
+										console.log('getUserTeamPoints','3',S(this.sql).collapseWhitespace().s);
 										rs.game_points = result;
 										callback(null,original_team_id,rs);
 									});
@@ -427,7 +435,8 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 								FROM "+config.database.database+".game_fixtures WHERE matchday IN (?) AND (home_id = ? OR away_id=?)"
 								,[week,original_team_id,original_team_id],
 								function(err,matches){
-									console.log(S(this.sql).collapseWhitespace().s);
+									console.log('getUserTeamPoints','4',S(this.sql).collapseWhitespace().s);
+									console.log('update_rank',S(this.sql).collapseWhitespace().s);
 									console.log(matches);
 									if(typeof rs.game_points!=='undefined' && matches!=null){
 										//console.log(rs.game_points);
@@ -470,7 +479,7 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 											rs.game_points.push(other_games.shift());
 										}
 									}
-									console.log('current_game_points',rs.game_points);
+									console.log('update_rank','current_game_points',rs.game_points);
 									callback(err,rs);
 								});
 				}else{
@@ -486,6 +495,7 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 									FROM "+config.database.statsdb+".game_team_extra_points \
 									WHERE game_team_id=? GROUP BY game_id LIMIT 400",
 									[rs.id],function(err,r){
+										console.log('getUserTeamPoints','5',S(this.sql).collapseWhitespace().s);
 									if(!err){
 										console.log(S(this.sql).collapseWhitespace().s);
 										if(r!=null){
@@ -509,7 +519,8 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 			}
 		],
 		function(err,result){
-			
+			console.log('update_rank','RESULT',result);
+			console.log('update_result',result);
 			done(err,result);	
 		}
 	);

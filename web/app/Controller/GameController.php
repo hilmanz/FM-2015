@@ -90,7 +90,9 @@ class GameController extends AppController {
 		}else{
 			$is_new_user = false;
 		}
-
+		if(Configure::read('DEBUG_CAN_UPDATE_FORMATION')){
+			$is_new_user = true;
+		}
 		if(time() < $time_limit || Configure::read('debug') > 0 || $is_new_user){
 			if(time() > $this->openTime || $is_new_user){
 				$userData = $this->getUserData();
@@ -128,7 +130,8 @@ class GameController extends AppController {
 		
 		$game_team_id = $this->userData['team']['id'];
 		$notifications = $this->Notification->find('all',array(
-											  'conditions'=>array('Notification.game_team_id'=>array(0, $game_team_id)),
+											  'conditions'=>array('Notification.game_team_id'=>array(0, $game_team_id),
+											  						'league'=>$_SESSION['league']),
 											  'order'=>array("Notification.id" => "DESC"),
 											  'limit 25'));
 		$messages = array();
