@@ -11,8 +11,25 @@ var async = require('async');
 var mysql = require('mysql');
 var S = require('string');
 /////DECLARATIONS/////////
-var FILE_PREFIX = config.updater_file_prefix+config.competition.id+'-'+config.competition.year;
+///
+///
+var argv = require('optimist').argv;
 
+
+if(typeof argv.league !== 'undefined'){
+	switch(argv.league){
+		case 'ita':
+			console.log('Serie A Activated');
+			config = require('./config.ita').config;
+		break;
+		default:
+			console.log('EPL Activated');
+			config = require('./config').config;
+		break;
+	}
+}
+var FILE_PREFIX = config.updater_file_prefix+config.competition.id+'-'+config.competition.year;
+var filedata = argv.file;
 
 
 /////THE LOGICS///////////////
@@ -48,7 +65,7 @@ function getRandomInt(category) {
 }
 async.waterfall([
 	function(callback){
-		open_file('transfer_value_v3.csv',function(err,content){
+		open_file(filedata,function(err,content){
 			callback(err,content.toString());
 		});
 	},
@@ -87,7 +104,7 @@ async.waterfall([
 			function(item,next){
 				console.log(item);
 				
-				conn.query("UPDATE ffgame.master_player SET transfer_value = ? WHERE uid = ?",
+				conn.query("UPDATE "+config.database.database+".master_player SET transfer_value = ? WHERE uid = ?",
 							[item.transfer_value,item.player_id],
 							function(err,rs){
 								console.log(S(this.sql).collapseWhitespace().s);

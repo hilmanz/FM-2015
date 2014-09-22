@@ -254,7 +254,7 @@ class ProfileController extends AppController {
 	
 	public function register_team(){
 		$userData = $this->getUserData();
-		
+		CakeLog::write('create_team',' ['.$_SESSION['league'].'] - register_team');
 		if(@$userData['register_completed']!=1 || $userData['team']==null){
 			$team = $this->Session->read('TeamRegister');
 			$this->set('previous_team',$team);
@@ -330,6 +330,8 @@ class ProfileController extends AppController {
 
 	public function create_team(){
 		$userData = $this->getUserData();
+		CakeLog::write('create_team',' ['.$_SESSION['league'].'] - create_team');
+		CakeLog::write('create_team',' ['.$this->Session->read('league').'] - create_team');
 		if(@$userData['register_completed']!=1 || $userData['team']==null){
 			$team = $this->Session->read('TeamRegister');
 			$players = explode(',',$this->request->data['players']);
@@ -366,7 +368,7 @@ class ProfileController extends AppController {
 				$this->Session->setFlash('Maaf, Anda tidak dapat membentuk tim lagi. Nampaknya Anda sudah melakukan pembentukan tim sebelumnya.');
 				$this->redirect('/profile/team_error');
 			}else{
-				CakeLog::write('create_team',$data['fb_id'].'-success creating game_user and game_team');
+				CakeLog::write('create_team',$data['fb_id'].' ['.$this->Session->read('league').'] - success creating game_user and game_team');
 				$step1_ok = true;
 				$userData['team'] = $this->Game->getTeam(Sanitize::paranoid($userData['fb_id']));
 				$this->loadModel('Team');
@@ -375,10 +377,11 @@ class ProfileController extends AppController {
 					'user_id'=>$user['User']['id'],
 					'team_id'=>Sanitize::paranoid($team['team_id']),
 					'team_name'=>Sanitize::clean($team['team_name']),
-					'league'=>$_SESSION['league']
+					'league'=>$this->Session->read('league')
 				));
-
+				CakeLog::write('create_team','InsertTeam->'.json_encode($InsertTeam));
 				if($InsertTeam){
+					CakeLog::write('create_team','InsertTeam->'.json_encode($InsertTeam));
 					$check_team = $this->Team->findByUser_id($user['User']['id']);
 					if($check_team['Team']['user_id']==$user['User']['id']){
 						CakeLog::write('create_team',$data['fb_id'].'-success creating fantasy.teams '.json_encode($InsertTeam));
@@ -387,6 +390,8 @@ class ProfileController extends AppController {
 						CakeLog::write('create_team',$data['fb_id'].'- data not exists in fantasy.teams '.json_encode($check_team));
 					}
 					
+				}else{
+					CakeLog::write('create_team','InsertTeam->'.json_encode($InsertTeam));
 				}
 				
 			}

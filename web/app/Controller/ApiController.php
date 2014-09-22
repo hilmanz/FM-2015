@@ -59,8 +59,12 @@ class ApiController extends AppController {
 	public function auth(){
 		$fb_id = $this->request->query('fb_id');
 		$user = $this->User->findByFb_id($fb_id);
+		$refresh_at = intval(@$this->request->query['refresh']);
 		$check_current_session = $this->Session->read('API_CURRENT_ACCESS_TOKEN');
-		if(strlen($fb_id) > 2 && $this->validateAPIAccessToken($check_current_session)){
+		if($refresh_at == 1){
+			$this->Session->write('API_CURRENT_ACCESS_TOKEN',null);
+		}
+		if(strlen($fb_id) > 2 && $this->validateAPIAccessToken($check_current_session) && $refresh_at==0){
 			$this->gameApiAccessToken = $check_current_session;
 			$api_session = $this->readAccessToken();
 			$session_fb_id = $api_session['fb_id'];

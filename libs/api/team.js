@@ -215,6 +215,7 @@ function create(data,callback){
 						}
 						conn.query(sql,d,function(err,rs){
 							console.log('CREATE_TEAM',S(this.sql).collapseWhitespace().s);
+							console.log('CREATE_TEAM',rs);
 							callback(err,result.insertId);
 						});
 					}else{

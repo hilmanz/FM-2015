@@ -75,8 +75,8 @@ class AppController extends Controller {
 				$this->renewUserData();
 			}
 		}else{
-			$_SESSION['ffgamedb'] = 'ffgame';
-			$_SESSION['ffgamestatsdb'] = 'ffgame_stats';
+			//$_SESSION['ffgamedb'] = 'ffgame';
+			//$_SESSION['ffgamestatsdb'] = 'ffgame_stats';
 		}
 		if(!isset($_SESSION['league'])){
 			$_SESSION['league'] = 'epl';
@@ -230,7 +230,12 @@ class AppController extends Controller {
 												));
 					}
 					
-
+					if($_SESSION['league']=='ita'){
+						CakeLog::write('matchday','last_matchday:'.json_encode($last_matchday));
+						CakeLog::write('matchday','previous_match:'.json_encode($previous_match));
+						CakeLog::write('matchday','upcoming_match:'.json_encode($upcoming_match));
+						CakeLog::write('matchday','matchstatus:'.json_encode($matchstatus));
+					}
 					//pr($matchstatus);
 					//pr(date("Y-m-d H:i:s",time()));
 					//pr( strtotime($previous_match['start_dt']));
@@ -359,8 +364,11 @@ class AppController extends Controller {
 					$this->set('open_time',$open_time);
 					//pr(date("Y-m-d H:i:s",$open_time));
 				}
+				if($_SESSION['league']=='ita'){
+					CakeLog::write('matchday','closeTime:'.json_encode($this->closeTime));
+					CakeLog::write('matchday','openTime:'.json_encode(date("Y-m-d H:i:s",$this->openTime)));	
+				}
 				
-
 				
 				
 				

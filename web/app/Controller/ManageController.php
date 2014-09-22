@@ -457,6 +457,7 @@ class ManageController extends AppController {
 		$userData = $this->userData;
 		
 		$next_match = $this->nextMatch;
+
 		$next_match['match']['home_original_name'] = @$next_match['match']['home_name'];
 		$next_match['match']['away_original_name'] = @$next_match['match']['away_name'];
 		if(@$next_match['match']['home_id']==@$userData['team']['team_id']){
@@ -466,7 +467,7 @@ class ManageController extends AppController {
 		}
 		
 		$this->set('next_match',$next_match['match']);
-
+		CakeLog::write('next_match',json_encode($next_match['match']));
 		//match venue
 		$match_venue = @$this->Game->getVenue($next_match['match']['home_id']);
 		$this->set('venue',$match_venue);
@@ -756,7 +757,7 @@ class ManageController extends AppController {
 	user already set a formation for the upcoming matchday.
 	Note that the new tactics only applied for the upcoming matchday.*/
 	public function tactics(){
-		
+		CakeLog::write('tactics',$_SESSION);
 		
 		$userData = $this->userData;
 
@@ -855,6 +856,8 @@ class ManageController extends AppController {
 				instruction_id,
 				amount) VALUES ";
 		
+
+
 		$total_spend = 0;
 		for($i=0;$i<sizeof($this->request->data['instruction']);$i++){
 
@@ -884,7 +887,7 @@ class ManageController extends AppController {
 				ON DUPLICATE KEY UPDATE
 				amount = VALUES(amount);";
 
-
+				CakeLog::write('tactics',$sql);
 		if($total_spend <= $instruction_points){
 			$is_ok = true;
 		}

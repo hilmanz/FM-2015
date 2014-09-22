@@ -20,13 +20,13 @@
     <div  id="pilih-liga"  class="widgets tr">
       <div>
 
-	       <a href="#">
+	       <a href="<?=$this->Html->url('/login/?league=ita')?>">
 	       	<img src="<?=$this->Html->url('/images/italy.jpg')?>"/>
 	       </a>
    		</div>
    		<div>
-	       <a href="#" class="button">
-	       COMING SOON
+	       <a href="<?=$this->Html->url('/login/?league=ita')?>" class="button">
+	         LOGIN KE SERIE A
 	       </a>
    		</div>	
     </div>
