@@ -49,6 +49,7 @@ exports.setConfig = function(c){
 var league = 'epl';
 exports.setLeague = function(l){
 	league = l;
+	punishment.setLeague(league);
 }
 
 console.log('lineup_stats - creating pool');
@@ -537,9 +538,9 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 														var msg_id = "ALL_PLAYER_STARTED_"+matchday;
 														var msg = "Selamat, anda baru saja mendapatkan bonus poin sebesar 20 dipertandingan lalu.";
 														conn.query("INSERT IGNORE INTO "+config.database.frontend_schema+".notifications\
-																	(content,url,dt,game_team_id,msg_id)\
+																	(content,url,dt,game_team_id,msg_id,league)\
 																	VALUES\
-																	(?,'#',NOW(),?,?)",[msg,item.id,msg_id],function(err,rs){
+																	(?,'#',NOW(),?,?)",[msg,item.id,msg_id,league],function(err,rs){
 																		//console.log('---',this.sql,'----');
 																		console.log('extra_point_notification',S(this.sql).collapseWhitespace().s);
 																		cb(err,true);
@@ -558,9 +559,9 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 														}
 														var msg = "Kamu mendapatkan potongan poin sebesar "+penalty+" karena star kamu negatif";
 														conn.query("INSERT IGNORE INTO "+config.database.frontend_schema+".notifications\
-																	(content,url,dt,game_team_id,msg_id)\
+																	(content,url,dt,game_team_id,msg_id,league)\
 																	VALUES\
-																	(?,'#',NOW(),?,?)",[msg,item.id,msg_id],function(err,rs){
+																	(?,'#',NOW(),?,?)",[msg,item.id,msg_id,league],function(err,rs){
 																		//console.log('---',this.sql,'----');
 																		console.log('extra_point_notification',S(this.sql).collapseWhitespace().s);
 																		cb(err,true);

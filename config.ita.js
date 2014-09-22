@@ -16,8 +16,8 @@ exports.config = {
 		port:6379
 	},
 	environment: 'development', //change to production when go live.
-	job_server_rank:{host:'localhost',port:3098},
-	job_server:{host:'localhost',port:3099},
+	job_server_rank:{host:'localhost',port:4098},
+	job_server:{host:'localhost',port:4099},
 	ecash :  {
 		protocol:'https',
 		host:'mandiri-ecash.com',

@@ -17,6 +17,9 @@ if(time() > @$close_time['ts'] && Configure::read('debug') == 0){
 }
 endif;
 
+if(Configure::read('DEBUG_CAN_UPDATE_FORMATION')){
+    $is_new_user = true;
+}
 if($is_new_user){
     
     $can_update_formation = true;

@@ -415,3 +415,5 @@ Configure::write('MINIMUM_INSTRUCTION_POINTS',10);
 
 
 Configure::write('FRONTEND_SCHEMA','fantasy');
+
+Configure::write('DEBUG_CAN_UPDATE_FORMATION',true);

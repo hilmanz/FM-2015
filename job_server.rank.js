@@ -54,8 +54,13 @@ var pool  = mysql.createPool({
 var app = express();
 var RedisStore = require('connect-redis')(express);
 
+var port = config.port;
+if(typeof argv.port !== 'undefined'){
+	port = argv.port;
+}
+
 // all environments
-app.set('port', process.env.PORT || config.port);
+app.set('port', process.env.PORT || port);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.favicon());
@@ -177,8 +182,8 @@ app.get('/refresh',function(req,res){
 });
 
 
-http.createServer(app).listen(3098, function(){
-  console.log('Express server listening on port 3098');
+http.createServer(app).listen(port, function(){
+  console.log('Express server listening on port ',port);
 });
 
 
