@@ -14,13 +14,14 @@ var redis = require('redis');
 var player_stats_category = require(path.resolve('./libs/game_config')).player_stats_category;
 var S = require('string');
 var argv = require('optimist').argv;
-
+var redis_key = 'epl';
 
 if(typeof argv.league !== 'undefined'){
 	switch(argv.league){
 		case 'ita':
 			console.log('Serie A Activated');
 			config = require('./config.ita').config;
+			redis_key = 'ita';
 		break;
 		default:
 			console.log('EPL Activated');
@@ -477,43 +478,18 @@ function storeMatchInfoToRedis(conn,matchday,done){
 		},
 		function(matches,standings,cb){
 
-			redisClient.set('standings',JSON.stringify(standings),function(err,rs){
+			redisClient.set('standings_'+redis_key,JSON.stringify(standings),function(err,rs){
 				if(!err){
 					console.log('match','standings successfully stored');
 				}else{
 					console.log('match','Error',err.message);
 				}
+				cb(err,matches);
 			});
-			if(typeof argv.league !== 'undefined'){
-				console.log('liga',argv.league);
-				switch(argv.league){
-					case 'ita':
-						redisClient.set('standings_ita',JSON.stringify(standings),function(err,rs){
-							if(!err){
-								console.log('match','standings successfully stored');
-							}else{
-								console.log('match','Error',err.message);
-							}
-							//cb(err,matches);
-						});
-					break;
-					default:
-						redisClient.set('standings_epl',JSON.stringify(standings),function(err,rs){
-							if(!err){
-								console.log('match','standings successfully stored');
-							}else{
-								console.log('match','Error',err.message);
-							}
-							//cb(err,matches);
-						});
-					break;
-				}
-			}
-			cb(matches);
 		},
 		function(matches,cb){
 			console.log('match','storing matchinfo',matches);
-			redisClient.set('matchinfo_'+matchday,JSON.stringify(matches),function(err,rs){
+			redisClient.set('matchinfo_'+matchday+'_'+redis_key,JSON.stringify(matches),function(err,rs){
 				if(!err){
 					console.log('matchinfo successfully stored');
 				}else{

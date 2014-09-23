@@ -385,7 +385,12 @@ class ApiController extends AppController {
 		$response['stats']['club_value'] = intval($budget) + $response['stats']['points'];
 
 		//club
-		$club = $this->Team->findByUser_id($user['User']['id']);
+		$conditions = array('conditions' => array(
+												'user_id'=>$user['User']['id'], 
+												'league'=>$this->league)
+							);
+
+		$club = $this->Team->find('first', $conditions);
 		$response['club'] = array('id'=>$club['Team']['id'],
 									'team_name'=>$club['Team']['team_name'],
 									'team_id'=>$club['Team']['team_id'],
@@ -565,7 +570,7 @@ class ApiController extends AppController {
 							'Weekly_point.game_id', 'Weekly_point.matchday', 'Weekly_point.matchdate', 
 							'SUM(Weekly_point.points + Weekly_point.extra_points) AS TotalPoints', 'Team.id', 'Team.user_id', 
 							'Team.team_id','Team.team_name'),
-			'conditions'=>array('Weekly_point.team_id'=>$club['Team']['id']),
+			'conditions'=>array('Weekly_point.team_id'=>$club['Team']['id'], 'Weekly_point.league' => $this->league),
 	        'limit' => 100,
 	        'group' => 'Weekly_point.matchday',
 	        'order' => array(
@@ -580,7 +585,7 @@ class ApiController extends AppController {
 						'game_id'=>$p['Weekly_point']['game_id'],
 						'matchday'=>$p['Weekly_point']['matchday'],
 						'matchdate'=>$p['Weekly_point']['matchdate'],
-						'points'=>@$p[0]['TotalPoints']
+						'points'=>@ceil($p[0]['TotalPoints'])
 					);
 			}
 		}else{

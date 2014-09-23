@@ -17,7 +17,7 @@ var S = require('string');
 var argv = require('optimist').argv;
 var request = require('request');
 var url = require('url');
-
+var redis_key = 'epl';
 
 
 if(typeof argv.league !== 'undefined'){
@@ -25,6 +25,7 @@ if(typeof argv.league !== 'undefined'){
 		case 'ita':
 			console.log('Serie A Activated');
 			config = require('./config.ita').config;
+			redis_key = 'ita';
 		break;
 		default:
 			console.log('EPL Activated');
@@ -1282,7 +1283,7 @@ function storeMatchInfoToRedis(conn,matchday,done){
 						});
 		},
 		function(matches,cb){
-			redisClient.set('matchinfo_'+matchday,JSON.stringify(matches),function(err,rs){
+			redisClient.set('matchinfo_'+matchday+'_'+redis_key,JSON.stringify(matches),function(err,rs){
 				if(!err){
 					console.log('matchinfo successfully stored');
 				}else{

@@ -62,9 +62,10 @@ async.waterfall([
 	}
 ],
 function(err){
-	pool.end(function(e){
+	conn.release();
+	pool.end(function(err){
 		console.log('done');
-	})
+	});
 });
 
 //TRIGGERED EVENTS
@@ -85,9 +86,7 @@ function processTriggeredEvents(done){
 			}
 		],
 		function(err,rs){
-			conn.end(function(err){
-				done(err);
-			});
+			done(err);
 		});
 	});
 }
@@ -484,7 +483,6 @@ function getAllEventsWhichWillHappenToday(cb){
 					AND DATE(schedule_dt) <= DATE(NOW()) \
 					LIMIT 20;",
 					[],function(err,rs){
-						conn.end(function(e){
 							try{
 								if(rs.length>0){
 									cb(err,rs);
@@ -494,7 +492,6 @@ function getAllEventsWhichWillHappenToday(cb){
 							}catch(e){
 								cb(err,null);
 							}
-						});
 					});
 	});
 }
@@ -595,9 +592,7 @@ function flagSchedule(schedule,flag,cb){
 		conn.query("UPDATE ffgame.master_events SET n_status=? WHERE id=?",
 					[flag,schedule.id],
 					function(err,rs){
-						conn.end(function(err){
-							cb(err,rs);	
-						});
+						cb(err,rs);	
 					});
 	});
 }
@@ -607,9 +602,7 @@ function distributeEventToIndividualTeam(schedule,cb){
 	pool.getConnection(function(err,conn){
 		//queue those selected individual teams to event_immediate table
 		distributeEachTeam(conn,schedule,targets,function(err){
-			conn.end(function(e){
-				cb(err);
-			})
+			cb(err);
 		});
 	});
 }
@@ -728,9 +721,7 @@ function distributeEventToAllTeams(schedule,cb){
 				}
 			});
 		},function(err){
-			conn.end(function(e){
-				cb(err);
-			});
+			cb(err);
 		});
 	});
 }
@@ -767,9 +758,7 @@ function distributeEventByOriginalTeam(schedule,cb){
 				}
 			});
 		},function(err){
-			conn.end(function(e){
-				cb(err);
-			});
+			cb(err);
 		});
 	});
 }
@@ -827,9 +816,7 @@ function distributeEventByOriginalTeamPrequisite(schedule,cb){
 				}
 			});
 		},function(err){
-			conn.end(function(e){
-				cb(err);
-			});
+			cb(err);
 		});
 	});
 }
@@ -866,9 +853,7 @@ function distributeEventByOriginalPlayer(schedule,cb){
 				}
 			});
 		},function(err){
-			conn.end(function(e){
-				cb(err);
-			});
+			cb(err);
 		});
 	});
 }
@@ -961,9 +946,7 @@ function distributeEventByTier(schedule,cb){
 				}
 			],
 			function(err){
-				conn.end(function(e){
-					cb(err);
-				});
+				cb(err);
 		});
 	});
 	
@@ -1032,9 +1015,7 @@ function distributeMasterEventToTeam(schedule,cb){
 						for(var i in rs){
 							players.push(rs[i].uid);
 						}
-						conn.end(function(err){
-							next();
-						});
+						next();
 					});
 		});
 		
@@ -1087,10 +1068,7 @@ function distributeMasterEvents(targets,schedule,cb){
 				next();
 			});
 		},function(err){
-			conn.end(function(err){
-				console.log('done');
-				cb(err);
-			});
+			console.log('done');
 		});
 	});
 }
@@ -1372,9 +1350,7 @@ function processMoneyPerks(cb){
 			});
 		},
 		function(err){
-			conn.end(function(e){
-				cb(e);
-			});
+			cb(err);
 		});	
 	});
 }
@@ -1410,10 +1386,7 @@ function processImmediateEvents(cb){
 				
 			});
 		},function(err){
-			conn.end(function(err){
-				cb(err);
-			});
-			
+			cb(err);
 		});
 	});
 }

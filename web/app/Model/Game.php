@@ -410,7 +410,7 @@ class Game extends AppModel {
 		}
 		$matchday+=1;
 		$nm = $matchday;
-		$response 	= $this->api_call('/livematches/'.$matchday);
+		$response 	= $this->api_call('/livematches/'.$matchday.'/'.$league);
 		$standings	= $this->api_call('/standings/'.$league);
 		$is_live = 1;
 		$show_stats = 0;
@@ -421,7 +421,7 @@ class Game extends AppModel {
 			}
 			$is_live = 0;
 			//check if the previous matchday has cached stats.
-			$response = $this->api_call('/livematches/'.$matchday);
+			$response = $this->api_call('/livematches/'.$matchday.'/'.$league);
 			if(sizeof($response['data'])>0){
 				$show_stats = 1;
 			}
