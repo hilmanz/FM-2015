@@ -172,7 +172,7 @@ app.get('/leaderboard',[auth.canAccess],gameplay.leaderboard);
 app.get('/matchstatus/:matchday',[auth.canAccess],gameplay.matchstatus);
 app.get('/livestats/:game_id',[auth.canAccess],gameplay.livestats);
 app.get('/livegoals/:game_id',[auth.canAccess],gameplay.livegoals);
-app.get('/livematches/:matchday',[auth.canAccess],gameplay.livematches);
+app.get('/livematches/:matchday/:league',[auth.canAccess],gameplay.livematches);
 app.get('/standings/:league',[auth.canAccess],gameplay.standings);
 app.get('/apply_perk/:game_team_id/:perk_id',[auth.canAccess],gameplay.apply_perk);
 app.get('/check_perk/:game_team_id/:perk_id',[auth.canAccess],gameplay.check_perk);
