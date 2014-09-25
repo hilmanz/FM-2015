@@ -28,49 +28,49 @@ var pool  = mysql.createPool({
 });
 
 
-
-async.waterfall([
-	//process triggered events first
-	function(callback){
-		processTriggeredEvents(function(err,rs){
-			callback(err);
+pool.getConnection(function(err,conn){
+	async.waterfall([
+		//process triggered events first
+		function(callback){
+			processTriggeredEvents(conn, function(err,rs){
+				callback(err);
+			});
+		},
+		//get all standard events which will happen today and still not been processed.
+		function(callback){
+			getAllEventsWhichWillHappenToday(conn, function(err,rs){
+				callback(err,rs);
+			});
+		},
+		function(schedules,callback){
+			processSchedule(schedules,function(err){
+				callback(err);
+			});
+		},
+		function(callback){
+			//process immediate events
+			processImmediateEvents(conn, function(err){
+				callback(err);
+			});
+		},
+		function(callback){
+			//process money perks.
+			//as per 12/12/2013, every money event will be processed immediately.
+			processMoneyPerks(conn, function(err){
+				callback(err);
+			});
+		}
+	],
+	function(err){
+		conn.release();
+		pool.end(function(err){
+			console.log('done');
 		});
-	},
-	//get all standard events which will happen today and still not been processed.
-	function(callback){
-		getAllEventsWhichWillHappenToday(function(err,rs){
-			callback(err,rs);
-		});
-	},
-	function(schedules,callback){
-		processSchedule(schedules,function(err){
-			callback(err);
-		});
-	},
-	function(callback){
-		//process immediate events
-		processImmediateEvents(function(err){
-			callback(err);
-		});
-	},
-	function(callback){
-		//process money perks.
-		//as per 12/12/2013, every money event will be processed immediately.
-		processMoneyPerks(function(err){
-			callback(err);
-		});
-	}
-],
-function(err){
-	conn.release();
-	pool.end(function(err){
-		console.log('done');
 	});
 });
 
 //TRIGGERED EVENTS
-function processTriggeredEvents(done){
-	pool.getConnection(function(err,conn){
+function processTriggeredEvents(conn, done){
 		console.log('process triggered events');
 		async.waterfall([
 			function(cb){
@@ -88,7 +88,6 @@ function processTriggeredEvents(done){
 		function(err,rs){
 			done(err);
 		});
-	});
 }
 
 function getAllTriggeredEventsThatHappenToday(conn,done){
@@ -475,25 +474,23 @@ function getTeamsRangeInTier(conn,tier,done){
 
 
 //STANDARD EVENTS
-function getAllEventsWhichWillHappenToday(cb){
+function getAllEventsWhichWillHappenToday(conn, cb){
 	//the yesterday's unexecuted events should be able to processed also.
-	pool.getConnection(function(err,conn){
-		conn.query("SELECT * FROM ffgame.master_events \
-					WHERE n_status=0 \
-					AND DATE(schedule_dt) <= DATE(NOW()) \
-					LIMIT 20;",
-					[],function(err,rs){
-							try{
-								if(rs.length>0){
-									cb(err,rs);
-								}else{
-									cb(err,[]);
-								}
-							}catch(e){
-								cb(err,null);
+	conn.query("SELECT * FROM ffgame.master_events \
+				WHERE n_status=0 \
+				AND DATE(schedule_dt) <= DATE(NOW()) \
+				LIMIT 20;",
+				[],function(err,rs){
+						try{
+							if(rs.length>0){
+								cb(err,rs);
+							}else{
+								cb(err,[]);
 							}
-					});
-	});
+						}catch(e){
+							cb(err,null);
+						}
+				});
 }
 
 //for each events, check its event_type
@@ -1324,8 +1321,7 @@ function sendNotificationEmails(schedule,cb){
 /*
 * process all game_perks that rewards a money to user immediately
 */
-function processMoneyPerks(cb){
-	pool.getConnection(function(err,conn){
+function processMoneyPerks(conn, cb){
 		var has_data = true;
 		async.whilst(
 		function(){
@@ -1352,13 +1348,11 @@ function processMoneyPerks(cb){
 		function(err){
 			cb(err);
 		});	
-	});
 }
 
 //process the immediate events,
 //at the moment, we only send or deduct the money.
-function processImmediateEvents(cb){
-	pool.getConnection(function(err,conn){
+function processImmediateEvents(conn, cb){
 		var has_data = true;
 		async.whilst(function(){
 			return has_data;
@@ -1388,7 +1382,6 @@ function processImmediateEvents(cb){
 		},function(err){
 			cb(err);
 		});
-	});
 }
 
 function apply_event_modifier(conn,queue,cb){
@@ -1542,6 +1535,10 @@ function next_match(conn,game_team_id,done){
 						});
 			},
 			function(rs,callback){
+				var matchday = rs[0].matchday - 1;
+				if(matchday == 0){
+					matchday = 1;
+				}
 				try{
 					conn.query("SELECT match_date \
 								FROM \
@@ -1549,7 +1546,7 @@ function next_match(conn,game_team_id,done){
 								WHERE matchday = ? \
 								ORDER BY match_date DESC \
 								LIMIT 1;",
-								[(rs[0].matchday - 1)],
+								[matchday],
 								function(err,last_match){
 									rs[0].last_match = last_match[0].match_date;
 									callback(err,rs);

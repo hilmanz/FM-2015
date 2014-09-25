@@ -1581,7 +1581,12 @@ class ApiController extends AppController {
 		
 		$game_team = $this->Game->getTeam($fb_id);
 		//club
-		$club = $this->Team->findByUser_id($user['User']['id']);
+		$conditions = array('conditions' => array(
+												'user_id'=>$user['User']['id'], 
+												'league'=>$this->league)
+							);
+
+		$club = $this->Team->find('first', $conditions);
 
 		$next_match = $this->Game->getNextMatch($game_team['team_id']);
 		$next_match['match']['home_original_name'] = $next_match['match']['home_name'];
@@ -5654,13 +5659,18 @@ class ApiController extends AppController {
 	*/
 	public function fixtures(){
 		$this->layout="ajax";
+		$competition_id = 8;
+		$session_id = Configure::read('FM_SESSION_ID');
+		if(@$_REQUEST['league']=='ita'){
+			$competition_id = 21;
+		}
 		$rs  = $this->Game->query("SELECT a.*,b.name as home_name,c.name as away_name
 										FROM ".$this->ffgamedb.".game_fixtures a
 										INNER JOIN ".$this->ffgamedb.".master_team b
 										ON a.home_id = b.uid
 										INNER JOIN ".$this->ffgamedb.".master_team c
 										ON a.away_id = c.uid
-										WHERE a.competition_id=8 AND session_id=2014
+										WHERE a.competition_id={$competition_id} AND session_id={$session_id}
 										ORDER BY a.matchday
 										LIMIT 380");
 		$fixture = array();

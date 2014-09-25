@@ -52,6 +52,11 @@ class LoginController extends AppController {
 
 	public function index()
 	{
+		//clear session
+		$this->Session->delete('Userlogin.info');
+		$this->Session->delete('TeamRegister');
+		$this->Session->delete('UserFBDetail');
+  		$this->Session->delete('Userlogin.is_login');
 
 		if($this->request->is("post"))
 		{
