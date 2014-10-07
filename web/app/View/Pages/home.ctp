@@ -75,7 +75,7 @@
                       <a class="smallerThumb" href="#">
                         <img src="http://omo.akamai.opta.net/image.php?custID=c8bb60c8f6d0184c33a87e6f3041b9cc&sport=football&entity=player&description=<?=str_replace('t','',$top_players[$i]['team_id'])?>&dimensions=103x155&id=<?=str_replace('p','',$top_players[$i]['player_id'])?>"/></a>
                        <h3>
-						<span><?=h($top_players[$i]['name'])?></span>
+						<span><?=h($top_players[$i]['NAME'])?></span>
 						<span class="points"><?=number_format($top_players[$i]['total'])?> Pts</span>
                      </h3>
                      

@@ -45,7 +45,7 @@ $overall = isset($overall) ? "selected='selected'":"";
                       <td class="l-rank"><?=number_format($no)?></td>
                       <td class="l-club"><?=h($value['c']['team_name'])?></td>
                       <td class="l-manager"><?=h($value['d']['name'])?></td>
-                      <td class="l-points alignright"><?=number_format($value['b']['points'])?></td>
+                      <td class="l-points alignright"><?=number_format($value['b']['total_points'])?></td>
                     </tr>
                   <?php
                   $no++;

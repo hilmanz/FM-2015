@@ -13,6 +13,7 @@
                     Disini satu akun hanya bisa membuat satu private league saja.
                     Dan satu akun hanya bisa ikut satu private league saja.
                     </p>
+                    <br />
                     <?php if($join_button): ?>
                         <a class="button fr" href="<?=$this->Html->url('/privateleague/join_confirmation')?>">
                             Join Private League

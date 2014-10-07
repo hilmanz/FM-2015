@@ -1640,7 +1640,7 @@ class ApiController extends AppController {
 										'match_date_ts'=>strtotime($next_match['match']['match_date'])
 										);
 			$user['User']['close_time'] = $this->closeTime;
-			$user['User']['team_name'] = $user['Team']['team_name'];
+			$user['User']['team_name'] = $club['Team']['team_name'];
 			$this->set('response',array('status'=>1,'data'=>$user['User']));
 		}
 		$this->render('default');
@@ -2453,7 +2453,10 @@ class ApiController extends AppController {
 		//bind the model's association first.
 		//i'm too lazy to create a new Model Class :P
 		$this->MerchandiseItem->bindModel(array(
-			'belongsTo'=>array('MerchandiseCategory')
+			'belongsTo'=>array('MerchandiseCategory'=>array('type'=>'inner',
+					'conditions'=>array(
+						"is_mobile = 0"
+					)))
 		));
 
 		//we need to populate the category
@@ -2512,7 +2515,7 @@ class ApiController extends AppController {
 		//retrieve the total rows
 		unset($options['limit']);
 		unset($options['offset']);
-		$total_rows = $this->MerchandiseItem->find('count',$options);
+		$total_rows = count($rs);
 		
 		//check the stock for each items
 		for($i=0;$i<sizeof($rs);$i++){
@@ -2590,7 +2593,6 @@ class ApiController extends AppController {
 		//get the item detail
 		$item = $this->MerchandiseItem->find('first', $where);
 		
-		
 			
 		$item['MerchandiseItem']['available'] = $item['MerchandiseItem']['stock'];
 
@@ -2614,7 +2616,12 @@ class ApiController extends AppController {
 		$response['children'] = $this->MerchandiseItem->find('all',$child_opts);
 		$response['parent'] = $this->MerchandiseItem->findById($item['MerchandiseItem']['parent_id']);
 		$this->layout="ajax";
-		$this->set('response',array('status'=>1,'data'=>$response));
+		$status = 1;
+		if($category['MerchandiseCategory']['is_mobile'] == 1){
+			$status = 0;
+			$response = '';
+		}
+		$this->set('response',array('status'=>$status,'data'=>$response));
 		$this->render('default');
 	}
 
@@ -2662,11 +2669,14 @@ class ApiController extends AppController {
 		//bind the model's association first.
 		//i'm too lazy to create a new Model Class :P
 		$this->MerchandiseItem->bindModel(array(
-			'belongsTo'=>array('MerchandiseCategory')
+			'belongsTo'=>array('MerchandiseCategory'=>array(
+								'type' => 'inner',
+								'conditions' => array('is_mobile' => 1)
+							))
 		));
 
 		//we need to populate the category
-		$categories = $this->getCatalogMainCategories();
+		$categories = $this->getCatalogMainCategoriesMobile();
 		$response['main_categories'] = $categories;
 
 		$total_rows = 0;
@@ -2816,7 +2826,13 @@ class ApiController extends AppController {
 		$response['children'] = $this->MerchandiseItem->find('all',$child_opts);
 		$response['parent'] = $this->MerchandiseItem->findById($item['MerchandiseItem']['parent_id']);
 		$this->layout="ajax";
-		$this->set('response',array('status'=>1,'data'=>$response));
+		$status = 1;
+		if($category['MerchandiseCategory']['is_mobile'] == 0){
+			$status = 0;
+			$response = '';
+		}
+
+		$this->set('response',array('status'=>$status,'data'=>$response));
 		$this->render('default');
 	}
 	/*
@@ -3750,7 +3766,21 @@ class ApiController extends AppController {
 	private function getCatalogMainCategories(){
 		//retrieve main categories
 		$categories = $this->MerchandiseCategory->find('all',
-						array('conditions'=>array('parent_id'=>0),
+						array('conditions'=>array('parent_id'=>0,'is_mobile'=>0),
+							  'limit'=>100)
+					);
+		for($i=0;$i<sizeof($categories);$i++){
+			$categories[$i]['Child'] = $this->getChildCategories($categories[$i]['MerchandiseCategory']['id']);
+		}
+		return $categories;
+	}
+	/**
+	*	get catalog's main categories for mobile
+	*/
+	private function getCatalogMainCategoriesMobile(){
+		//retrieve main categories
+		$categories = $this->MerchandiseCategory->find('all',
+						array('conditions'=>array('parent_id'=>0,'is_mobile'=>1),
 							  'limit'=>100)
 					);
 		for($i=0;$i<sizeof($categories);$i++){
@@ -5077,8 +5107,8 @@ class ApiController extends AppController {
 	}
 
 		/*
-	* API for login user from send_activation
-	* POST :  /api/send_activation/
+	* API for login user from send_activation_mobile
+	* POST :  /api/send_activation_mobile/
 	* PostData : ?fb_id=[s]&email=[s]
 	* Response :JSON
 	*/
@@ -5097,10 +5127,14 @@ class ApiController extends AppController {
 				$data_request['email'] = $rs_user['User']['email'];
 				$data_request['activation_code'] = $rs_user['User']['activation_code'];
 
+				$encrypt_param = encrypt_param(serialize($data_request));
+				$ss_web = Configure::read('SUPERSOCCER_WEB');
+				$data_request['url'] = $ss_web.'activation/?param='.$encrypt_param;
+
 				$send_mail = $this->requestAction(
 													array(
 														'controller' => 'profile',
-														'action' => 'send_mail'
+														'action' => 'send_link_activation'
 													),
 													array('data_request' => $data_request)
 												);
@@ -5127,8 +5161,8 @@ class ApiController extends AppController {
 
 
 	/*
-	* API for login user from activation_user
-	* POST :  /api/activation_user/
+	* API for login user from activation_user_mobile
+	* POST :  /api/activation_user_mobile/
 	* PostData : ?email=[s]&activation_code=[n]
 	* Response :JSON
 	*/
@@ -5831,7 +5865,10 @@ class ApiController extends AppController {
 		$team_id = $this->request->data['team_id'];
 
 		$user = $this->User->findByFb_id($fb_id);
+		$user['Team'] = $this->Game->getTeam($fb_id);
+		
 		$userData = $user['User'];
+		Cakelog::write('api', 'api.create_team '.json_encode($user).' '.json_encode($userData));
 		
 		if(@$userData['register_completed']!=1 || $user['Team']==null){
 			
@@ -5914,4 +5951,31 @@ class ApiController extends AppController {
 		$this->render('default');	
 		
 	}
+
+	public function get_mobile_charge()
+	{
+		$charge = Configure::read('MOBILE_CHARGE');
+		
+		if($this->request->query('trx_type') != NULL)
+		{
+			$trx_type = strtoupper(trim($this->request->query('trx_type')));
+			if(array_key_exists($trx_type, $charge))
+			{
+				$amount[$trx_type] = $charge[$trx_type];
+				$results = array('status'=>1,'data'=>$amount);
+			}
+			else
+			{
+				$results = array('status'=>0,'data'=>NULL,'message'=>'Terjadi Kesalahan !');
+			}
+		}
+		else
+		{
+			$results = array('status'=>1,'data'=>$charge);
+		}
+
+		$this->set('response',$results);
+		$this->render('default');	
+	}
+
 }

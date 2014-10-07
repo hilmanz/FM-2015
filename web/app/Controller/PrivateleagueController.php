@@ -41,14 +41,12 @@ class PrivateleagueController extends AppController {
 
 	public function index()
 	{
-		$userData = $this->getUserData();
-		$rs_user = $this->User->findByFb_id($userData['fb_id']);
+		$rs_user = $this->userDetail;
 		$team_id 	= $rs_user['Team']['id'];
-
 		$join_button = false;
 
 		//check if user has create private league or user has joined private league
-		$result = $this->League->checkUser($userData['email'], $team_id, $this->league);
+		$result = $this->League->checkUser($rs_user['User']['email'], $team_id, $this->league);
 		if($result['has_invited'] == 1 && $result['has_joined'] != 1)
 		{
 			$join_button = true;	
@@ -63,12 +61,13 @@ class PrivateleagueController extends AppController {
 	public function create()
 	{
 		$this->Session->delete('league_id');
-		
-		$userData 	= $this->getUserData();
-		$rs_user 	= $this->User->findByFb_id($userData['fb_id']);
+
+		$rs_user 	= $this->userDetail;
 		$user_id 	= $rs_user['User']['id'];
 		$email 		= $rs_user['User']['email'];
 		$team_id 	= $rs_user['Team']['id'];
+
+
 
 		//check if user has create private league or user has joined private league
 		$result = $this->League->checkUser($email, $team_id, $this->league);
@@ -81,7 +80,7 @@ class PrivateleagueController extends AppController {
 		else if($result['has_joined'] == 1)
 		{
 			//redirect to /privateleague
-			$this->Session->setFlash('Loe gak bisa buat private league lagi');
+			$this->Session->setFlash('Sorry, lo sudah bergabung dengan Private League sebelumnya.');
 			$this->redirect('/privateleague');
 		}
 
@@ -203,7 +202,7 @@ class PrivateleagueController extends AppController {
 				$this->leagueInvitation->saveMany($data);
 				
 				$this->Session->delete('league_id');
-				$this->Session->setFlash('Berhasil');
+				$this->Session->setFlash('Undangan untuk gabung ke Private League '.$rs_league['League']['name'].' sudah dikirim ke email teman loe.');
 				$this->redirect('/privateleague');
 			}catch(Exception $e){
 				$this->Session->setFlash('Terjadi kesalahan, silahkan coba lagi');
@@ -214,8 +213,7 @@ class PrivateleagueController extends AppController {
 
 	public function join_confirmation()
 	{
-		$userData 	= $this->getUserData();
-		$rs_user 	= $this->User->findByFb_id($userData['fb_id']);
+		$rs_user 	= $this->userDetail;
 		$email 		= $rs_user['User']['email'];
 
 		$rs_league = $this->League->query("SELECT * FROM league_invitations a 
@@ -238,6 +236,7 @@ class PrivateleagueController extends AppController {
 		}
 		else
 		{
+			$this->Session->setFlash('Sorry, lo sudah bergabung dengan Private League sebelumnya.');
 			$this->redirect('/privateleague');
 		}
 
@@ -247,8 +246,7 @@ class PrivateleagueController extends AppController {
 	{
 		$trx_code = $this->request->query['trx'];
 		$param = unserialize(decrypt_param($trx_code));
-		$userData 	= $this->getUserData();
-		$rs_user = $this->User->findByFb_id($userData['fb_id']);
+		$rs_user = $this->userDetail;
 
 		if($param['email'] == $rs_user['User']['email'])
 		{
@@ -279,8 +277,7 @@ class PrivateleagueController extends AppController {
 
 	public function join()
 	{
-		$userData 	= $this->getUserData();
-		$rs_user 	= $this->User->findByFb_id($userData['fb_id']);
+		$rs_user 	= $this->userDetail;
 		$email 		= $rs_user['User']['email'];
 		$team_id 	= $rs_user['Team']['id'];
 
@@ -328,8 +325,7 @@ class PrivateleagueController extends AppController {
 
 	public function reject()
 	{
-		$userData 	= $this->getUserData();
-		$rs_user 	= $this->User->findByFb_id($userData['fb_id']);
+		$rs_user 	= $this->userDetail;
 		$email 		= $rs_user['User']['email'];
 
 		$trx_code = $this->request->query['trx'];
@@ -356,8 +352,7 @@ class PrivateleagueController extends AppController {
 
 	public function pengaturan()
 	{
-		$userData 	= $this->getUserData();
-		$rs_user 	= $this->User->findByFb_id($userData['fb_id']);
+		$rs_user 	= $this->userDetail;
 
 	    $rs_league = $this->League->query("SELECT * FROM league 
 	    									WHERE user_id='{$rs_user['User']['id']}'
@@ -416,8 +411,7 @@ class PrivateleagueController extends AppController {
 
 	public function leaderboard()
 	{
-		$userData 	= $this->getUserData();
-		$rs_user 	= $this->User->findByFb_id($userData['fb_id']);
+		$rs_user 	= $this->userDetail;
 		$team_id 	= $rs_user['Team']['id'];
 
 		$matchday = 0;
@@ -432,7 +426,7 @@ class PrivateleagueController extends AppController {
 
 		$rs_league = $this->League->getLeague($team_id, $this->league);
 
-		$rs_leaderboard = $this->League->query("SELECT a.*,b.*,c.*,d.name FROM league_member a 
+		$rs_leaderboard = $this->League->query("SELECT c.id,c.team_name,d.name,b.total_points FROM league_member a 
 												INNER JOIN league_table b ON a.league_id = b.league_id
 												INNER JOIN teams c ON b.team_id = c.id
 												INNER JOIN users d ON c.user_id = d.id
@@ -440,9 +434,10 @@ class PrivateleagueController extends AppController {
 												AND b.matchday='{$matchday}'
 												AND b.league='{$this->league}'
 												GROUP BY b.team_id
-												ORDER BY b.points DESC
+												ORDER BY b.total_points DESC
 												LIMIT 1000");
 
 		$this->set('rs_leaderboard', $rs_leaderboard);
 	}
+
 }

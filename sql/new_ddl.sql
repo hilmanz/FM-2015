@@ -560,3 +560,9 @@ ADD UNIQUE INDEX `UNIQUE` (`team_id` ASC, `league` ASC);
 
 ALTER TABLE `fantasy`.`notifications` 
 ADD COLUMN `league` VARCHAR(3) NULL DEFAULT 'epl' AFTER `msg_id`;
+
+ALTER TABLE `fantasy`.`merchandise_categories` 
+ADD COLUMN `is_mobile` VARCHAR(1) NULL DEFAULT '0' AFTER `parent_id`;
+
+ALTER TABLE `fantasy`.`league_table` 
+ADD COLUMN `total_points` INT(11) NULL AFTER `points`;

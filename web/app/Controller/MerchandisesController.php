@@ -81,7 +81,10 @@ class MerchandisesController extends AppController {
 		//bind the model's association first.
 		//i'm too lazy to create a new Model Class :P
 		$this->MerchandiseItem->bindModel(array(
-			'belongsTo'=>array('MerchandiseCategory')
+			'belongsTo'=>array('MerchandiseCategory'=>array(
+					'type' => 'inner',
+					'conditions' => array('is_mobile' => 0)
+				))
 		));
 
 		//we need to populate the category
@@ -101,6 +104,11 @@ class MerchandisesController extends AppController {
 
 			//we need to know the category details
 			$category = $this->MerchandiseCategory->findById($category_id);
+			//cek if category is mobile redirect to merchandise page
+			if($category['MerchandiseCategory']['is_mobile'] == 1)
+			{
+				$this->redirect('/merchandises');
+			}
 			$this->set('category_name',h($category['MerchandiseCategory']['name']));
 
 		}else{
@@ -328,6 +336,10 @@ class MerchandisesController extends AppController {
 		$this->set('user_detail', $this->userDetail);
 
 		$category = $this->MerchandiseCategory->findById($item['MerchandiseItem']['merchandise_category_id']);
+		if($category['MerchandiseCategory']['is_mobile'] == 1)
+		{
+			$this->redirect('/merchandises');
+		}
 		$this->set('category_name',h($category['MerchandiseCategory']['name']));
 
 		
@@ -396,7 +408,8 @@ class MerchandisesController extends AppController {
 	private function populate_main_categories(){
 		//retrieve main categories
 		$categories = $this->MerchandiseCategory->find('all',
-														array('conditions'=>array('parent_id'=>0),
+														array('conditions'=>array('parent_id'=>0,
+																				'is_mobile'=>0),
 															  'limit'=>100)
 													);
 		for($i=0;$i<sizeof($categories);$i++){

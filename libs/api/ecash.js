@@ -73,6 +73,8 @@ function step1(transaction_id,clientIpAddress,description,amount,source,callback
 		returnUrl = service.returnUrl5;
 	}else if(source=='FMRENEWAL'){
 		returnUrl = service.returnUrl6;
+	}else if(source=='FMPAYMENTMOBILE'){
+		returnUrl = service.returnUrl7;
 	}else{
 		returnUrl = service.returnUrl2;
 	}

@@ -7,14 +7,28 @@ var S = require('string');
 var frontend_schema = config.database.frontend_schema;
 var template = require('./privateleague_mailer_template').template;
 
-var transport = nodemailer.createTransport(smtpTransport({
-    host: 'smtp.mailgun.org',
-    port: 25,
+var transport = nodemailer.createTransport("SMTP",{
+    host: config.haraka.host,
+    port: config.haraka.port,
+    from: config.haraka.from,
     auth: {
-        user: config.mailgun.user,
-        pass: config.mailgun.pass
-    }
-}));
+        user: config.haraka.user,
+        pass: config.haraka.pass
+    },
+    authMethod: "LOGIN"
+});
+
+console.log(config.haraka);
+
+//var transport = nodemailer.createTransport(smtpTransport({
+//    host: config.mailgun.host,
+//    port: config.mailgun.port,
+//    from: config.mailgun.from,
+//    auth: {
+//        user: config.mailgun.user,
+//        pass: config.mailgun.pass
+//    }
+//}));
 
 var pool  = mysql.createPool({
    host     : config.database.host,
@@ -23,7 +37,6 @@ var pool  = mysql.createPool({
 });
 
 var mailOption = {
-					from: config.mailgun.from,
 					to: "",
 					subject: "Private League Invitation",
 					html: template.invite
@@ -32,13 +45,13 @@ var mailOption = {
 
 
 var start = 0;
-var limit = 1;
+var limit = 100;
 var doLoop = true;
 pool.getConnection(function(err,conn){
 	async.whilst(
 	    function () { return doLoop; },
 	    function (callback) {
-	        conn.query("SELECT * FROM "+frontend_schema+".league_invitations \
+	        conn.query("SELECT * FROM "+config.database.frontend_schema+".league_invitations \
 						WHERE is_processed = 0 AND n_status = 0 \
 						LIMIT ?,?",
 				[start,limit],
@@ -80,8 +93,8 @@ function sendMail(conn,users,done){
 						console.log(err);
 						callback();
 					}else{
-						console.log("Message Sent "+info.response);
-						conn.query("UPDATE "+frontend_schema+".league_invitations SET is_processed=1 \
+						console.log("Message Sent "+JSON.stringify(info));
+						conn.query("UPDATE "+config.database.frontend_schema+".league_invitations SET is_processed=1 \
 									WHERE id=?",[id],function(err,rs){
 										console.log(S(this.sql).collapseWhitespace().s);
 										i++;

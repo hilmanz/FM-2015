@@ -245,7 +245,7 @@ $weekly_performance = null;
             <p>Gaji Mingguan</p>
             <h4>ss$ <?=number_format($data['player']['salary'])?></h4>
         </div>
-        <div class="club-info fl">
+        <div class="club-info fl" style="width:150px;">
             <p>Nilai Transfer</p>
             <h4>
                 ss$

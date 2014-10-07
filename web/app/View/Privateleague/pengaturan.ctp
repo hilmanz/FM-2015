@@ -3,14 +3,39 @@
      	 <?php echo $this->element('infobar'); ?>
       </div>
       <div class="rowd">
+      <div class="fl">
+        <a href="<?=$this->Html->url('/privateleague')?>" class="button">
+          KEMBALI
+        </a>
+      </div>
        
     <div id="thecontent">
         <div id="content">
         	<div class="content">
             	<div class="row-2">
                     <h1 class="red">Pengaturan Liga</h1>
+                    <?php if(count($rs_joined) > 0): ?>
+                    <p>Joined</p>
+                    <table class="theTable footable" width="100%">
+                      <thead>
+                          <tr>
+                              <th data-class="expand">No.</th>
+                              <th>Email</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        <?php $i=1; foreach($rs_joined as $value): ?>
+                        <tr>
+                          <td><?=$i?></td>
+                          <td><?=$value['leagueInvitation']['email']?></td>
+                        </tr>
+                        <?php $i++; endforeach; ?>
+                      </tbody>
+                    </table>
+                    <?php endif; ?>
+
                     <?php if(count($rs_invited) > 0): ?>
-                    <p>Yang Belum Join</p>
+                    <p>Waiting Confirmation</p>
                     <table class="theTable footable" width="100%">
                       <thead>
                           <tr>
@@ -35,30 +60,11 @@
                       </tbody>
                     </table>
                     <?php endif; ?>
-                    <?php if(count($rs_joined) > 0): ?>
-                    <p>Yang Sudah Join</p>
-                    <table class="theTable footable" width="100%">
-                      <thead>
-                          <tr>
-                              <th data-class="expand">No.</th>
-                              <th>Email</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                        <?php $i=1; foreach($rs_joined as $value): ?>
-                        <tr>
-                          <td><?=$i?></td>
-                          <td><?=$value['leagueInvitation']['email']?></td>
-                        </tr>
-                        <?php $i++; endforeach; ?>
-                      </tbody>
-                    </table>
-                    <?php endif; ?>
     			</div><!-- end .row-2 -->
               <form class="theForm" action="<?=$this->Html->url('/privateleague/invite')?>" 
                 enctype="multipart/form-data" method="post">
                   <div class="row">
-                      <label>Email</label>
+                      <label>Email Teman</label>
                       <input type="hidden" name="league_trx" value="<?=$league_trx?>" />
                       <input id="email" type="text" name="email[]" value="" maxlength="30"/>
                       <a id="add_email" href="javascript:;" class="fr yellow">
@@ -68,7 +74,7 @@
                   <div id="t_email">
                   </div>
                   <div class="row">
-                      <a id="submit_invite" class="button" href="javascript:;">Invite</a>
+                      <a id="submit_invite" class="button" href="javascript:;">Kirim Undangan</a>
                       <span id="message"></span>
                   </div><!-- end .row -->
               </form>
@@ -98,7 +104,7 @@ $(document).ready(function(){
 });
   
   $('a#copylink').on('click', function(e){
-    var link = "<?=Configure::read('DOMAIN');?>privateleague/linkjoin/?trx="+$(this).attr('data-trx');
+    var link = "<?=Configure::read('DOMAIN');?>/privateleague/linkjoin/?trx="+$(this).attr('data-trx');
     $('#t_link').text(link);
 
     $("#bgPopup").fadeIn();
@@ -111,7 +117,7 @@ $(document).ready(function(){
     if(count <= limit)
     {
       $('#t_email').append('<div class="row">\
-                        <label>Email</label>\
+                        <label>Email Teman</label>\
                         <input id="email" type="text" name="email[]" value="" maxlength="30"/>\
                     </div>');
     }
