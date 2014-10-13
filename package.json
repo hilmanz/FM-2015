@@ -31,6 +31,7 @@
     "php-unserialize":"latest",
     "request":"latest",
     "nodemailer-smtp-transport":"latest",
-    "nodemailer-sendmail-transport":"latest"
+    "nodemailer-sendmail-transport":"latest",
+    "smtpc":"latest"
   }
 }

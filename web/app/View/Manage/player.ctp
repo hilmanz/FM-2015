@@ -24,6 +24,11 @@ var daily_stats = {};
 </script>
 <?php
 require_once APP . 'Vendor' . DS. 'stats.locale.php';
+if($_SESSION['league']=='epl'){
+    $transfer_date = '11';
+}else{
+    $transfer_date = '17';
+}
 //mapping statistics
 $games = array(
         'game_started'=>'game_started',
@@ -750,7 +755,7 @@ $("#btnSale").fancybox({
     </div>
     <div class="window_closed" style="display:none;">
         <h1>Transfer Window Sedang Tutup</h1>
-        <h3>Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 11.</h3>
+        <h3>Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal <?=$transfer_date?>.</h3>
         
     </div>
 </script>
