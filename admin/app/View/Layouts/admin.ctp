@@ -73,6 +73,7 @@
                                 <li>
                                     <a href="<?=$this->Html->url('/perks')?>">Game Perks</a>
                                 </li>
+                                <li><a href="<?=$this->Html->url('/simulation')?>">FM Points Simulation</a></li>
 							</ul>
                         </li>
                     	<li><a href="#">OPTA</a>
@@ -80,6 +81,7 @@
                             	<li><a href="<?=$this->Html->url('/pushlogs')?>">Push Logs</a></li>
                             	<li><a href="<?=$this->Html->url('/matches')?>">Match Results</a></li>
                             	<li><a href="<?=$this->Html->url('/stats')?>">Statistics</a></li>
+
 							</ul>
                         </li>
                         <li>
