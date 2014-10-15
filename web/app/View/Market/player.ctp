@@ -66,7 +66,10 @@ $passing_and_attacking = array(
     'accurate_layoffs'=>'accurate_layoffs',
     'penalty_won'=>'penalty_won',
     'won_corners'=>'won_corners',
-    'fk_foul_won'=>'fk_foul_won'
+    'fk_foul_won'=>'fk_foul_won',
+    'ontarget_scoring_att'=>'ontarget_scoring_att',
+    'att_ibox_goal'=>'att_ibox_goal',
+    'att_obox_goal'=>'att_obox_goal'
   );
 
 
@@ -90,7 +93,7 @@ $defending = array(
 $goalkeeper = array(
               'good_high_claim'=> 'good_high_claim',
               'saves'=> 'saves',
-             
+                'penalty_save'=>'penalty_save'
                   );
 
 

@@ -31,6 +31,10 @@ function stats_translated($stats_name,$locale='id'){
 	        'penalty_won'=>'Mendapatkan tendangan pinalti',
 	        'won_corners'=>'Mendapatkan tendangan pojok',
 	        'fk_foul_won'=>'Mendapatkan Tendangan Bebas',
+	        'ontarget_scoring_att'=>'Melakukan tembakan ke arah gawang',
+	        'att_ibox_goal'=>'Mencetak gol dari dalam kotak pinalti',
+	        'att_obox_goal'=>'Mencetak gol dari luar kotak pinalti',
+
 
 
 	    
@@ -53,7 +57,7 @@ function stats_translated($stats_name,$locale='id'){
        
         'good_high_claim'=> 'Berhasil menangkap crossing lawan',
         'saves'=> 'Menyelamatkan tendangan lawan',
-       
+       	'penalty_save'=> 'Menyelamatkan Pinalti',
 
         //mistakes and errors
         'fk_foul_lost'=>    'Kehilangan tendangan bebas',

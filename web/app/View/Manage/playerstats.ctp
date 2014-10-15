@@ -41,13 +41,13 @@ function getTotalPoints($str,$stats){
 
 $games = getStatsList($data['position'],'game_started,total_sub_on',$data['ori_stats'],$modifier);
               
-$attacking_and_passing = getStatsList($data['position'],'goals,att_freekick_goal,att_pen_goal,att_ibox_target,att_obox_target,goal_assist_openplay,goal_assist_setplay,att_assist_openplay,att_assist_setplay,second_goal_assist,big_chance_created,accurate_through_ball,accurate_cross_nocorner,accurate_pull_back,won_contest,long_pass_own_to_opp_success,accurate_long_balls,accurate_flick_on,accurate_layoffs,penalty_won,won_corners,fk_foul_won',
+$attacking_and_passing = getStatsList($data['position'],'goals,att_freekick_goal,att_pen_goal,att_ibox_target,att_obox_target,goal_assist_openplay,goal_assist_setplay,att_assist_openplay,att_assist_setplay,second_goal_assist,big_chance_created,accurate_through_ball,accurate_cross_nocorner,accurate_pull_back,won_contest,long_pass_own_to_opp_success,accurate_long_balls,accurate_flick_on,accurate_layoffs,penalty_won,won_corners,fk_foul_won,ontarget_scoring_att,att_ibox_goal,att_obox_goal',
                         $data['ori_stats'],$modifier);
 
 
 $defending = getStatsList($data['position'],'duel_won,aerial_won,ball_recovery,won_tackle,interception_won,interceptions_in_box,offside_provoked,outfielder_block,effective_blocked_cross,effective_head_clearance,effective_clearance,clearance_off_line  ',$data['ori_stats'],$modifier);
 
-$goalkeeping = getStatsList($data['position'],'good_high_claim,saves',$data['ori_stats'],$modifier);
+$goalkeeping = getStatsList($data['position'],'good_high_claim,saves,penalty_save',$data['ori_stats'],$modifier);
 $mistakes_and_errors = getStatsList($data['position'],
     'penalty_conceded,fk_foul_lost,poss_lost_all,challenge_lost,error_lead_to_shot,error_lead_to_goal,total_offside,yellow_card,red_card',$data['ori_stats'],$modifier);
 

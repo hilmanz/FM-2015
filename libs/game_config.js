@@ -151,7 +151,10 @@ exports.player_stats_category = {
 		'accurate_layoffs',
 		'penalty_won',
 		'won_corners',
-		'fk_foul_won'
+		'fk_foul_won',
+		'ontarget_scoring_att',
+		'att_ibox_goal',
+		'att_obox_goal'
 
     ],
     defending:[
@@ -170,7 +173,8 @@ exports.player_stats_category = {
     ],
     goalkeeper:[
         'good_high_claim',
-        'saves'
+        'saves',
+        'penalty_save'
     ],
     mistakes_and_errors:[
         'penalty_conceded',
