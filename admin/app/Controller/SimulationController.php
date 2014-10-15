@@ -34,6 +34,7 @@ class SimulationController extends AppController {
 		$this->set('teams',$teams);
 
 		if($this->request->is('post')){
+
 			$stats = $this->showStats($league);
 			$this->set('stats',$stats);
 		}
@@ -85,8 +86,9 @@ class SimulationController extends AppController {
 	private function getItaFixture($team_id,$matchday){
 		$sql = "SELECT game_id FROM ffgame_ita.game_fixtures 
 				WHERE (home_id = '{$team_id}' OR away_id = '{$team_id}') 
-				AND matchday={$matchday} AND competition_id=8 AND session_id={$this->season};";
+				AND matchday={$matchday} AND competition_id=21 AND session_id={$this->season};";
 		$q = $this->Admin->query($sql);
+
 		return $q[0]['game_fixtures'];
 	}
 	private function getEPLStats($game_id,$team_id){

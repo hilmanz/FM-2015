@@ -13,7 +13,7 @@
 	<h3>
 		<?=$league?>
 	</h3>
-	<form action="<?=$this->Html->url('/simulation')?>" method="post">
+	<form action="<?=$this->Html->url('/simulation/?league='.$league)?>" method="post">
 		<select name="team_id">
 			<option value="0">
 				Pilih Tim
