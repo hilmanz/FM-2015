@@ -65,6 +65,10 @@ class AppController extends Controller {
 				$this->Session->write('ffgamedb', 'ffgame');
 				$this->Session->write('ffgamestatsdb', 'ffgame_stats');
 			}
+
+			$endpoints = Configure::read('API_ENDPOINTS');
+			Configure::write('API_URL',$endpoints[$_SESSION['league']]);
+			$this->Session->write('API_URL',null);
 			
 		}
 
@@ -108,7 +112,7 @@ class AppController extends Controller {
 		return $access_token;
 	}
 	public function initAccessToken(){
-		
+
 		if($this->getAccessToken()!=null){
 			
 			$check = $this->api_call('/checkSession',array('access_token'=>$this->getAccessToken()));
@@ -150,7 +154,22 @@ class AppController extends Controller {
 		
 	}
 	public function getAPIUrl(){
-		return Configure::read('API_URL');
+		$in_session = $this->Session->read('API_URL');
+
+		if(isset($in_session)){
+			return $in_session;
+		}else{
+			$API_URL = Configure::read('API_URL');
+			if(is_array($API_URL)){
+				$n = sizeof($API_URL);
+				$API_URL = $API_URL[rand(0,($n-1))];
+			}
+			$this->Session->write('API_URL',$API_URL);
+			$in_session = $this->Session->read('API_URL');
+			return $API_URL;
+		}
+		
+		
 	}
 	public function getAPIKey(){
 		return Configure::read('API_KEY');
