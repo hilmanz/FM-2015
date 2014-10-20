@@ -475,31 +475,40 @@ function calculatePlayerPoints(conn,points,game_id,player,done){
 						VALUES";
 			var data  = [];
 			var n = 0;
-			for(var i in player_stats){
-				if(n>0){
-					sql+=",";
+			console.log(player_stats,player_stats.length);
+			try{
+				for(var i in player_stats){
+					if(n>0){
+						sql+=",";
+					}
+					sql += "(?,?,?,?,?,NOW())";
+					data.push(game_id);
+					data.push(team_id);
+					data.push(player_id);
+					data.push(i);
+					data.push(player_stats[i]);
+					n++;
 				}
-				sql += "(?,?,?,?,?,NOW())";
-				data.push(game_id);
-				data.push(team_id);
-				data.push(player_id);
-				data.push(i);
-				data.push(player_stats[i]);
-				n++;
-			}
-						
-			sql+= " ON DUPLICATE KEY UPDATE\
-						stats_value = VALUES(stats_value),\
-						last_update = VALUES(last_update);";
+							
+				sql+= " ON DUPLICATE KEY UPDATE\
+							stats_value = VALUES(stats_value),\
+							last_update = VALUES(last_update);";
 
-			conn.query(sql,data,function(err,rs){
-				//console.log('inserting player stats -> ',this.sql);
-				console.log(S(this.sql).collapseWhitespace().s);
-				if(err){
-					console.log(err.message);
-				}
-				callback(err,null);
-			});
+				conn.query(sql,data,function(err,rs){
+					//console.log('inserting player stats -> ',this.sql);
+					console.log(S(this.sql).collapseWhitespace().s);
+					if(err){
+						console.log('error : ',err.message,game_id,team_id,'player_id:',player_id,'|',S(this.sql).collapseWhitespace().s,player_stats);
+					}else{
+						console.log('save to master_player_stats OK');
+					}
+					callback(err,null);
+				});
+			}catch(e){
+				//artinya pemain ini tidak bermain, jadi tidak punya stats
+				callback(null,null);
+			}
+			
 			
 
 		}

@@ -80,7 +80,7 @@ exports.update = function(since_id,until_id,game_id,done){
 				});
 			},
 			function(game,home_team,away_team,callback){
-				console.log(game,home_team,away_team);
+				
 				async.parallel([
 						function(callback){
 							calculateIncomeForAllHomeTeams(since_id,until_id,game_id,game,home_team,away_team,
@@ -122,60 +122,73 @@ function calculateIncomeForAllHomeTeams(since_id,until_id,game_id,game,home_team
 	console.log('calculate all home teams');
 	var limit = 100;
 	var start = 0;
-	var team_id = home_team[0].uid;
-	var away_team_id = away_team[0].uid;
-	var home_rank = 0;
-	var away_rank = 0;
-	pool.getConnection(function(err,conn){
-		console.log('getting the team\'s rank');
-		async.waterfall(
-		[
-			function(callback){
-				//getting home rank
-				conn.query("SELECT t_position AS rank FROM "+config.database.database+".master_standings WHERE team_id=? LIMIT 1;",
-						   	[team_id],
-							   function(err,rs){
-							   		if(!err){
-							   			home_rank = rs[0].rank;
-							   		}else{
-							   			home_rank = 0;
-							   		}
-							   		callback(err,rs);
-							   }
-						   );
-			},
-			function(rs,callback){
-				//getting away rank
-				conn.query("SELECT t_position AS rank FROM "+config.database.database+".master_standings WHERE team_id=? LIMIT 1;",
-						   	[away_team_id],
-							   function(err,rs){
-							   		if(!err){
-							   			away_rank = rs[0].rank;
-							   		}else{
-							   			away_rank = 0;
-							   		}
-							   		callback(err,rs);
-							   }
-						   );
-			}
-			
-		],
-		function(err,result){
-			conn.release();
-			console.log('home_rank',home_rank);
-			console.log('AWAY RANK',away_rank);
-			processHomeTeams(since_id,until_id,start,limit,team_id,game_id,home_rank,away_rank,game,done);
-			
+	try{
+		var team_id = home_team[0].uid;
+		var away_team_id = away_team[0].uid;
+		var home_rank = 0;
+		var away_rank = 0;
+
+		pool.getConnection(function(err,conn){
+			console.log('getting the team\'s rank');
+			async.waterfall(
+			[
+				function(callback){
+					//getting home rank
+					conn.query("SELECT t_position AS rank FROM "+config.database.database+".master_standings WHERE team_id=? LIMIT 1;",
+							   	[team_id],
+								   function(err,rs){
+								   		if(!err){
+								   			home_rank = rs[0].rank;
+								   		}else{
+								   			home_rank = 0;
+								   		}
+								   		callback(err,rs);
+								   }
+							   );
+				},
+				function(rs,callback){
+					//getting away rank
+					conn.query("SELECT t_position AS rank FROM "+config.database.database+".master_standings WHERE team_id=? LIMIT 1;",
+							   	[away_team_id],
+								   function(err,rs){
+								   		if(!err){
+								   			away_rank = rs[0].rank;
+								   		}else{
+								   			away_rank = 0;
+								   		}
+								   		callback(err,rs);
+								   }
+							   );
+				}
+				
+			],
+			function(err,result){
+				conn.release();
+				console.log('home_rank',home_rank);
+				console.log('AWAY RANK',away_rank);
+				processHomeTeams(since_id,until_id,start,limit,team_id,game_id,home_rank,away_rank,game,done);
+				
+			});
 		});
-	});
+	}catch(e){
+		done(null,[]);
+	}
+	
 }
 function calculateIncomeForAllAwayTeams(since_id,until_id,game_id,game,home_team,away_team,done){
 	console.log('calculate all away teams');
-	var limit = 100;
-	var start = 0;
-	var team_id = away_team[0].uid;
+
+	try{
+		var limit = 100;
+		var start = 0;
+		var team_id = away_team[0].uid;
+		processAwayTeams(since_id,until_id,start,limit,team_id,game_id,0,0,game,done);
+	}catch(e){
+		done(null,[]);
+	}
 	
-	processAwayTeams(since_id,until_id,start,limit,team_id,game_id,0,0,game,done);
+	
+	
 	
 }
 function processHomeTeams(since_id,until_id,start,limit,team_id,game_id,rank,away_rank,game,done){

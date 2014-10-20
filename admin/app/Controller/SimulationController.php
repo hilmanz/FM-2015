@@ -92,12 +92,12 @@ class SimulationController extends AppController {
 		return $q[0]['game_fixtures'];
 	}
 	private function getEPLStats($game_id,$team_id){
-		$sql = "SELECT player_id,b.name,b.position,SUM(stats_value) AS total 
-				FROM ffgame_stats.master_player_stats a
+
+		$sql = "SELECT player_id,b.name,b.position,points as total
+				FROM ffgame_stats.master_match_player_points a
 				INNER JOIN ffgame.master_player b
 				ON a.player_id = b.uid
 				WHERE game_id='{$game_id}' AND a.team_id='{$team_id}' 
-				AND stats_name IN (SELECT stats_name FROM ffgame.game_matchstats_modifier)
 				GROUP BY player_id;";
 
 		$stats = $this->Admin->query($sql);
@@ -105,24 +105,23 @@ class SimulationController extends AppController {
 		foreach($stats as $st){
 			$rs[] = array('name'=>$st['b']['name'],
 							'position'=>$st['b']['position'],
-							'points'=>$st[0]['total']);
+							'points'=>$st['a']['total']);
 		}
 		return $rs;
 	}
 	private function getItaStats($game_id,$team_id){
-		$sql = "SELECT player_id,b.name,b.position,SUM(stats_value) AS total 
-				FROM ffgame_stats_ita.master_player_stats a
+		$sql = "SELECT player_id,b.name,b.position,points as total
+				FROM ffgame_stats_ita.master_match_player_points a
 				INNER JOIN ffgame_ita.master_player b
 				ON a.player_id = b.uid
 				WHERE game_id='{$game_id}' AND a.team_id='{$team_id}' 
-				AND stats_name IN (SELECT stats_name FROM ffgame_ita.game_matchstats_modifier)
 				GROUP BY player_id;";
 		$stats = $this->Admin->query($sql);
 		$rs = array();
 		foreach($stats as $st){
 			$rs[] = array('name'=>$st['b']['name'],
 							'position'=>$st['b']['position'],
-							'points'=>$st[0]['total']);
+							'points'=>$st['a']['total']);
 		}
 		return $rs;
 	}

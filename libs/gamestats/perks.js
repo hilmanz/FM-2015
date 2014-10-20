@@ -250,12 +250,13 @@ exports.apply_jersey_perks = apply_jersey_perks;
 * process POINTS_MODIFIER_PER_CATEGORY perks
 */
 function POINTS_MODIFIER_PER_CATEGORY(conn,game_team_id,perks,new_stats,callback){
-	console.log('new_stats',new_stats);
+	console.log('new_stats',JSON.stringify(new_stats));
 	var extra_points = [];
 	
 
 	var extra_points_value = getExtraPointsByValue(perks);
-
+	console.log('extra_points_value',game_team_id,JSON.stringify(extra_points_value));
+	console.log('extra_points_value',game_team_id,JSON.stringify(perks));
 	if(new_stats.length > 0){
 		async.eachSeries(
 			new_stats,
@@ -290,17 +291,20 @@ function POINTS_MODIFIER_PER_CATEGORY(conn,game_team_id,perks,new_stats,callback
 										goalkeeping:getExtraPoints(perks[i].data,
 																			 stats.points)});
 								}
-								console.log('getExtraPoints',JSON.stringify(extra_points));
+								
 
 							break;
 							case 'mistakes_and_errors':
 								if(stats.category == 'mistakes_and_errors'){
 									extra_points.push({
-										mistakes_and_errors: -1 * getExtraPoints(perks[i].data,
+										mistakes_and_errors: getExtraPoints(perks[i].data,
 																			 stats.points)});
+									console.log('extra_points_value','mistakes_and_errors',game_team_id,
+													'getExtraPoints',stats.points,'-->',getExtraPoints(perks[i].data,
+																			 stats.points));
+
 								}
 								
-
 							break;
 							default:
 								//do nothing
@@ -310,7 +314,7 @@ function POINTS_MODIFIER_PER_CATEGORY(conn,game_team_id,perks,new_stats,callback
 				}
 				next();
 			},function(err,rs){
-
+				console.log('extra_points_value',game_team_id,JSON.stringify(extra_points));
 				callback(err,extra_points,extra_points_value);	
 			});
 	}else{
@@ -363,11 +367,11 @@ function getExtraPoints(perk_data,points){
 	var extra1 = 0; //extra points from point_percentage
 	perk_data.point_percentage = parseFloat(perk_data.point_percentage);
 	perk_data.point_value = parseFloat(perk_data.point_value);
-	//console.log('getExtraPoints','points:',points,'%',perk_data.point_percentage,'v',perk_data.point_value);
-	if(typeof perk_data.point_percentage !== 'undefined' && perk_data.point_percentage > 0){
+	console.log('extra_points_value','getExtraPoints','points:',points,'%',perk_data.point_percentage,'v',perk_data.point_value);
+	if(typeof perk_data.point_percentage !== 'undefined' && perk_data.point_percentage != 0){
 		extra1 = points * (perk_data.point_percentage / 100);
 	}
-	//console.log('getExtraPoints',extra1,'+',perk_data.point_value,'=',(extra1 + perk_data.point_value));
+	console.log('extra_points_value','getExtraPoints',extra1,'+',perk_data.point_value,'=',(extra1 + perk_data.point_value));
 	//return parseFloat(extra1 + perk_data.point_value);
 	return parseFloat(extra1);
 }
