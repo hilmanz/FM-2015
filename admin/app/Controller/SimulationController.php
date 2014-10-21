@@ -34,7 +34,7 @@ class SimulationController extends AppController {
 		$this->set('teams',$teams);
 
 		if($this->request->is('post')){
-
+			
 			$stats = $this->showStats($league);
 			$this->set('stats',$stats);
 		}
@@ -93,35 +93,47 @@ class SimulationController extends AppController {
 	}
 	private function getEPLStats($game_id,$team_id){
 
-		$sql = "SELECT player_id,b.name,b.position,points as total
-				FROM ffgame_stats.master_match_player_points a
+		
+		$sql = "SELECT *,SUM(total) AS points 
+				FROM (SELECT player_id,b.name,b.position,stats_name,stats_value,(stats_value * f) AS total
+				FROM optadb.player_stats a
 				INNER JOIN ffgame.master_player b
 				ON a.player_id = b.uid
-				WHERE game_id='{$game_id}' AND a.team_id='{$team_id}' 
+				INNER JOIN ffgame.game_matchstats_modifier c
+				ON c.name = a.stats_name
+				WHERE game_id='{$game_id}' AND a.team_id='{$team_id}') aa
 				GROUP BY player_id;";
 
 		$stats = $this->Admin->query($sql);
 		$rs = array();
+		
 		foreach($stats as $st){
-			$rs[] = array('name'=>$st['b']['name'],
-							'position'=>$st['b']['position'],
-							'points'=>$st['a']['total']);
+			$rs[] = array('name'=>$st['aa']['name'],
+							'position'=>$st['aa']['position'],
+							'points'=>$st['0']['points']);
 		}
 		return $rs;
 	}
 	private function getItaStats($game_id,$team_id){
-		$sql = "SELECT player_id,b.name,b.position,points as total
-				FROM ffgame_stats_ita.master_match_player_points a
+		
+
+		$sql = "SELECT *,SUM(total) AS points 
+				FROM (SELECT player_id,b.name,b.position,stats_name,stats_value,(stats_value * f) AS total
+				FROM optadb.player_stats a
 				INNER JOIN ffgame_ita.master_player b
 				ON a.player_id = b.uid
-				WHERE game_id='{$game_id}' AND a.team_id='{$team_id}' 
+				INNER JOIN ffgame_ita.game_matchstats_modifier c
+				ON c.name = a.stats_name
+				WHERE game_id='{$game_id}' AND a.team_id='{$team_id}') aa
 				GROUP BY player_id;";
+
 		$stats = $this->Admin->query($sql);
 		$rs = array();
+		
 		foreach($stats as $st){
-			$rs[] = array('name'=>$st['b']['name'],
-							'position'=>$st['b']['position'],
-							'points'=>$st['a']['total']);
+			$rs[] = array('name'=>$st['aa']['name'],
+							'position'=>$st['aa']['position'],
+							'points'=>$st['0']['points']);
 		}
 		return $rs;
 	}

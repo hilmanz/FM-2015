@@ -793,6 +793,7 @@ class PlayersController extends AppController {
 
 	}
 	private function is_in_category($map,$category,$stats_name){
+		
         foreach($map[$category] as $n=>$v){
             if($v==$stats_name){
               return true;
@@ -828,7 +829,8 @@ class PlayersController extends AppController {
 			'accurate_layoffs'=>'accurate_layoffs',
 			'penalty_won'=>'penalty_won',
 			'won_corners'=>'won_corners',
-			'fk_foul_won'=>'fk_foul_won'
+			'fk_foul_won'=>'fk_foul_won',
+			''
 		);
 
 
@@ -844,7 +846,10 @@ class PlayersController extends AppController {
 			'effective_blocked_cross'   =>  'effective_blocked_cross',
 			'effective_head_clearance'  =>  'effective_head_clearance',
 			'effective_clearance'   =>  'effective_clearance',
-			'clearance_off_line'    =>  'clearance_off_line'  
+			'clearance_off_line'    =>  'clearance_off_line',
+			'ontarget_scoring_att' => 'ontarget_scoring_att',
+			'att_ibox_goal' => 'att_ibox_goal',
+			'att_obox_goal' => 'att_obox_goal'
 
 
 		);
@@ -852,7 +857,7 @@ class PlayersController extends AppController {
 		$goalkeeper = array(
 		          'good_high_claim'=> 'good_high_claim',
 		          'saves'=> 'saves',
-		         
+		          'penalty_save'=>'penalty_save',
 		              );
 
 
@@ -873,6 +878,7 @@ class PlayersController extends AppController {
 			'passing_and_attacking'=>$passing_and_attacking,
 			'defending'=>$defending,
 			'goalkeeper'=>$goalkeeper,
+			'goalkeeping'=>$goalkeeper,
 			'mistakes_and_errors'=>$mistakes_and_errors
 	 	);
 
