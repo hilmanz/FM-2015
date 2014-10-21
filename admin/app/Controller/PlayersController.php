@@ -830,7 +830,10 @@ class PlayersController extends AppController {
 			'penalty_won'=>'penalty_won',
 			'won_corners'=>'won_corners',
 			'fk_foul_won'=>'fk_foul_won',
-			''
+			'att_ibox_goal' => 'att_ibox_goal',
+			'att_obox_goal' => 'att_obox_goal',
+			'ontarget_scoring_att' => 'ontarget_scoring_att'
+			
 		);
 
 
@@ -847,9 +850,8 @@ class PlayersController extends AppController {
 			'effective_head_clearance'  =>  'effective_head_clearance',
 			'effective_clearance'   =>  'effective_clearance',
 			'clearance_off_line'    =>  'clearance_off_line',
-			'ontarget_scoring_att' => 'ontarget_scoring_att',
-			'att_ibox_goal' => 'att_ibox_goal',
-			'att_obox_goal' => 'att_obox_goal'
+			
+			
 
 
 		);
@@ -878,7 +880,7 @@ class PlayersController extends AppController {
 			'passing_and_attacking'=>$passing_and_attacking,
 			'defending'=>$defending,
 			'goalkeeper'=>$goalkeeper,
-			'goalkeeping'=>$goalkeeper,
+			
 			'mistakes_and_errors'=>$mistakes_and_errors
 	 	);
 

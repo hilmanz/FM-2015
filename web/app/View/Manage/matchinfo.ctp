@@ -94,7 +94,10 @@ function getTotalPoints($str,$stats){
                                             accurate_layoffs,
                                             penalty_won,
                                             won_corners,
-                                            fk_foul_won',
+                                            fk_foul_won,ontarget_scoring_att,
+                                            att_ibox_goal,
+                                            att_obox_goal',
+                                            
                                             $detail['ori_stats']);
                     $defending = getTotalPoints('duel_won,
                                             aerial_won,
@@ -109,7 +112,7 @@ function getTotalPoints($str,$stats){
                                             effective_clearance,
                                             clearance_off_line',$detail['ori_stats']);
 
-                    $goalkeeping = getTotalPoints('good_high_claim,saves',$detail['ori_stats']);
+                    $goalkeeping = getTotalPoints('good_high_claim,saves,penalty_save',$detail['ori_stats']);
                     $mistakes_and_errors = getTotalPoints('penalty_conceded,
                                             fk_foul_lost,
                                             poss_lost_all,
