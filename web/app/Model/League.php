@@ -12,16 +12,19 @@ class League extends AppModel {
 	{
 		$rs = $this->query("SELECT * FROM league_member a 
 							INNER JOIN league b ON a.league_id = b.id 
-							WHERE team_id = '{$team_id}' AND a.league='{$league}'");
+							WHERE team_id = '{$team_id}' AND a.league='{$league}' LIMIT 1000");
+		Cakelog::write('debug', json_encode($rs));
 
 		foreach ($rs as $key => $value)
 		{
 			$total_invite = $this->query("SELECT count(id) as total_invited FROM league_invitations 
-										WHERE league_id='{$value['b']['id']}' AND league='{$league}'");
+										WHERE league_id='{$value['b']['id']}' AND league='{$league}' 
+										LIMIT 1000");
 
 			$total_joined = $this->query("SELECT count(id) as total_joined FROM league_invitations 
 										WHERE league_id='{$value['b']['id']}'
-										AND n_status = 1 AND league='{$league}'");
+										AND n_status = 1 AND league='{$league}' 
+										LIMIT 1000");
 
 			$rs[$key]['a']['total_invited'] = $total_invite[0][0]['total_invited'];
 			$rs[$key]['a']['total_joined'] = $total_joined[0][0]['total_joined'];

@@ -24,14 +24,20 @@
                     <?php if($user['paid_member'] == 1 && $user['paid_member_status'] == 1): ?>
                         <h3 class="fr yellow">Akun loe sudah di upgrade</h3>
                     <?php elseif($user['paid_member'] == 1 && $user['paid_member_status'] == 0): ?>
-                        <p class="fr">
-                            <a class="button" href="<?=$this->Html->url('/upgrade/paymonthly')?>">
-                                Bayar Bulanan
-                            </a>
-                        </p>
+                        <br />
+                        <div style="border:#000 solid 1px;padding:5px;background-color:#FDCB02;">
+                            <p style="text-align:center;color:#000;">
+                                <span style="font-size:16px;font-weight:bold;">AKUN LOE SUDAH EXPIRED</span><br />untuk bisa terus menikmati fasilitas Pro League silahkan bayar sekarang untuk memperpanjang akun loe.
+                            </p>
+                            <p style="text-align:center;">
+                                <a class="button" href="<?=$this->Html->url('/upgrade/paymonthly')?>">
+                                    Bayar Disini
+                                </a>
+                            </p>
+                        </div>
                     <?php else: ?>
                         <p class="fr">
-                            <a class="button" href="<?=$this->Html->url('/upgrade/member')?>">Upgrade</a>
+                            <a class="button" href="<?=$this->Html->url('/upgrade/member')?>">Upgrade Member</a>
                         </p>
                     <?php endif; ?>
     			</div><!-- end .row-2 -->

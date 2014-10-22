@@ -47,7 +47,7 @@ if(isset($first_time) && $first_time==true):
                             	 <img src="<?=$this->Html->url('/content/AturFormasiLo.jpg')?>"/>
                             </div>	<!-- end .howtobanner -->
                              <div class="howto-text">
-                                <p>Pada kolom mengelola tim, pilih formasi yang dipakai (4-4-2, 4-3-1-2, 4-3-3, 3-5-2, dll) lalu atur formasi elo dengan cara pilih salah satu pemain di slot kanan lalu geser ke slot bergambar lapangan sesuai posisi.</p>
+                                <p>Pada menu mengelola tim, pilih formasi yang dipakai (4-4-2, 4-3-1-2, 4-3-3, 3-5-2, dll) lalu atur formasi elo dengan cara pilih salah satu pemain di slot kanan lalu geser ke slot bergambar lapangan sesuai posisi.</p>
                              </div><!-- end .howto-text -->
                         </li>
                         <li>
@@ -55,7 +55,7 @@ if(isset($first_time) && $first_time==true):
                             	 <img src="<?=$this->Html->url('/content/LihatStatusKeuanganKlub.jpg')?>"/>
                             </div>	<!-- end .howtobanner -->
                              <div class="howto-text">
-                                <p>Di kolom klab saya, elo bisa lihat info klub, status keuangan klub dan grafik pemain.</p>
+                                <p>Di menu klab saya, elo bisa lihat info klub, status keuangan klub dan grafik pemain.</p>
                              </div><!-- end .howto-text -->
                         </li>
                         <li>
@@ -63,7 +63,7 @@ if(isset($first_time) && $first_time==true):
                             	 <img src="<?=$this->Html->url('/content/GantiProfil.jpg')?>"/>
                             </div>	<!-- end .howtobanner -->
                              <div class="howto-text">
-                                <p>Di kolom profil saya, elo bisa mengganti profil dan memasang foto tim lo</p>
+                                <p>Di menu profil saya, elo bisa mengganti profil dan memasang foto tim lo</p>
                              </div><!-- end .howto-text -->
                         </li>
                         <li>
@@ -71,7 +71,7 @@ if(isset($first_time) && $first_time==true):
                             	 <img src="<?=$this->Html->url('/content/LihatPeringkat.jpg')?>"/>
                             </div>	<!-- end .howtobanner -->
                              <div class="howto-text">
-                                <p>Di kolom papan peringkat, elo bisa lihat peringkat ke berapa time lo berdasarkan keseluruhan, bulanan dan mingguan</p>
+                                <p>Di menu papan peringkat, elo bisa lihat peringkat ke berapa time lo berdasarkan keseluruhan, bulanan dan mingguan</p>
                              </div><!-- end .howto-text -->
                         </li>
                         <li>
@@ -79,7 +79,7 @@ if(isset($first_time) && $first_time==true):
                             	 <img src="<?=$this->Html->url('/content/TransferBeliPemain.jpg')?>"/>
                             </div>	<!-- end .howtobanner -->
                              <div class="howto-text">
-                                <p>Di kolom bursa transfer, elo bias belanja pemain yang mau elo masukkan kedalam tim</p>
+                                <p>Di menu bursa transfer, elo bisa belanja pemain yang mau elo masukkan kedalam tim</p>
                              </div><!-- end .howto-text -->
                         </li>
                         <li>
@@ -87,7 +87,7 @@ if(isset($first_time) && $first_time==true):
                             	 <img src="<?=$this->Html->url('/content/PerhitunganPoin.jpg')?>"/>
                             </div>	<!-- end .howtobanner -->
                              <div class="howto-text">
-                                <p>Di kolom Bantuan dan FAQ, elo bias baca penjelasan lebih lengkap tentang Super Soccer Football Manager dan perhitungan poin statistik pemain</p>
+                                <p>Di menu Bantuan dan FAQ, elo bisa baca penjelasan lebih lengkap tentang Super Soccer Football Manager dan perhitungan poin statistik pemain</p>
                              </div><!-- end .howto-text -->
                         </li>
                         <li>
@@ -95,7 +95,7 @@ if(isset($first_time) && $first_time==true):
                             	 <img src="<?=$this->Html->url('/content/TukarKoin.jpg')?>"/>
                             </div>	<!-- end .howtobanner -->
                              <div class="howto-text">
-                                <p>Di kolom online catalog, elo bisa menukar koin elo dengan merchandise yang disediakan dan membeli item lain seperti booster, customized jersey line up elo dll</p>
+                                <p>Di menu online catalog, elo bisa menukar koin elo dengan merchandise yang disediakan dan membeli item lain seperti booster, customized jersey line up elo dll</p>
                              </div><!-- end .howto-text -->
                         </li>
                         <li>

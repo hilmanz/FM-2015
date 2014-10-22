@@ -962,27 +962,4 @@ class ProfileController extends AppController {
 		return false;
 	}
 
-
-	private function curlPost($url,$params,$cookie_file='',$timeout=15){
-	  $ch = curl_init();
-	  curl_setopt($ch, CURLOPT_URL,$url);
-	  curl_setopt($ch,CURLOPT_TIMEOUT,$timeout);
-	  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);  
-	  curl_setopt($ch, CURLOPT_POST, 1);
-	  curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
-	  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	  curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-	  
-	  if($cookie_file!=''){
-	    curl_setopt($ch,CURLOPT_COOKIEJAR, $cookie_file);
-	    curl_setopt($ch,CURLOPT_COOKIEFILE, $cookie_file); 
-	  }
-	  $response = curl_exec ($ch);
-	  $info = curl_getinfo($ch);
-	  if($info['http_code']==0){
-	    $response = json_encode(array('error'=>'unable to connect to web service !'));
-	  }
-	  curl_close ($ch);
-	  return $response;
-	}
 }

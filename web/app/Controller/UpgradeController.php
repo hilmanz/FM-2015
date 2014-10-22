@@ -44,32 +44,65 @@ class UpgradeController extends AppController {
 		$rs_user = $this->User->findByFb_id($userData['fb_id']);
 		$transaction_id = intval($rs_user['User']['id']).'-'.date("YmdHis").'-'.rand(0,999);
 		$description = 'Purchase Order #'.$transaction_id;
-
+		Cakelog::write('debug', json_encode($rs_user));
 		$amount = 0;
-		if($this->checkTotalTeam() > 1)
+
+		$can_upgrade = true;
+		if($rs_user['User']['paid_member'] == 1 && $rs_user['User']['paid_member_status'] == 1)
 		{
-			$amount = $amount + $this->epl_charge($userData['fb_id']);
-			$amount = $amount + $this->ita_charge($userData['fb_id']);
+			$can_upgrade = false;
+		}
+		else if($rs_user['User']['paid_member'] == 1 && $rs_user['User']['paid_member_status'] == 0)
+		{
+			$can_upgrade = false;
+		}
+
+		if($can_upgrade)
+		{
+			$data_view = array();
+			if($this->checkTotalTeam() > 1)
+			{
+				$amount = $amount + $this->epl_charge($userData['fb_id']);
+				$amount = $amount + $this->ita_charge($userData['fb_id']);
+				$data_view['league'] = array('English Premier League', 'Serie A Italy');
+
+				$period_epl = $this->checkRegisterGameUser($userData['fb_id'], 'epl');
+				$period_ita = $this->checkRegisterGameUser($userData['fb_id'], 'ita');
+
+				$data_view['register_date'] = array(
+										$period_epl[0][0]['tanggal'],
+										$period_ita[0][0]['tanggal']
+									);
+
+				$data_view['period'] = array($period_epl[0][0]['period'],
+											$period_ita[0][0]['period']);
+
+				$data_view['charge'] = array($this->charge,$this->charge);
+			}
+			else
+			{
+				$amount = $amount + $this->epl_charge($userData['fb_id']);
+				if($amount == 0)
+				{
+					$amount = $amount + $this->ita_charge($userData['fb_id']);
+				}
+
+			}
+
+			$rs = $this->Game->getEcashUrl(array(
+				'transaction_id'=>$transaction_id,
+				'description'=>$description,
+				'amount'=>$amount,
+				'clientIpAddress'=>$this->request->clientIp(),
+				'source'=>'FMUPGRADE'
+			));
+			$this->set('data_view', $data_view);
+			$this->set('rs', $rs);
 		}
 		else
 		{
-			$amount = $amount + $this->epl_charge($userData['fb_id']);
-			if($amount == 0)
-			{
-				$amount = $amount + $this->ita_charge($userData['fb_id']);
-			}
-
+			$this->redirect('/profile');
 		}
-
-		$rs = $this->Game->getEcashUrl(array(
-			'transaction_id'=>$transaction_id,
-			'description'=>$description,
-			'amount'=>$amount,
-			'clientIpAddress'=>$this->request->clientIp(),
-			'source'=>'FMUPGRADE'
-		));
-
-		$this->set('rs', $rs);
 	}
 
 	public function member_success()
@@ -181,7 +214,7 @@ class UpgradeController extends AppController {
 			$userData = $this->userData;
 			$rs_user = $this->User->findByFb_id($userData['fb_id']);
 			$transaction_id = intval($rs_user['User']['id']).'-'.date("YmdHis").'-'.rand(0,999);
-			$description = 'Purchase Order #'.$transaction_id;
+			$description = 'Monthly Subscription '.date('m/Y').' #'.$transaction_id;
 
 			$amount = 0;
 			if($this->checkTotalTeam() > 1)
@@ -195,15 +228,25 @@ class UpgradeController extends AppController {
 				$amount = $amount + ($ita_interval_month*$this->charge);
 			}
 			else
-			{
-				$amount = $amount + ($this->bill_interval($userData['fb_id'], 'epl')*$this->charge);
+			{	$epl_interval_month = ($this->bill_interval($userData['fb_id'], 'epl') == 0) ? '1': 
+										$this->bill_interval($userData['fb_id'], 'epl');
+				$amount = $amount + ($epl_interval_month*$this->charge);
 				if($amount == 0)
 				{
-					$amount = $amount + ($this->bill_interval($userData['fb_id'], 'ita')*$this->charge);
+					$ita_interval_month = ($this->bill_interval($userData['fb_id'], 'ita') == 0) ? '1': 
+										$this->bill_interval($userData['fb_id'], 'ita');
+					$amount = $amount + ($ita_interval_month*$this->charge);
 				}
 
 			}
 			
+			Cakelog::write('debug','Upgrade.paymonthly '.json_encode(array(
+				'transaction_id'=>$transaction_id,
+				'description'=>$description,
+				'amount'=>intval($amount),
+				'clientIpAddress'=>$this->request->clientIp(),
+				'source'=>'FMRENEWAL'
+			)));
 
 			$rs = $this->Game->getEcashUrl(array(
 				'transaction_id'=>$transaction_id,
@@ -212,6 +255,15 @@ class UpgradeController extends AppController {
 				'clientIpAddress'=>$this->request->clientIp(),
 				'source'=>'FMRENEWAL'
 			));
+			Cakelog::write('debug', 'Upgrade.paymonthly '.json_encode($rs));
+
+			$invoice = array(
+								'amount' => $amount,
+								'total_team' => $this->checkTotalTeam(),
+								'desc' => 'Monthly Subscription '.date('m/Y')
+							);
+
+			$this->set('invoice', $invoice);
 
 			$this->set('rs', $rs);
 		}
@@ -235,7 +287,7 @@ class UpgradeController extends AppController {
 			{
 				try{
 					$userData = $this->userData;
-					$transaction_name = 'Purchase Order #'.$data[3];
+					$transaction_name = 'Monthly Subscription '.date('m/Y').' #'.$data[3];
 					$detail = json_encode($rs['data']);
 
 					$amount = 0;
@@ -273,17 +325,20 @@ class UpgradeController extends AppController {
 					}
 					else
 					{
-						$amount = $amount+($this->bill_interval($userData['fb_id'], 'epl')*$this->charge);
+						$epl_interval_month = ($this->bill_interval($userData['fb_id'], 'epl') == 0) ? '1': 
+										$this->bill_interval($userData['fb_id'], 'epl');
+						$amount = $amount+($epl_interval_month*$this->charge);
 						$league = 'epl';
 						if($amount == 0)
 						{
-							$amount = $amount+($this->bill_interval($userData['fb_id'], 'ita')*$this->charge);
+							$ita_interval_month = ($this->bill_interval($userData['fb_id'], 'ita') == 0) ? '1': 
+												$this->bill_interval($userData['fb_id'], 'ita');
+							$amount = $amount+($ita_interval_month*$this->charge);
 							$league = 'ita';
 
-							if($amount)
+							if($amount == 0)
 							{
 								throw new Exception("Error amount");
-								
 							}
 						}
 
@@ -300,7 +355,8 @@ class UpgradeController extends AppController {
 					}
 
 					$this->MembershipTransactions->query("UPDATE member_billings
-												SET log_dt=NOW(),expire=NOW() + INTERVAL 1 MONTH
+												SET log_dt=NOW(),expire=NOW() + INTERVAL 1 MONTH,
+												is_sevendays_notif=0,is_threedays_notif=0
 												WHERE fb_id='{$userData['fb_id']}'");
 					
 					$this->User->query("UPDATE users SET paid_member_status=1 
@@ -360,8 +416,9 @@ class UpgradeController extends AppController {
 											DATE_FORMAT(transaction_dt, '%Y%m')) AS bulan
 											FROM membership_transactions
 											WHERE fb_id='{$fb_id}'
+											AND transaction_type IN ('UPGRADE MEMBER', 'RENEWAL MEMBER')
 											AND league = '{$league}'
-											ORDER BY transaction_dt desc
+											ORDER BY transaction_dt DESC
 											LIMIT 1");
 
 		return intval(@$bill_interval[0][0]['bulan']);
@@ -376,5 +433,30 @@ class UpgradeController extends AppController {
 	    ));
 
 	    return $total_team;
+	}
+
+	private function checkRegisterGameUser($fb_id, $league)
+	{
+		if($league == 'ita')
+		{
+			$date = $this->MembershipTransactions->query("SELECT 
+									DATE_FORMAT(register_date, '%d-%m-%Y') AS tanggal, 
+									PERIOD_DIFF(DATE_FORMAT(CURDATE() + INTERVAL 1 MONTH, '%Y%m'), 
+									DATE_FORMAT(register_date, '%Y%m')) AS period
+									FROM ffgame_ita.game_users
+									WHERE fb_id='{$fb_id}'
+									LIMIT 1");
+		}
+		else
+		{
+			$date = $this->MembershipTransactions->query("SELECT 
+									DATE_FORMAT(register_date, '%d-%m-%Y') AS tanggal,
+									PERIOD_DIFF(DATE_FORMAT(CURDATE() + INTERVAL 1 MONTH, '%Y%m'), 
+									DATE_FORMAT(register_date, '%Y%m')) AS period
+									FROM ffgame.game_users
+									WHERE fb_id='{$fb_id}'
+									LIMIT 1");
+		}
+		return $date;
 	}
 }

@@ -284,3 +284,24 @@ function getTransferValueBonus($performance,$transfer_value){
                                             intval($transfer_value));
   return $performance_bonus;
 }
+
+function send_mail($data = array())
+{   
+
+    App::import('Component', 'Email'); 
+    $view = new View();
+
+    $body = $view->element($data['template'], $data);
+
+    $Email = new CakeEmail('smtp');
+
+    $Email->to(trim($data['to']));
+    $Email->subject($data['subject']);
+    $Email->emailFormat('html');
+    if($Email->send($body))
+    {
+      return true;
+    }
+
+    return false;
+}

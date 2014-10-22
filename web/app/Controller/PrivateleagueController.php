@@ -279,10 +279,15 @@ class PrivateleagueController extends AppController {
 	{
 		$rs_user 	= $this->userDetail;
 		$email 		= $rs_user['User']['email'];
-		$team_id 	= $rs_user['Team']['id'];
 
 		$trx_code = $this->request->query['trx'];
 		$param = unserialize(decrypt_param($trx_code));
+
+		$rs_team = $this->League->query("SELECT id FROM fantasy.teams 
+								WHERE user_id='{$rs_user['User']['id']}' 
+								AND league='{$param['league']}'");
+
+		$team_id = $rs_team[0]['teams']['id'];
 
 		if($param['email'] == $email)
 		{
@@ -430,7 +435,7 @@ class PrivateleagueController extends AppController {
 												INNER JOIN league_table b ON a.league_id = b.league_id
 												INNER JOIN teams c ON b.team_id = c.id
 												INNER JOIN users d ON c.user_id = d.id
-												WHERE b.league_id='{$rs_league[0]['b']['id']}' 
+												WHERE b.league_id='{$rs_league[0]['a']['league_id']}' 
 												AND b.matchday='{$matchday}'
 												AND b.league='{$this->league}'
 												GROUP BY b.team_id

@@ -55,6 +55,16 @@ class ApiController extends AppController {
 			$this->ffgamedb = 'ffgame';
 			$this->ffgamestatsdb = 'ffgame_stats';
 		}
+
+		$this->User->bindModel(array(
+						'hasOne'=>array(
+							'Team'=>array(
+								'conditions' => array(
+									'Team.league' => $this->league)
+								)
+						)
+					)
+				);
 	}
 	public function auth(){
 		$fb_id = $this->request->query('fb_id');
@@ -2244,7 +2254,11 @@ class ApiController extends AppController {
 					$rs = array('status'=>'0','error'=>'Transaction Failed');
 				}
 			}else{
-				$rs = array('status'=>3,'message'=>'Transfer window is closed','open'=>strtotime(@$window['tw_open']),
+				$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 11';
+				if($this->league= 'ita'){
+					$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 17';
+				}
+				$rs = array('status'=>3,'message'=>$msg,'open'=>strtotime(@$window['tw_open']),
 							'close'=> strtotime(@$window['tw_close']), 'now'=>time());
 			}
 		}
@@ -2360,7 +2374,11 @@ class ApiController extends AppController {
 					$rs = array('status'=>'0','error'=>'Transaction Failed');
 				}
 			}else{
-				$rs = array('status'=>3,'message'=>'Transfer window is closed');
+				$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 11';
+				if($this->league == 'ita'){
+					$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 17';
+				}
+				$rs = array('status'=>3,'message'=>$msg);
 			}
 		}
 
@@ -2401,7 +2419,11 @@ class ApiController extends AppController {
 		if($can_transfer){
 			$rs = array('status'=>1,'message'=>'Transfer window is open');
 		}else{
-			$rs = array('status'=>0,'message'=>'Transfer window is closed');
+			$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 11';
+			if($this->league= 'ita'){
+				$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 17';
+			}
+			$rs = array('status'=>0,'message'=>$msg);
 		}
 
 	
@@ -2686,7 +2708,7 @@ class ApiController extends AppController {
 			//check for child ids, and add it into category_ids
 			$category_ids = $this->getChildCategoryIds($category_id,$category_ids);
 			$options = array('conditions'=>array(
-									'price_credit' => '<> 0',
+									'price_credit != 0',
 									'merchandise_category_id'=>$category_ids,
 									'MerchandiseItem.parent_id'=>0,
 									'merchandise_type'=>0,'n_status'=>1),
@@ -3399,6 +3421,52 @@ class ApiController extends AppController {
 	$items[1]['qty']
 	*/
 	public function catalog_purchase($game_team_id){
+		
+		$this->layout="ajax";
+
+		$param = unserialize(decrypt_param(@$this->request->data['param']));
+		if(!isset($this->request->data['param'])){
+			$item_id = $this->request->data['item_id'];
+			$qty = $this->request->data['qty'];
+			$param = array();
+
+			for($i=0;$i<count($item_id);$i++){
+				$param[$i] = array('item_id' => $item_id[$i],
+									'qty' => $qty[$i]
+								);
+			}
+		}
+		$fb_id = intval($this->request->data['fb_id']);
+		CakeLog::write('debug','param '.json_encode($param));
+		$result = $this->pay_with_coins($fb_id,$game_team_id,$param);
+		CakeLog::write('debug',$game_team_id.'-team_id');
+		CakeLog::write('debug',$game_team_id,'data ->'.json_encode($this->request->data));
+		CakeLog::write('debug','catalog - '.json_encode($result));
+		$is_transaction_ok = $result['is_transaction_ok'];
+		$no_fund = @$result['no_fund'];
+		$order_id = @$result['order_id'];
+		
+		if($is_transaction_ok == true)
+		{
+			//check accross the items, we apply the perk for all digital items
+			$this->process_items($result['items'],$order_id);
+			$this->set('response',array('status'=>1,'data'=>$result));
+		}
+		else
+		{
+			$data_error = array(
+									"game_team_id" => $game_team_id,
+									"request_data" => $this->request->data,
+									"result" => $result
+								);
+			CakeLog::write('error', 'api.catalog_purchase '.json_encode($data_error));
+			$this->set('response',array('status'=>0));
+		}
+		$this->render('default');
+	}
+
+
+	public function m_catalog_purchase($game_team_id){
 		
 		$this->layout="ajax";
 
@@ -4556,6 +4624,520 @@ class ApiController extends AppController {
 		
 		$this->render('default');
 	}
+
+	/*
+	*	Private League API for Mobile APPs
+	*/
+	public function private_leagues()
+	{
+		$this->loadModel('League');
+		$fb_id = trim($this->request->query('fb_id'));
+		Cakelog::write('debug', 'param '.json_encode($this->request->query));
+
+		$rs_user = $this->User->findByFb_id($fb_id);
+		if(count($rs_user) > 0)
+		{
+			$rs_league = $this->League->checkUser($rs_user['User']['email'], 
+											$rs_user['Team']['id'], $this->league);
+
+			$rs = $this->League->getLeague($rs_user['Team']['id'], $this->league);
+
+			$response = array();
+			foreach ($rs as $key => $value)
+			{
+				$is_admin = false;
+				if($value['b']['user_id'] == $rs_user['User']['id']){
+					$is_admin = true;
+				}
+				$response[$key] = array(
+									'id' => $value['a']['league_id'],
+									'name' => $value['b']['name'],
+									'is_admin' => $is_admin,
+									'players_joined' => $value['a']['total_joined'],
+									'players_max' => $value['b']['max_player'],
+									'players_invited' => $value['a']['total_invited']
+								);
+			}
+
+			$this->set('response',array('status'=>1, 'data' => $response));
+
+			$this->render('default');
+		}
+		else
+		{
+			$this->set('response',array('status'=>0, 'data' => null));
+
+			$this->render('default');
+		}
+
+		
+	}
+
+	public function private_league_detail()
+	{
+		$this->loadModel('League');
+
+		$private_league_id = trim($this->request->query('private_league_id'));
+
+		$name = $this->League->query("SELECT name FROM league WHERE id='{$private_league_id}'");
+		if(count($name) > 0)
+		{
+			$rs_weekly = $this->League->query("SELECT c.id,c.team_name,d.name,b.total_points,b.matchday 
+											FROM league_member a 
+											INNER JOIN league_table b ON a.league_id = b.league_id
+											INNER JOIN teams c ON b.team_id = c.id
+											INNER JOIN users d ON c.user_id = d.id
+											WHERE b.league_id='{$private_league_id}' 
+											AND b.league='{$this->league}'
+											GROUP BY b.team_id,b.matchday
+											ORDER BY b.total_points DESC
+											LIMIT 100000");
+
+			$rs_overall = $this->League->query("SELECT c.id,c.team_name,d.name,b.total_points,b.matchday
+												FROM league_member a 
+												INNER JOIN league_table b ON a.league_id = b.league_id
+												INNER JOIN teams c ON b.team_id = c.id
+												INNER JOIN users d ON c.user_id = d.id
+												WHERE b.league_id='{$private_league_id}' 
+												AND b.league='{$this->league}'
+												GROUP BY b.team_id,b.matchday
+												ORDER BY b.total_points DESC
+												LIMIT 100000");
+
+			$response = array();
+			$weekly = array();
+			$overall = array();
+			$points = array();
+			
+			foreach ($rs_weekly as $key => $value)
+			{
+				$matchday = $value['b']['matchday'];
+				$weekly[$matchday]['week'] = $matchday;
+				$weekly[$matchday]['standing'][] = array(
+										'club_name' => $value['c']['team_name'],
+										'manager_name' => $value['d']['name'],
+										'points' => $value['b']['total_points']
+									);
+			}
+			$weekly = array_values($weekly);
+
+			foreach($rs_overall as $key => $value)
+			{
+				$team_id = $value['c']['id'];
+				if(!isset($points[$team_id])){
+					$points[$team_id] = 0;
+				}
+				$points[$team_id] += $value['b']['total_points'];
+				$overall[$team_id] = array(
+										'club_name' => $value['c']['team_name'],
+										'manager_name' => $value['d']['name'],
+										'points' => $points[$team_id]
+									);
+			}
+			$overall = array_values($overall);
+			
+			$this->set('response',array('status'=>1, 'data' => array(
+																'name' => $name[0]['league']['name'],
+																'weekly_standing' => $weekly,
+																'overall_standing' => $overall
+																)));
+			
+		}
+		else
+		{
+			$this->set('response',array('status'=>0, 'data' => array(
+																'name' => null,
+																'weekly_standing' => null,
+																'overall_standing' => null
+																)));
+		}
+
+		$this->render('default');
+	}
+
+	public function private_league_detail_dummy()
+	{
+		$this->loadModel('League');
+
+		$private_league_id = trim($this->request->query('private_league_id'));
+
+		$name = $this->League->query("SELECT name FROM league WHERE id='{$private_league_id}'");
+		if(count($name) > 0)
+		{
+			$rs_weekly = $this->League->query("SELECT c.id,c.team_name,d.name,b.total_points,b.matchday 
+											FROM league_member a 
+											INNER JOIN league_table b ON a.league_id = b.league_id
+											INNER JOIN teams c ON b.team_id = c.id
+											INNER JOIN users d ON c.user_id = d.id
+											WHERE b.league_id='{$private_league_id}' 
+											AND b.league='{$this->league}'
+											GROUP BY b.team_id,b.matchday
+											ORDER BY b.total_points DESC
+											LIMIT 100000");
+
+			$rs_overall = $this->League->query("SELECT c.id,c.team_name,d.name,b.total_points,b.matchday
+												FROM league_member a 
+												INNER JOIN league_table b ON a.league_id = b.league_id
+												INNER JOIN teams c ON b.team_id = c.id
+												INNER JOIN users d ON c.user_id = d.id
+												WHERE b.league_id='{$private_league_id}' 
+												AND b.league='{$this->league}'
+												GROUP BY b.team_id,b.matchday
+												ORDER BY b.total_points DESC
+												LIMIT 100000");
+
+			$response = array();
+			$weekly = array();
+			$overall = array();
+			$points = array();
+			
+			foreach ($rs_weekly as $key => $value)
+			{
+				$matchday = $value['b']['matchday'];
+				$weekly[$matchday]['week'] = $matchday;
+				$weekly[$matchday]['standing'][] = array(
+										'club_name' => $value['c']['team_name'],
+										'manager_name' => $value['d']['name'],
+										'points' => $value['b']['total_points']
+									);
+			}
+			$weekly = array_values($weekly);
+
+			foreach($rs_overall as $key => $value)
+			{
+				$team_id = $value['c']['id'];
+				if(!isset($points[$team_id])){
+					$points[$team_id] = 0;
+				}
+				$points[$team_id] += $value['b']['total_points'];
+				$overall[$team_id] = array(
+										'club_name' => $value['c']['team_name'],
+										'manager_name' => $value['d']['name'],
+										'points' => $points[$team_id]
+									);
+			}
+			$overall = array_values($overall);
+
+			print_r($overall);
+			exit();
+			
+			$this->set('response',array('status'=>1, 'data' => array(
+																'name' => $name[0]['league']['name'],
+																'weekly_standing' => $weekly,
+																'overall_standing' => $overall
+																)));
+			
+		}
+		else
+		{
+			$this->set('response',array('status'=>0, 'data' => array(
+																'name' => null,
+																'weekly_standing' => null,
+																'overall_standing' => null
+																)));
+		}
+
+		$this->render('default');
+	}
+
+	public function manage_private_league()
+	{
+		$this->loadModel('leagueInvitation');
+		$private_league_id = trim($this->request->query('private_league_id'));
+
+		$rs_invited = $this->leagueInvitation->find('all', array(
+	    	'limit' => 1000,
+	        'conditions' => array(
+	        						'leagueInvitation.league_id' => $private_league_id,
+	        						'league' => $this->league,
+	        						'n_status' => 0
+	        					))
+	    );
+
+	    $email_invited = array();
+	    foreach ($rs_invited as $key => $value)
+	    {
+	    	$email_invited[] = array('email' => $value['leagueInvitation']['email']);
+	    }
+	    $email_invited = array_values($email_invited);
+
+		$rs_joined = $this->leagueInvitation->find('all', array(
+	    	'limit' => 1000,
+	        'conditions' => array(
+	        						'leagueInvitation.league_id' => $private_league_id,
+	        						'league' => $this->league,
+	        						'n_status' => 1
+	        					))
+	    );
+
+	    $email_joined = array();
+	    foreach ($rs_joined as $key => $value)
+	    {
+	    	$email_joined[] = array('email' => $value['leagueInvitation']['email']);
+	    }
+	    $email_joined = array_values($email_joined);
+
+		$this->set('response',array('status'=>1, 'data' => array(
+															'joined' => $email_joined,
+															'waiting_confirmation' => $email_invited
+															)));
+		$this->render('default');
+	}
+
+	public function private_league_invites()
+	{
+		$this->loadModel('League');
+		$fb_id = trim($this->request->query('fb_id'));
+
+		$rs_user = $this->User->findByFb_id($fb_id);
+
+		$rs_invited = $this->League->query("SELECT * FROM league_invitations a 
+											INNER JOIN league b ON a.league_id = b.id 
+											INNER JOIN users c ON b.user_id = c.id 
+											WHERE a.email = '{$rs_user['User']['email']}' AND a.n_status = 0
+											AND a.league='{$this->league}'
+											LIMIT 100000");
+		Cakelog::write('debug', json_encode($rs_invited));
+		$response = array();
+		foreach ($rs_invited as $key => $value)
+		{
+			$response[] = array(
+												'private_league_id' => $value['b']['id'],
+												'private_league_name' => $value['b']['name'],
+												'inviter' => $value['c']['name']
+												);
+		}
+		$this->set('response',array('status'=>1, 'data' => array('invitations' => $response)));
+		$this->render('default');
+	}
+
+	public function private_league_config()
+	{
+		$max_player = Configure::read('PRIVATE_LEAGUE_PLAYER_MAX');
+		$this->set('response',array('status'=>1, 'data' => array('max_player' => $max_player)));
+		$this->render('default');
+	}
+
+	public function create_private_league()
+	{
+		$this->loadModel('League');
+		if($this->request->is("post"))
+		{
+			$upload_dir	= Configure::read('privateleague_web_dir');
+			$max_player = Configure::read('PRIVATE_LEAGUE_PLAYER_MAX');
+
+			$fb_id = Sanitize::clean($this->request->data['fb_id']);
+			$league_name = Sanitize::clean($this->request->data['private_league_name']);
+			$rs_user = $this->User->findByFb_id($fb_id);
+
+			/*$league_logo = $_FILES['private_league_logo'];
+			if(is_array($league_logo))
+			{
+				$allow_ext = array('jpeg', 'jpg', 'gif');
+				$aFile = explode('.', $league_logo['name']);
+				$file_ext = array_pop($aFile);
+				$filename = 'privateleague_default.jpg';
+				if(in_array($file_ext, $allow_ext))
+				{
+					$filename = date("ymdhis").'-'.rand(0, 99999).'.'.$file_ext;
+					if(move_uploaded_file($league_logo['tmp_name'], $upload_dir.$filename))
+					{
+						$this->Thumbnail->create($upload_dir.$filename,
+														$upload_dir.'thumb_'.$filename,
+														150,150);
+					}
+				}	
+			}*/
+			$filename = 'privateleague_default.jpg';
+			$data = array('name' => $league_name,
+									'logo' => $filename,
+									'type' => 'private_league',
+									'user_id' => $rs_user['User']['id'],
+									'max_player' => $max_player,
+									'date_created' => date("Y-m-d H:i:s"),
+									'n_status' => 1,
+									'league' => $this->league
+									);
+
+			try{
+				$dataSource = $this->League->getDataSource();
+				$dataSource->begin();
+
+				$this->League->create();
+				$result = $this->League->save($data);
+
+				$league_id = $this->League->id;
+
+				$this->League->query("INSERT INTO 
+									league_invitations(league_id, email, n_status, league) 
+									VALUES('{$league_id}','{$rs_user['User']['email']}',1,'{$this->league}')");
+
+				$this->League->query("INSERT INTO league_member
+											(league_id,team_id,join_date,n_status,league) 
+											VALUES('{$league_id}','{$rs_user['Team']['id']}',
+												now(),1,'{$this->league}')");
+
+				$dataSource->commit();
+				$response = array('id' => $result['League']['id'],
+								   'name' => $result['League']['name'],
+								   'max_player' => $result['League']['max_player']
+									);
+
+				$this->set('response',array('status'=>1, 'data' => $response));
+				
+
+			}catch(Exception $e){
+				$dataSource->rollback();
+				$this->set('response',array('status'=>0, 
+										'data' => null, 
+										'message' => 'Only One Private League Allowed Per User')
+				);
+			}
+
+		}
+		else
+		{
+			$this->set('response',array('status'=>0, 'data' => null));
+		}
+		$this->render('default');
+	}
+
+	public function invite_to_private_league()
+	{
+		if($this->request->is("post"))
+		{
+			$this->loadModel('League');
+			$this->loadModel('leagueInvitation');
+			$private_league_id = $this->request->data['private_league_id'];
+			$email = $this->request->data['email'];
+
+			try{
+
+				$rs_league = $this->League->findById($private_league_id);
+				$max_player = $rs_league['League']['max_player'];
+
+				$rs_invited = $this->leagueInvitation->find('count', array(
+		        'conditions' => array(
+		        						'leagueInvitation.league_id' => $private_league_id,
+		        						'league' => $this->league,
+		        						'n_status' => 0
+		        					))
+			    );
+
+			    $rs_joined = $this->leagueInvitation->find('count', array(
+			        'conditions' => array(
+			        						'leagueInvitation.league_id' => $private_league_id,
+			        						'league' => $this->league,
+			        						'n_status' => 1
+			        					))
+			    );
+
+			    $limit = $max_player - ($rs_invited + $rs_joined);
+
+			    $dataSource = $this->leagueInvitation->getDataSource();
+				$dataSource->begin();
+
+			    $i=2;
+				foreach ($email as $value)
+				{
+					$this->leagueInvitation->query("INSERT INTO fantasy.league_invitations
+													(league_id,email,n_status,league) 
+													VALUES
+													('{$private_league_id}','{$value}',
+														0,'{$this->league}')");
+
+					if($i == $limit){
+						break;
+					}
+					$i++;
+				}
+
+				$dataSource->commit();
+				
+				$this->set('response',array('status'=>1));
+			}catch(Exception $e){
+				$dataSource->rollback();
+				$this->set('response',array('status'=>0, 
+											'message' => $value.' has joined in other private league'));
+			}
+		}
+		else
+		{
+			$this->set('response',array('status'=>0, 'message' => 'Post Method Only'));
+		}
+		$this->render('default');
+	}
+
+	public function private_league_invite_action()
+	{
+		if($this->request->is("post"))
+		{
+			$this->loadModel('League');
+			$this->loadModel('leagueInvitation');
+
+			$fb_id = $this->request->data['fb_id'];
+			$private_league_id = $this->request->data['private_league_id'];
+			$action = $this->request->data['action'];
+			$rs_user = $this->User->findByFb_id($fb_id);
+			try{
+				$email = $rs_user['User']['email'];
+				$team_id = $rs_user['Team']['id'];
+				$dataSource = $this->League->getDataSource();
+				$dataSource->begin();
+				if($action == 'accept')
+				{
+					$this->leagueInvitation->updateAll(
+									array('n_status' => 1),
+									array(
+											'league_id' => $private_league_id,
+											'email' => $email, 
+											'n_status' => 0, 
+											'league' => $this->league
+										)
+									);
+				}
+				else if($action == 'reject')
+				{
+					$this->leagueInvitation->updateAll(
+									array('n_status' => 2),
+									array(
+											'league_id' => $private_league_id,
+											'email' => $email, 
+											'n_status' => 0, 
+											'league' => $this->league
+										)
+									);
+				}
+				else
+				{
+					throw new Exception("Action not defined");
+				}
+
+				$this->League->query("INSERT INTO league_member(league_id,team_id,join_date,n_status,league)
+										VALUES('{$private_league_id}','{$team_id}',now(),1,'{$this->league}')");
+				$dataSource->commit();
+				$this->set('response',array('status'=>1));
+			}catch(Exception $e){
+				$dataSource->rollback();
+
+				Cakelog::write('error', 
+				'Api.private_league_invite_action '.$e->getMessage().
+				' data:'.json_encode($rs_user));
+
+				$this->set('response',array('status'=>0,'message'=>'something wrong'));
+			}
+		}
+		else
+		{
+			$this->set('response',array('status'=>0, 'message' => 'Post Method Only'));
+		}
+		$this->render('default');
+	}
+
+	/*
+	*	End Of Private League API	
+	*/
+
 	private function getBetValue($bet_name,$bets){
 		for($i=0;$i<sizeof($bets);$i++){
 			if($bets[$i]['a']['bet_name']==$bet_name){
@@ -4978,8 +5560,8 @@ class ApiController extends AppController {
 				//$this->loadModel('ProfileModel');
 				$response = $this->api_post('/user/register',$data_save);
 
-				CakeLog::write('error', 
-					'api.register_supersoccer /user/register data'.json_encode($response));
+				//CakeLog::write('error', 
+				//	'api.register_supersoccer /user/register data'.json_encode($response));
 
 				if($response['status']==1 || @$check2['User']['register_completed'] == 0)
 				{
@@ -5014,6 +5596,28 @@ class ApiController extends AppController {
 			}
 		}
 
+		$this->render('default');
+	}
+
+	public function check_email()
+	{
+		$email = trim($this->request->query['email']);
+
+		$rs_user = $this->User->findByEmail($email);
+		$data = array();
+		if(count($rs_user) > 0)
+		{
+			$data['id'] = $rs_user['User']['id'];
+			$data['fb_id'] = $rs_user['User']['fb_id'];
+			$data['name'] = $rs_user['User']['name'];
+			$data['email'] = $rs_user['User']['email'];
+
+			$this->set('response',array('status'=>1, 'data' => $data));
+		}
+		else
+		{
+			$this->set('response',array('status'=>1, 'data' => null));
+		}
 		$this->render('default');
 	}
 
@@ -5168,24 +5772,17 @@ class ApiController extends AppController {
 	*/
 	public function activation_user_mobile()
 	{
-		if($this->request->is("post"))
-		{
-			$this->loadModel('User');
-			$email = trim(Sanitize::clean($this->request->data['email']));
-			$activation_code = trim(Sanitize::clean($this->request->data['activation_code']));
+		$this->loadModel('User');
+		$email = trim(Sanitize::clean($this->request->query['email']));
+		$activation_code = trim(Sanitize::clean($this->request->query['activation_code']));
 
-			$rs_user = $this->User->findByEmail($email);
-			if(count($rs_user) != 0)
+		$rs_user = $this->User->findByEmail($email);
+		if(count($rs_user) != 0)
+		{
+			if($rs_user['User']['activation_code'] == $activation_code)
 			{
-				if($rs_user['User']['activation_code'] == $activation_code)
-				{
-					$this->User->query("UPDATE users SET n_status = 1 WHERE email='{$email}'");
-					$this->set('response', array('status'=>1));
-				}
-				else
-				{
-					$this->set('response', array('status'=>0));
-				}
+				$this->User->query("UPDATE users SET n_status = 1 WHERE email='{$email}'");
+				$this->set('response', array('status'=>1));
 			}
 			else
 			{
@@ -5825,20 +6422,36 @@ class ApiController extends AppController {
 	}
 
 	//temporary function
-	public function remove_user($fb_id)
+	public function remove_user($fb_id = "")
 	{
+		if(isset($this->request->query['email']))
+		{
+			$email = $this->request->query['email'];
+			$rs_user = $this->User->findByEmail($email);
+
+			$fb_id = $rs_user['User']['fb_id'];
+		}
 		$rs_user = $this->User->findByFb_id($fb_id);
 		$rs_game_user = $this->User->query("SELECT * FROM 
 			ffgame.game_users WHERE fb_id='{$fb_id}' LIMIT 1");
 
+		$rs_game_user_ita = $this->User->query("SELECT * FROM 
+			ffgame_ita.game_users WHERE fb_id='{$fb_id}' LIMIT 1");
+
+
 		$this->layout="ajax";
 		$this->User->query("DELETE FROM fantasy.users WHERE fb_id='{$fb_id}'");
-		$this->User->query("DELETE FROM ffgame.game_users WHERE fb_id='{$fb_id}'");
+		
+		$this->User->query("DELETE FROM fantasy.teams WHERE user_id='{$rs_user['User']['id']}'");
+
 		$this->User->query("DELETE FROM fantasy.game_transactions WHERE fb_id='{$fb_id}'");
 		$this->User->query("DELETE FROM fantasy.game_team_cash WHERE fb_id='{$fb_id}'");
 
-		$this->User->query("DELETE FROM ffgame.game_teams WHERE user_id='{$rs_user['User']['id']}'");
-		$this->User->query("DELETE FROM fantasy.teams WHERE user_id='{$rs_game_user[0]['game_users']['id']}'");
+		$this->User->query("DELETE FROM ffgame.game_users WHERE fb_id='{$fb_id}'");
+		$this->User->query("DELETE FROM ffgame_ita.game_users WHERE fb_id='{$fb_id}'");
+		$this->User->query("DELETE FROM ffgame.game_teams WHERE user_id='{$rs_game_user[0]['game_users']['id']}'");
+		$this->User->query("DELETE FROM ffgame_ita.game_teams WHERE user_id='{$rs_game_user_ita[0]['game_users']['id']}'");
+		
 
 		$this->set('response',array('status'=>1));
 		$this->render('default');

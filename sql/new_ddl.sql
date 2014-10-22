@@ -566,3 +566,9 @@ ADD COLUMN `is_mobile` VARCHAR(1) NULL DEFAULT '0' AFTER `parent_id`;
 
 ALTER TABLE `fantasy`.`league_table` 
 ADD COLUMN `total_points` INT(11) NULL AFTER `points`;
+
+ALTER TABLE `fantasy`.`league_invitations` 
+ADD UNIQUE INDEX `unique_1` (`league_id` ASC, `email` ASC, `league` ASC);
+
+ALTER TABLE `fantasy`.`membership_transactions` 
+CHANGE COLUMN `transaction_name` `transaction_name` VARCHAR(255) NULL DEFAULT NULL ;

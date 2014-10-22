@@ -21,7 +21,7 @@
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 App::uses('Controller', 'Controller');
-require_once APP.DS.'Vendor'.DS.'common.php';
+//require_once APP.DS.'Vendor'.DS.'common.php';
 
 /**
  * Payment Controller
@@ -45,6 +45,7 @@ class PaymentController extends AppController {
 	// 2. save to session fb_id, transaction_id, transaction_type
 	// 3. get ecash url then redirect to payment mandiri ecash page
 	// 4. check trx_type in charge
+	// 5. check if user has purchase before
 	public function index()
 	{
 		$charge = Configure::read('MOBILE_CHARGE');
@@ -52,11 +53,17 @@ class PaymentController extends AppController {
 
 		if($this->request->query('fb_id') == NULL && $this->request->query('trx_type') == NULL)
 		{
-			$this->redirect($url_scheme.'fmpayment?status=0&message=Terjadi Kesalahan !');
+			$this->redirect($url_scheme.'fmpayment?status=1&message=Already, owned !');
 		}
 
 		$fb_id = trim($this->request->query('fb_id'));
 		$trx_type = strtoupper($this->request->query('trx_type'));
+
+		$is_payment = $this->isPayment($fb_id, 'UNLOCK '.$trx_type);
+
+		if($is_payment){
+			$this->redirect($url_scheme.'fmpayment?status=0&message=Terjadi Kesalahan !');
+		}
 
 		if(array_key_exists($trx_type, $charge))
 		{
@@ -112,7 +119,15 @@ class PaymentController extends AppController {
 		$rs = $this->Game->EcashValidate($id);
 		$fb_id = $this->Session->read('fb_id_payment');
 		$trx_type = $this->Session->read('trx_type_payment');
+		$transaction_id = $this->Session->read('transaction_id_payment');
+
 		$array_session = array('fb_id' => $fb_id, 'trx_type' => $trx_type);
+
+		$is_payment = $this->isPayment($fb_id, 'UNLOCK '.$trx_type);
+
+		if($is_payment){
+			$this->redirect($url_scheme.'fmpayment?status=1&message=Success, Already owned !');
+		}
 
 		if(isset($rs['data']) && $rs['data'] != '')
 		{
@@ -120,10 +135,29 @@ class PaymentController extends AppController {
 			if(isset($data[4]) && trim($data[4]) == "SUCCESS")
 			{
 				try{
+					//compare transaction_id
+					if($data[3] != $transaction_id){
+						throw new Exception("Invalid Transaction");
+					}
+
 					$transaction_name = 'Purchase Order #'.$data[3];
 					$transaction_type = 'UNLOCK '.$trx_type;
 					$amount = $charge[$trx_type];
 					$detail = json_encode($rs['data']);
+
+					//hit url mobile notification
+					$result_mobile = curlPost($url_mobile_notif,$array_session);
+					$result_mobile = json_decode($result_mobile, TRUE);
+
+					if($result_mobile['code'] == 1){
+						Cakelog::write('debug', 
+						'Payment.success result_mobile:'.json_encode($result_mobile).
+						' data:'.json_encode($rs).' fb_id:'.$fb_id);
+					}else{
+						Cakelog::write('error', 
+						'Payment.success result_mobile:'.json_encode($result_mobile).
+						' data:'.json_encode($rs).' fb_id:'.$fb_id);
+					}
 
 					$save_data = array(
 									'fb_id' => $fb_id,
@@ -137,14 +171,9 @@ class PaymentController extends AppController {
 
 					$this->MembershipTransactions->save($save_data);
 
-					//hit url mobile notification
-					$result_mobile = curlPost($url_mobile_notif,$array_session);
-					Cakelog::write('debug_payment', json_encode($result_mobile));
-
 					$this->redirect($url_scheme.'fmpayment?status=1&message=success');
 
 				}catch(Exception $e){
-					$dataSource->rollback();
 					Cakelog::write('error', 'Payment.success 
 						id='.$id.' data:'.json_encode($data).' message:'.$e->getMessage());
 					$this->redirect($url_scheme.'fmpayment?status=0&message=error');
@@ -160,6 +189,17 @@ class PaymentController extends AppController {
 			Cakelog::write('error', 'Payment.success '.$id.' Not Found');
 			$this->redirect($url_scheme.'fmpayment?status=0&message=Saat ini tidak bisa terhubung dengan mandiri ecash, Silahkan coba beberapa saat lagi');
 		}
+	}
+
+	private function isPayment($fb_id, $trx_type)
+	{
+		$rs = $this->MembershipTransactions->query("SELECT count(id) as total FROM membership_transactions
+											WHERE fb_id='{$fb_id}' AND transaction_type='{$trx_type}'
+											LIMIT 1");
+		if($rs[0][0]['total'] > 0){
+			return true;
+		}
+		return false;
 	}
 
 }

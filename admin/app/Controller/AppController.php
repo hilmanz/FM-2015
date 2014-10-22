@@ -191,6 +191,8 @@ class AppController extends Controller {
 			$params['access_token'] = $this->getAccessToken();
 		}
 		$params['api_key'] = $this->getAPIKey();
+
+		Cakelog::write('debug', $this->getAPIUrl().$uri);
 		$response = json_decode(curlGet($this->getAPIUrl().$uri,$params,$cookie_file,$timeout),true);
 		return $response;
 	}

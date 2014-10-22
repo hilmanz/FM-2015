@@ -64,7 +64,23 @@ class AppModel extends Model {
 		$this->access_token = $access_token;
 	}
 	public function getAPIUrl(){
-		return Configure::read('API_URL');
+		App::uses('CakeSession', 'Model/Datasource');
+		$in_session = CakeSession::read('API_URL');
+		
+		if(isset($in_session)){
+			return $in_session;
+		}else{
+			$API_URL = Configure::read('API_URL');
+			if(is_array($API_URL)){
+				$n = sizeof($API_URL);
+				$API_URL = $API_URL[rand(0,($n-1))];
+			}
+			CakeSession::write('API_URL',$API_URL);
+			
+			return $API_URL;
+		}
+
+		
 	}
 	public function getAPIKey(){
 		return Configure::read('API_KEY');
