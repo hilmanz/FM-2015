@@ -544,7 +544,7 @@ function sendNotification(conn,game_id,game_team_id,type,callback){
 			 Sepertinya keputusan Anda mengobral Tim telah membuat para supporter merasa tim kita kehilangan identitasnya.<br/>\
 			 Mereka memutuskan untuk memboikot tim kita dan tidak menghadiri pertandingan kemarin.<br/>\
 			 Sekelompok kecil fans melakukan demo di luar stadion, dan menghalangi fans lain datang ke stadion,<br/>\
-			 sehingga jumlah star anda berkurang.<br/> \
+			 sehingga jumlah pemasukan anda berkurang.<br/> \
 			Mohon maaf atas berita buruk ini. <br/>\
 			Good luck in the next game.<br/>\
 				<br/>\
@@ -562,7 +562,7 @@ function sendNotification(conn,game_id,game_team_id,type,callback){
 		msg = "Dengan hormat,<br/>\
 				Sehubungan dengan terjadinya keributan di daerah stadion Anda akhir pekan ini, \
 				kami terpaksa memberlakukan biaya over time kepada seluruh polisi yang bertugas menjaga keamanan di stadion Anda. \
-				Sesuai peraturan yang berlaku, maka kami membebankan biaya over time sebesar -5 star kepada Anda. \
+				Sesuai peraturan yang berlaku, maka kami membebankan biaya over time sebesar ss$ 500,000 kepada Anda. \
 				<br/>Terima kasih atas perhatiannya.<br/><br/>\
 				Hormat kami,<br/>\
 				<br/>\
@@ -582,7 +582,7 @@ function sendNotification(conn,game_id,game_team_id,type,callback){
 			   mengeluarkan cukup banyak biaya rumah tangga dan biaya lainnya yang kini harus mereka keluarkan lagi \
 			   setelah berpindah klub.<br/>\
 			   Setelah membicarakan hal ini dengan tim legal klab, kami sepakat untuk membayarkan kompensasi \
-			   sebesar -5 star. <br/><br/>\
+			   sebesar ss$ 500,000. <br/><br/>\
 			   Terimakasih<br/><br/>\
 				Salam,<br/>\
 				<br/>\

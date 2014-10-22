@@ -284,4 +284,23 @@ class LeaderboardController extends AppController {
 	public function success(){
 		$this->render('success');
 	}
+
+
+	private function getRealManagerPoints(){
+		$sql = "SELECT b.matchday,c.name AS team,a.team_id,a.overall_points 
+		FROM ffgame_stats_{$_SESSION['league']}.master_match_points a
+		INNER JOIN ffgame_{$_SESSION['league']}.game_fixtures b
+		ON a.game_id = b.game_id
+		INNER JOIN ffgame_{$_SESSION['league']}.master_team c
+		ON c.uid = a.team_id ORDER BY matchday ASC,overall_points DESC";
+		$rs = $this->Game->query($sql);
+		return $rs;
+	}
+
+	public function manager(){
+		$rs = $this->getRealManagerPoints();
+		pr($rs);
+		die();
+		$this->set('rs',$rs);
+	}
 }
