@@ -185,7 +185,7 @@ class LeaderboardController extends AppController {
 		  	}
 	   	}
 	  	
-	   	pr($current_month);
+	   
 	  	
 
 	  	$available_months = $this->Monthly_point->query("SELECT 
@@ -286,21 +286,87 @@ class LeaderboardController extends AppController {
 	}
 
 
+
+	
+	public function manager(){
+		$manager = $this->getManagerData();
+
+		$rs = $this->getRealManagerPoints();
+		$results = array();
+		$matchday = 0;
+		while(sizeof($rs)>0){
+			$t = array_shift($rs);
+			$results[] = array(
+				'matchday'=>$t['b']['matchday'],
+				'team_id'=>$t['a']['team_id'],
+				'points'=>$t['a']['overall_points'],
+				'team'=>$t['c']['team'],
+				'manager'=>$manager[$_SESSION['league']][$t['a']['team_id']]
+			);
+			$matchday = $t['b']['matchday'];
+		}
+		
+		$this->set('rs',$results);
+
+		$this->set('rank',$this->userRank);
+	    $this->set('tier',$this->getTier($this->userRank));
+	    $this->set('manager',true);
+	    $this->set('matchday',$matchday);
+	}
+	private function getManagerData(){
+		$manager = array('epl'=>array(),'ita'=>array());
+		$manager['epl']['t8'] = "Jose Mourinho";
+		$manager['epl']['t43'] = "Manuel Pellegrini";
+		$manager['epl']['t20'] = "Ronald Koeman";
+		$manager['epl']['t21'] = "Sam Allardyce";
+		$manager['epl']['t14'] = "Brendan Rodgers";
+		$manager['epl']['t1'] = "Louis Van Gaal";
+		$manager['epl']['t3'] = "Arsene Wenger";
+		$manager['epl']['t80'] = "Gary Monk";
+		$manager['epl']['t6'] = "Mauricio Pochettino";
+		$manager['epl']['t110'] = "Mark Hughes";
+		$manager['epl']['t88'] = "Steve Bruce";
+		$manager['epl']['t7'] = "Paul Lambert";
+		$manager['epl']['t11'] = "Roberto Martinez";
+		$manager['epl']['t35'] = "Alan Irvine";
+		$manager['epl']['t13'] = "Nigel Pearson";
+		$manager['epl']['t31'] = "Neil Warnock";
+		$manager['epl']['t56'] = "Gus Poyet";
+		$manager['epl']['t4'] = "Alan Pardew";
+		$manager['epl']['t90'] = "Sean Dyche";
+		$manager['epl']['t52'] = "Harry Redknapp";
+
+		$manager['ita']['t128'] = "Massimiliano Allegri";
+		$manager['ita']['t121'] = "Rudi Garcia";
+		$manager['ita']['t603'] = "Sinisa Mihajlovic";
+		$manager['ita']['t120'] = "Filippo Inzaghi";
+		$manager['ita']['t136'] = "Andrea Stramaccioni";
+		$manager['ita']['t129'] = "Stefano Pioli";
+		$manager['ita']['t459'] = "Rafael Benitez";
+		$manager['ita']['t126'] = "Andrea Mandorlini";
+		$manager['ita']['t127'] = "Walter Mazzarri";
+		$manager['ita']['t990'] = "Gian Piero Gasperini";
+		$manager['ita']['t125'] = "Vincenzo Montella";
+		$manager['ita']['t135'] = "Giampiero Ventura";
+		$manager['ita']['t695'] = "Maurizio Sarri";
+		$manager['ita']['t456'] = "Stefano Colantuono";
+		$manager['ita']['t1731'] = "Pierpaolo Bisoli";
+		$manager['ita']['t1405'] = "Giuseppe Iachini";
+		$manager['ita']['t124'] = "Zdenek Zeman";
+		$manager['ita']['t988'] = "Eugenio Corini";
+		$manager['ita']['t2182'] = "Eusebio Di Francesco";
+		$manager['ita']['t131'] = "Roberto Donadoni";
+
+		return $manager;
+	}
 	private function getRealManagerPoints(){
 		$sql = "SELECT b.matchday,c.name AS team,a.team_id,a.overall_points 
-		FROM ffgame_stats_{$_SESSION['league']}.master_match_points a
-		INNER JOIN ffgame_{$_SESSION['league']}.game_fixtures b
+		FROM {$_SESSION['ffgamestatsdb']}.master_match_points a
+		INNER JOIN {$_SESSION['ffgamedb']}.game_fixtures b
 		ON a.game_id = b.game_id
-		INNER JOIN ffgame_{$_SESSION['league']}.master_team c
+		INNER JOIN {$_SESSION['ffgamedb']}.master_team c
 		ON c.uid = a.team_id ORDER BY matchday ASC,overall_points DESC";
 		$rs = $this->Game->query($sql);
 		return $rs;
-	}
-
-	public function manager(){
-		$rs = $this->getRealManagerPoints();
-		pr($rs);
-		die();
-		$this->set('rs',$rs);
 	}
 }
