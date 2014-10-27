@@ -1,7 +1,7 @@
 <?php
 /**
  * Leaderboard Controller
-
+ *
  */
 App::uses('AppController', 'Controller');
 App::uses('Sanitize', 'Utility');
@@ -289,11 +289,24 @@ class LeaderboardController extends AppController {
 
 	
 	public function manager(){
+		$this->loadModel('Weekly_point');
 		$manager = $this->getManagerData();
 
 		$rs = $this->getRealManagerPoints();
 		$results = array();
 		$matchday = 0;
+
+		//my own points
+	    $my_poin = $this->Weekly_point->getWeeklyPoints($this->userDetail['Team']['id'],
+	    											 $_SESSION['league']);
+	    
+	    $me = array('name'=>$this->userDetail['User']['name'],
+	    				'avatar_img'=>$this->userDetail['User']['avatar_img'],
+	    				'team_name'=>$this->userDetail['Team']['team_name'],
+	    				'team_id'=>$this->userDetail['Team']['team_id'],
+	    				'points'=>$my_poin);
+
+	    
 		while(sizeof($rs)>0){
 			$t = array_shift($rs);
 			$results[] = array(
@@ -301,17 +314,78 @@ class LeaderboardController extends AppController {
 				'team_id'=>$t['a']['team_id'],
 				'points'=>$t['a']['overall_points'],
 				'team'=>$t['c']['team'],
-				'manager'=>$manager[$_SESSION['league']][$t['a']['team_id']]
+				'manager'=>$manager[$_SESSION['league']][$t['a']['team_id']],
+				'avatar_img'=>false,
+				'player'=>false
 			);
 			$matchday = $t['b']['matchday'];
 		}
+
+		//kita sisipkan pemain ke dalam daftar manager
+		$arr = array();
+		$merged_matchday = 1;
+		$n_merged = 0;
+		for($i=0;$i<sizeof($results);$i++){
+			
+			if(isset($me['points'][$results[$i]['matchday']]) 
+				&& $me['points'][$results[$i]['matchday']] > $results[$i]['points']
+				&& $merged_matchday == $results[$i]['matchday']){
+				
+
+				$arr[] = array('matchday'=>$results[$i]['matchday'],
+								'team_id'=>$me['team_id'],
+								'team'=>$me['team_name'],
+								'manager'=>$me['name'],
+								'avatar_img'=>$me['avatar_img'],
+								'points'=>intval(@$me['points'][$results[$i]['matchday']]),
+								'player'=>true);
+				
+				$merged_matchday++;
+				$n_merged++;
+				$arr[] = $results[$i];
+				
+
+			}else if($merged_matchday < $results[$i]['matchday']){
+
+				$arr[] = $results[$i];
+				//pemain berarti paling bawah
+				$arr[] = array('matchday'=>$merged_matchday,
+								'team_id'=>$me['team_id'],
+								'team'=>$me['team_name'],
+								'manager'=>$me['name'],
+								'avatar_img'=>$me['avatar_img'],
+								'points'=>intval(@$me['points'][$merged_matchday]),
+								'player'=>true);
+				$merged_matchday = $results[$i]['matchday'];
+
+				$n_merged++;
+
+			}else{
+
+				$arr[] = $results[$i];
+			}
+
+			
+			
+
+		}
 		
-		$this->set('rs',$results);
+		if($n_merged < $merged_matchday){
+			$arr[] = array('matchday'=>$merged_matchday,
+								'team_id'=>$me['team_id'],
+								'team'=>$me['team_name'],
+								'manager'=>$me['name'],
+								'avatar_img'=>$me['avatar_img'],
+								'points'=>intval(@$me['points'][$merged_matchday]),
+								'player'=>true);
+		}
+		$this->set('rs',$arr);
 
 		$this->set('rank',$this->userRank);
 	    $this->set('tier',$this->getTier($this->userRank));
 	    $this->set('manager',true);
 	    $this->set('matchday',$matchday);
+
 	}
 	private function getManagerData(){
 		$manager = array('epl'=>array(),'ita'=>array());

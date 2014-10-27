@@ -2826,3 +2826,8 @@ input[type=text], input[type="password"]{
 	width:100%;
 	margin-bottom:20px;
 }
+
+.playerhighlight td{
+	background-color: #fdcb02;
+	
+}

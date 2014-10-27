@@ -2,6 +2,7 @@
 $monthly = isset($monthly) ? "selected='selected'":"";
 $weekly = isset($weekly) ? "selected='selected'":"";
 $overall = isset($overall) ? "selected='selected'":"";
+$manager = isset($manager) ? "selected='selected'":"";
 $months = array('','Januari','Februari','Maret','April','Mei',
                     'Juni','Juli','Agustus','September','Oktober',
                     'November','Desember');
@@ -89,6 +90,7 @@ function isMonthAvailable($available,$m,$y){
               <option value="weekly" <?=$weekly?>>Mingguan</option>
               <option value="monthly" <?=$monthly?>>Bulanan</option>
               <option value="overall" <?=$overall?>>Keseluruhan</option>
+               <option value="manager" <?=@$manager?>>Manager Standings</option>
           </select>
         </form>
       </div>
@@ -173,6 +175,9 @@ $("select[name='period']").change(function(){
     break;
     case 'overall':
       document.location="<?=$this->Html->url('/leaderboard/overall')?>";
+    break;
+    case 'manager':
+      document.location="<?=$this->Html->url('/leaderboard/manager')?>";
     break;
     default:
       document.location="<?=$this->Html->url('/leaderboard')?>";

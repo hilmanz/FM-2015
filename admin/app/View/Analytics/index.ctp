@@ -155,7 +155,7 @@ function addChart(options){
                 text: options.title,
                 x: -20 //center
             },
-           
+           	zoomType: 'x',
             xAxis: {
                 categories: options.categories,
                 labels: {

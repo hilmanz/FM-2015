@@ -3,6 +3,7 @@ $monthly = isset($monthly) ? "selected='selected'":"";
 $weekly = isset($weekly) ? "selected='selected'":"";
 $overall = isset($overall) ? "selected='selected'":"";
 $manager = isset($manager) ? "selected='selected'":"";
+
 ?>
 <div id="leaderboardPage">
       <div class="rowd">
@@ -99,9 +100,10 @@ $manager = isset($manager) ? "selected='selected'":"";
         	<table width="100%" border="0" cellspacing="0" cellpadding="0" class="theTable footable">
                 <thead>
                     <tr>
-          				
-                        <th>Klab</th>
+          				      <th></th>
                         <th data-hide="phone,tablet">Manajer</th>
+                        <th>Klab</th>
+                        
                         <th data-hide="phone" class="alignright">Jumlah Poin</th>
                     </tr>
                 </thead>
@@ -150,14 +152,33 @@ $("select[name='period']").change(function(){
 </script>
 
 <script type="text/template" id="manager_list">
-  <% for(i=0;i<data.length;i++){%>
-  <% if(i==0||i%2==0){ %>
+  <% for(i=0;i<data.length;i++){
+    console.log(data[i]);
+  %>
+
+  <% if(data[i].player==true){ %>
+
+  <tr class="playerhighlight">
+  
+  <% }else if(i==0||i%2==0) { %> 
   <tr class="odd">
   <% }else{ %>
   <tr class="even">
   <%}%>
-    <td class="l-club"><%=data[i].team%></td>
+    <% if(data[i].player == true) { %>
+       <td style="width:100px;">
+       <?php if(strlen(@$user['avatar_img'])==0 || @$user['avatar_img']=='0'):?>
+          <img width="100px" src="http://graph.facebook.com/<?=$USER_DATA['fb_id']?>/picture" />
+        <?php else:?>
+          <img width="100px" src="<?=$this->Html->url('/files/120x120_'.@$user['avatar_img'])?>" />
+        <?php endif;?>
+      
+       </td>
+    <% }else{ %>
+    <td style="width:100px;"><img width="100px" src="<?=$this->Html->url('/images/managers/')?><%=data[i].team_id%>"/></td>
+    <% } %>
     <td class="l-manager"><%=data[i].manager%></td>
+    <td class="l-club"><%=data[i].team%></td>
     <td class="l-points alignright"><%=number_format(data[i].points)%></td>
   </tr>
   <%}%>
