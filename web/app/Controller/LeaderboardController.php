@@ -434,12 +434,17 @@ class LeaderboardController extends AppController {
 		return $manager;
 	}
 	private function getRealManagerPoints(){
+		$season_id = Configure::read('FM_SESSION_ID');
 		$sql = "SELECT b.matchday,c.name AS team,a.team_id,a.overall_points 
 		FROM {$_SESSION['ffgamestatsdb']}.master_match_points a
 		INNER JOIN {$_SESSION['ffgamedb']}.game_fixtures b
 		ON a.game_id = b.game_id
 		INNER JOIN {$_SESSION['ffgamedb']}.master_team c
-		ON c.uid = a.team_id ORDER BY matchday ASC,overall_points DESC";
+		ON c.uid = a.team_id 
+		WHERE b.session_id='{$season_id}'
+		ORDER BY matchday ASC,overall_points DESC";
+
+		
 		$rs = $this->Game->query($sql);
 		return $rs;
 	}
