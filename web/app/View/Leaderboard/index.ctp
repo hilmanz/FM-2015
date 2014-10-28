@@ -155,6 +155,9 @@ $("select[name='period']").change(function(){
     case 'overall':
       document.location="<?=$this->Html->url('/leaderboard/overall')?>";
     break;
+    case 'manager':
+      document.location="<?=$this->Html->url('/leaderboard/manager')?>";
+    break;
     default:
       document.location="<?=$this->Html->url('/leaderboard')?>";
     break;

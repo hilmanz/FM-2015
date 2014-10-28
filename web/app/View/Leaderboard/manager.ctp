@@ -3,24 +3,7 @@ $monthly = isset($monthly) ? "selected='selected'":"";
 $weekly = isset($weekly) ? "selected='selected'":"";
 $overall = isset($overall) ? "selected='selected'":"";
 $manager = isset($manager) ? "selected='selected'":"";
-$months = array('','Januari','Februari','Maret','April','Mei',
-                    'Juni','Juli','Agustus','September','Oktober',
-                    'November','Desember');
 
-$previous_month = ($current_month==1) ? 12 : $current_month - 1;
-$previous_year = ($current_month==1) ? $current_year - 1 : $current_year;
-
-$next_month = ($current_month==12) ? 1 : $current_month + 1;
-$next_year = ($current_month==12) ? $current_year + 1 : $current_year;
-
-function isMonthAvailable($available,$m,$y){
- 
-  foreach($available as $a){
-    if($a['monthly_points']['bln'] == $m && $a['monthly_points']['thn'] == $y){
-      return true;
-    }
-  }
-}
 ?>
 <div id="leaderboardPage">
       <div class="rowd">
@@ -72,43 +55,44 @@ function isMonthAvailable($available,$m,$y){
     <div class="headbar tr">
         <div class="leaderboard-head fl">
          
-        	<h1>Papan Peringkat – Bulan <?=$months[$current_month]?> <?=$current_year?></h1>
-            <p>Daftar urutan manajer berdasarkan poin tertinggi tiap bulan.<br />Diperbaharui secara mingguan. </p>
+        	<h1>Papan Peringkat – Manager</h1>
+            <p>Daftar urutan manajer berdasarkan poin tertinggi.<br />Diperbaharui secara mingguan. </p>
         </div>
         <div class="leaderboard-rank fr">
             <span>Peringkat Anda:</span>
-            <h3><?=number_format(@$rank)?></h3>
+            <h3><?=number_format($rank)?></h3>
             <span>Tier <?=$tier?></span>
         </div>
     </div><!-- end .headbar -->
-    <div class="headbar tr"> 
-        
+    <div class="headbar tr">
+     
       <div class="fl">
         <form action="<?=$this->Html->url('/leaderboard')?>" 
           method="get" enctype="application/x-www-form-urlencoded">
-          <select name="period"  class="styled">
-              <option value="weekly" <?=$weekly?>>Mingguan</option>
-              <option value="monthly" <?=$monthly?>>Bulanan</option>
-              <option value="overall" <?=$overall?>>Keseluruhan</option>
-               <option value="manager" <?=@$manager?>>Manager Standings</option>
+          <select name="period" class="styled">
+              <option value="weekly" <?=@$weekly?>>Mingguan</option>
+              <option value="monthly" <?=@$monthly?>>Bulanan</option>
+              <option value="overall" <?=@$overall?>>Keseluruhan</option>
+              <option value="manager" <?=@$manager?>>Manager Standings</option>
           </select>
         </form>
       </div>
-       <?php if(isMonthAvailable($available_months,$previous_month,$previous_year)):?>
+      
+       
         <div class="fr">
-          <a href="<?=$this->Html->url('/leaderboard/monthly?m='.
-                                        ($previous_month).'&y='.$previous_year)?>" 
-            class="button"><?=$months[$previous_month]?> <?=$previous_year?></a>
+          Matchday : <select name="matchday" class="styled">
+            <option value="0">Matchday</option>
+            <?php for($i=1;$i<=$matchday;$i++):?>
+            <?php if($i==$matchday):?>
+              <option value="<?=$i?>" selected='selected'><?=$i?></option>
+            <?php else:?>
+              <option value="<?=$i?>"><?=$i?></option>
+            <?php endif;?>
+            <?php endfor;?>
+          </select>
         </div>
-        <?php endif;?>
-
-        <?php if(isMonthAvailable($available_months,$next_month,$next_year)):?>
-        <div class="fr">
-          <a href="<?=$this->Html->url('/leaderboard/monthly?m='.
-                                        ($next_month).'&y='.$next_year)?>" 
-            class="button"><?=$months[$next_month]?> <?=$next_year?></a>
-        </div>
-        <?php endif;?>
+      
+       
     </div>
 
     <div id="thecontent">
@@ -116,44 +100,23 @@ function isMonthAvailable($available,$m,$y){
         	<table width="100%" border="0" cellspacing="0" cellpadding="0" class="theTable footable">
                 <thead>
                     <tr>
-          				<th data-class="expand">Peringkat</th>
-                        <th>Klab</th>
+          				      <th></th>
                         <th data-hide="phone,tablet">Manajer</th>
+                        <th>Klab</th>
+                        
                         <th data-hide="phone" class="alignright">Jumlah Poin</th>
                     </tr>
                 </thead>
-                <tbody>
-                  <?php
-                  $params = $this->Paginator->params('Monthly_point');
+                <tbody id="tblrows">
+                 
                   
-                    foreach($team as $n=>$t):
-                      $no = $n+1 + (($params['page']-1) * $params['limit']);
-
-                  ?>
-                  <tr class="odd">
-                    <td class="l-rank"><?=number_format($no)?></td>
-                    <td class="l-club"><?=h($t['Team']['team_name'])?></td>
-                    <td class="l-manager"><?=h($t['Manager']['name'])?></td>
-                    <td class="l-points alignright"><?=number_format($t['Point']['points'])?></td>
-                  </tr>
-                  <?php
-                  endforeach;
-                  ?>
+                 
                 </tbody>
             </table>
-            <div class="widget action-button tr">
-              <?php
-              echo $this->Paginator->prev(__('Sebelumnya'), array(), null, 
-                                          array('class' => 'prev'));
-              ?>
-              <?php
-              echo $this->Paginator->next(__('Berikutnya'), array(), null, 
-                                      array('class' => 'next'));
-              ?>
-            </div><!-- end .widget -->
+            
         </div><!-- end .content -->
         <div class="rows">
-           <?php for($i=0;$i<sizeof($long_banner2);$i++):?>
+            <?php for($i=0;$i<sizeof($long_banner2);$i++):?>
                   <div class="col2">
                       <div class="mediumBanner">
                         <a href="javascript:banner_click(<?=$long_banner2[$i]['Banners']['id']?>,'<?=$long_banner2[$i]['Banners']['url']?>');">
@@ -166,6 +129,7 @@ function isMonthAvailable($available,$m,$y){
         </div><!-- end .rows -->
     </div><!-- end #thecontent -->
 </div><!-- end #leaderboardPage -->
+
 <script>
 $("select[name='period']").change(function(){
   
@@ -184,4 +148,64 @@ $("select[name='period']").change(function(){
     break;
   }
 });
+
+</script>
+
+<script type="text/template" id="manager_list">
+  <% for(i=0;i<data.length;i++){
+    console.log(data[i]);
+  %>
+
+  <% if(data[i].player==true){ %>
+
+  <tr class="playerhighlight">
+  
+  <% }else if(i==0||i%2==0) { %> 
+  <tr class="odd">
+  <% }else{ %>
+  <tr class="even">
+  <%}%>
+    <% if(data[i].player == true) { %>
+       <td style="width:100px;">
+       <?php if(strlen(@$user['avatar_img'])==0 || @$user['avatar_img']=='0'):?>
+          <img width="100px" src="http://graph.facebook.com/<?=$USER_DATA['fb_id']?>/picture" />
+        <?php else:?>
+          <img width="100px" src="<?=$this->Html->url('/files/120x120_'.@$user['avatar_img'])?>" />
+        <?php endif;?>
+      
+       </td>
+    <% }else{ %>
+    <td style="width:100px;"><img width="100px" src="<?=$this->Html->url('/images/managers/')?><%=data[i].team_id%>"/></td>
+    <% } %>
+    <td class="l-manager"><%=data[i].manager%></td>
+    <td class="l-club"><%=data[i].team%></td>
+    <td class="l-points alignright"><%=number_format(data[i].points)%></td>
+  </tr>
+  <%}%>
+</script>
+
+<script>
+var matchday = <?=$matchday?>;
+var stats = <?=json_encode($rs)?>;
+function populate_stats(){
+  var data = [];
+  for(i=0;i<stats.length;i++){
+    if(stats[i].matchday == matchday){
+      data.push(stats[i]);
+    }
+  }
+  
+  render_view(manager_list,'#tblrows',{data:data});
+}
+$(document).ready(function(){
+  populate_stats();  
+  $("select[name='matchday']").change(function(){
+    if($(this).val() > 0){
+      matchday = $(this).val();  
+      populate_stats();
+    }
+    
+  });
+});
+
 </script>

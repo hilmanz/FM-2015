@@ -14,5 +14,15 @@ class Weekly_point extends AppModel {
 			'type'=>'INNER'
 		),
 	);
-	
+	public function getWeeklyPoints($team_id,$league='epl'){
+		$poin = $this->query("
+	    		SELECT matchday,SUM(points+extra_points) AS total FROM fantasy.weekly_points 
+				WHERE team_id = {$team_id} AND league='{$league}' 
+				GROUP BY matchday;");
+		$rs = array();
+	   	for($i=0;$i<sizeof($poin);$i++){
+	   		$rs[$poin[$i]['weekly_points']['matchday']] = $poin[$i][0]['total'];
+	   	}
+    	return $rs;
+	}
 }

@@ -1684,7 +1684,7 @@ table td a.button,table td .buttons{
 	opacity:0.8 !important;
 }
 .download-apple{
-	background:url(../images/btn_comingsoon.png) no-repeat;
+	background:url(../images/btn_apple.png) no-repeat;
 	right:250px;
 }
 #maintenancePage{
@@ -2825,4 +2825,9 @@ input[type=text], input[type="password"]{
 #pilih-liga img{
 	width:100%;
 	margin-bottom:20px;
+}
+
+.playerhighlight td{
+	background-color: #fdcb02;
+	
 }
