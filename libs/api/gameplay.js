@@ -2534,7 +2534,7 @@ exports.setPostponedStatus = function(redisClient,game_id,toggle,callback){
 //-->
 
 exports.bet_info = function(redisClient,game_id,callback){
-	redisClient.get('bet_info_'+league+'_'+game_id,function(err,rs){
+	redisClient.get('bet_info_'+game_id,function(err,rs){
 		console.log('bet_info',game_id,'result : ',rs);
 		if(rs==null){
 			rs = {

@@ -490,6 +490,7 @@
 								  </tr>
 							</tbody>
 						</table>
+						note : Kalo Lo pasang pemain di Bench FM Super Soccer, dan pemain tersebut dimainkan di pertandingan sebenarnya. Maka poin yang Lo dapatkan hanya 50% dari total poin pemain tersebut.
 					</div><!-- end .row-3 -->
 				</div><!-- end #tabs-point -->
 				<div id="tabs-howto">

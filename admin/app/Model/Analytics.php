@@ -50,6 +50,57 @@ class Analytics extends AppModel {
 		
 		return $results;
 	}
+
+	public function active_players_epl()
+	{
+		$sql = "SELECT DATE(register_date) AS dt,COUNT(id) AS total 
+				FROM ffgame.game_users a
+				GROUP BY DATE(register_date) ORDER BY id ASC LIMIT 1000";
+		$rs = $this->query($sql);
+		
+		$results = array();
+		for($i=0;$i<sizeof($rs);$i++){
+			$p = $rs[$i][0];
+			$p['total'] = $rs[$i][0]['total'];
+			$results[] = $p;
+		}
+
+		
+		return $results;
+	}
+
+	public function active_players_ita()
+	{
+		$sql = "SELECT DATE(register_date) AS dt,COUNT(id) AS total 
+				FROM ffgame_ita.game_users a
+				GROUP BY DATE(register_date) ORDER BY id ASC LIMIT 1000";
+		$rs = $this->query($sql);
+		
+		$results = array();
+		for($i=0;$i<sizeof($rs);$i++){
+			$p = $rs[$i][0];
+			$p['total'] = $rs[$i][0]['total'];
+			$results[] = $p;
+		}
+
+		
+		return $results;
+	}
+
+	public function total_active_player_epl()
+	{
+		$sql = "SELECT count(id) as total FROM ffgame.game_users;";
+		$rs = $this->query($sql);		
+		return $rs;
+	}
+
+	public function total_active_player_ita()
+	{
+		$sql = "SELECT count(id) as total FROM ffgame_ita.game_users;";
+		$rs = $this->query($sql);		
+		return $rs;
+	}
+
 	//-->
 	//retrieving unique user monthly stats.
 	//we can get the data from fantasy.activity_logs

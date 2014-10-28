@@ -546,4 +546,3 @@ class Game extends AppModel {
 		return $rs;	
 	}
 }
-

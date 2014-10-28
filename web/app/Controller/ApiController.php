@@ -2199,7 +2199,7 @@ class ApiController extends AppController {
 
 		$user = $this->User->findByFb_id($fb_id);
 		
-		
+		Cakelog::write('debug', 'Api.sale fb_id:'.$fb_id.' user:'.json_encode($user).' player_id:'.$player_id);
 		if(strlen($user['User']['avatar_img'])<2){
 			$user['User']['avatar_img'] = "http://graph.facebook.com/".$fb_id."/picture";
 		}else{
@@ -4336,6 +4336,7 @@ class ApiController extends AppController {
 		$this->render('default');
 	}
 	//below is the list of `tebak-skor` minigame APIs
+	//below is the list of `tebak-skor` minigame APIs
 	public function submit_bet($game_id){
 
 		$game_id = Sanitize::clean($game_id);
@@ -4444,7 +4445,7 @@ class ApiController extends AppController {
 				$sql = "INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
 						(fb_id,transaction_dt,transaction_name,amount,details)
 						VALUES
-						('{$data['fb_id']}',NOW(),'{$transaction_name}',{$bet_cost},'deduction')
+						('{$fb_id}',NOW(),'{$transaction_name}',{$bet_cost},'deduction')
 						ON DUPLICATE KEY UPDATE
 						amount = VALUES(amount);";
 				$this->Game->query($sql,false);
@@ -4453,7 +4454,7 @@ class ApiController extends AppController {
 						(fb_id,cash)
 						SELECT fb_id,SUM(amount) AS cash 
 						FROM ".Configure::read('FRONTEND_SCHEMA').".game_transactions
-						WHERE fb_id = {$data['fb_id']}
+						WHERE fb_id = {$fb_id}
 						GROUP BY fb_id
 						ON DUPLICATE KEY UPDATE
 						cash = VALUES(cash);";
@@ -4734,97 +4735,21 @@ class ApiController extends AppController {
 										'points' => $points[$team_id]
 									);
 			}
-			$overall = array_values($overall);
+
+			arsort($points);
+			$overall_fix = array();
+			
+			foreach ($points as $key => $value)
+			{
+				$overall_fix[$key] = $overall[$key];
+			}
+
+			$overall_fix = array_values($overall_fix);
 			
 			$this->set('response',array('status'=>1, 'data' => array(
 																'name' => $name[0]['league']['name'],
 																'weekly_standing' => $weekly,
-																'overall_standing' => $overall
-																)));
-			
-		}
-		else
-		{
-			$this->set('response',array('status'=>0, 'data' => array(
-																'name' => null,
-																'weekly_standing' => null,
-																'overall_standing' => null
-																)));
-		}
-
-		$this->render('default');
-	}
-
-	public function private_league_detail_dummy()
-	{
-		$this->loadModel('League');
-
-		$private_league_id = trim($this->request->query('private_league_id'));
-
-		$name = $this->League->query("SELECT name FROM league WHERE id='{$private_league_id}'");
-		if(count($name) > 0)
-		{
-			$rs_weekly = $this->League->query("SELECT c.id,c.team_name,d.name,b.total_points,b.matchday 
-											FROM league_member a 
-											INNER JOIN league_table b ON a.league_id = b.league_id
-											INNER JOIN teams c ON b.team_id = c.id
-											INNER JOIN users d ON c.user_id = d.id
-											WHERE b.league_id='{$private_league_id}' 
-											AND b.league='{$this->league}'
-											GROUP BY b.team_id,b.matchday
-											ORDER BY b.total_points DESC
-											LIMIT 100000");
-
-			$rs_overall = $this->League->query("SELECT c.id,c.team_name,d.name,b.total_points,b.matchday
-												FROM league_member a 
-												INNER JOIN league_table b ON a.league_id = b.league_id
-												INNER JOIN teams c ON b.team_id = c.id
-												INNER JOIN users d ON c.user_id = d.id
-												WHERE b.league_id='{$private_league_id}' 
-												AND b.league='{$this->league}'
-												GROUP BY b.team_id,b.matchday
-												ORDER BY b.total_points DESC
-												LIMIT 100000");
-
-			$response = array();
-			$weekly = array();
-			$overall = array();
-			$points = array();
-			
-			foreach ($rs_weekly as $key => $value)
-			{
-				$matchday = $value['b']['matchday'];
-				$weekly[$matchday]['week'] = $matchday;
-				$weekly[$matchday]['standing'][] = array(
-										'club_name' => $value['c']['team_name'],
-										'manager_name' => $value['d']['name'],
-										'points' => $value['b']['total_points']
-									);
-			}
-			$weekly = array_values($weekly);
-
-			foreach($rs_overall as $key => $value)
-			{
-				$team_id = $value['c']['id'];
-				if(!isset($points[$team_id])){
-					$points[$team_id] = 0;
-				}
-				$points[$team_id] += $value['b']['total_points'];
-				$overall[$team_id] = array(
-										'club_name' => $value['c']['team_name'],
-										'manager_name' => $value['d']['name'],
-										'points' => $points[$team_id]
-									);
-			}
-			$overall = array_values($overall);
-
-			print_r($overall);
-			exit();
-			
-			$this->set('response',array('status'=>1, 'data' => array(
-																'name' => $name[0]['league']['name'],
-																'weekly_standing' => $weekly,
-																'overall_standing' => $overall
+																'overall_standing' => $overall_fix
 																)));
 			
 		}

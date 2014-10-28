@@ -19,6 +19,7 @@ class AnalyticsController extends AppController {
 		parent::beforeFilter();
 		$this->loadModel('Analytics');
 	}
+
 	public function index(){
 		//get the top teams
 		$team_used = $this->Analytics->team_used();
@@ -36,6 +37,14 @@ class AnalyticsController extends AppController {
 		//transfer window list
 		$transfer_window = $this->Analytics->transfer_window();
 		$this->set('transfer_window',$transfer_window);
+
+		//total player epl
+		$rs_epl = $this->Analytics->total_active_player_epl();
+		$this->set('rs_epl',$rs_epl);
+
+		//total player ita
+		$rs_ita = $this->Analytics->total_active_player_ita();
+		$this->set('rs_ita',$rs_ita);
 		/*
 		//most bought player
 		$most_buy = $this->Analytics->transfer_most_buy();
@@ -49,6 +58,40 @@ class AnalyticsController extends AppController {
 
 	public function daily_registrations(){
 		$rs = $this->Analytics->daily_registrations();
+		
+		for($i=0;$i<sizeof($rs);$i++){
+			if($rs[$i]['dt']!=null){
+				$categories[] = $rs[$i]['dt'];
+				$xValue[] = intval($rs[$i]['total']);	
+			}
+		}
+		$this->layout = "ajax";
+		$this->set('response',
+					array('status'=>1,
+						  'data'=>array('categories'=>$categories,
+						  				'values'=>$xValue)));
+		$this->render('response');
+	}
+
+	public function active_players_epl(){
+		$rs = $this->Analytics->active_players_epl();
+		
+		for($i=0;$i<sizeof($rs);$i++){
+			if($rs[$i]['dt']!=null){
+				$categories[] = $rs[$i]['dt'];
+				$xValue[] = intval($rs[$i]['total']);	
+			}
+		}
+		$this->layout = "ajax";
+		$this->set('response',
+					array('status'=>1,
+						  'data'=>array('categories'=>$categories,
+						  				'values'=>$xValue)));
+		$this->render('response');
+	}
+
+	public function active_players_ita(){
+		$rs = $this->Analytics->active_players_ita();
 		
 		for($i=0;$i<sizeof($rs);$i++){
 			if($rs[$i]['dt']!=null){

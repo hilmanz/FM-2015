@@ -49,7 +49,7 @@ pool.getConnection(function(err,conn){
 			function(matchday,game_id,cb){
 				//foreach game_ids, retrieve the playerstats
 				//and populate it into ffgame_stats.master_player_progress
-				//console.log(game_id);
+				console.log(game_id);
 				if(game_id.length > 0){
 					generateStats(conn,matchday,game_id,cb);
 				}else{
