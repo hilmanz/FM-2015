@@ -2,6 +2,18 @@
 	User Analytics
 </h3>
 <div class="row">
+	Total : <?=number_format($rs_epl[0][0]['total'])?>
+	<div class="active_players_epl">
+	</div>
+	<!-- end of unique player daily -->
+</div>
+<div class="row">
+	Total : <?=number_format($rs_ita[0][0]['total'])?>
+	<div class="active_players_ita">
+	</div>
+	<!-- end of unique player daily -->
+</div>
+<div class="row">
 	<!-- Daily Registrations-->
 	<div class="daily_registrations">
 	</div>
@@ -108,6 +120,8 @@
 <!--charts -->
 <script>
 $(function () {
+	active_players_epl();
+	active_players_ita();
 	unique_user_daily();
 	unique_user_weekly();
 	unique_user_monthly();
@@ -242,6 +256,37 @@ function daily_registrations(){
 						xText: "Tanggal",
 						yText: "Total",
 						title: 'Daily Registrations'
+					});
+				}	
+			});
+}
+
+function active_players_epl(){
+	api_call('<?=$this->Html->url("/analytics/active_players_epl")?>',
+			function(response){
+				if(response.status==1){
+					addChart({
+						target:'.active_players_epl',
+						categories: response.data.categories,
+						xValue: response.data.values,
+						xText: "Tanggal",
+						yText: "Total",
+						title: 'Active Players EPL'
+					});
+				}	
+			});
+}
+function active_players_ita(){
+	api_call('<?=$this->Html->url("/analytics/active_players_ita")?>',
+			function(response){
+				if(response.status==1){
+					addChart({
+						target:'.active_players_ita',
+						categories: response.data.categories,
+						xValue: response.data.values,
+						xText: "Tanggal",
+						yText: "Total",
+						title: 'Active Players SERIE A'
 					});
 				}	
 			});
