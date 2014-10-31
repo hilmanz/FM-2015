@@ -516,6 +516,10 @@ class ManageController extends AppController {
 
 		//banners
 		$sidebar_banner = $this->getBanners('INSIDE_SIDEBAR',2,true);
+
+		$team_small = $this->getBanners('TEAM_SMALL',1,true);
+		$this->set('team_small',$team_small);
+		
 		$this->set('popup_setformation', $this->popup_setformation());
 		$this->set('sidebar_banner',$sidebar_banner);
 	}

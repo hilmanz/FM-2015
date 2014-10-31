@@ -156,9 +156,19 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
     <div id="thecontent">
         <div class="box4 fl" id="bannerBox">
            
-        	<div class="banner250x250">
+        	<!--<div class="banner250x250">
 			<?=$this->element('sponsor_banner',array('slot'=>'TEAM_SMALL','game_team_id'=>$game_team_id));?>
+            </div>-->
+            <?php for($i=0;$i<sizeof($team_small);$i++):?>
+            <div class="banner250x250">
+                <a 
+                href="<?=$this->Html->url('/sponsors/jump/1/'.$team_small[$i]['Banners']['id'])?>" 
+                    target="_blank">
+                    <img src="<?=$this->Html->url(Configure::read('avatar_web_url').
+                                $team_small[$i]['Banners']['banner_file'])?>" />
+                </a>
             </div>
+            <?php endfor;?>
             <?php for($i=0;$i<sizeof($sidebar_banner);$i++):?>
         	<div class="banner250x250">
                 <a 
