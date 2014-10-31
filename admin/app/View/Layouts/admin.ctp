@@ -87,6 +87,9 @@
                         <li>
                             <a href="<?=$this->Html->url('/banners')?>">Banners</a>
                         </li>
+                        <li>
+                            <a href="<?=$this->Html->url('/payment')?>">Payment</a>
+                        </li>
                         <?php if($_SESSION['league'] == 'epl'): ?>
                         <li>
                             <a href="<?=$this->Html->url('?league=ita')?>">Switch To SERI A</a>

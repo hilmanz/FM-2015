@@ -13,7 +13,8 @@ class ActivityLogComponent extends Component {
         $this->model->save(array(
         		'user_id'=>$user_id,
         		'log_dt'=>date("Y-m-d H:i:s"),
-        		'log_type'=>$activity
+        		'log_type'=>$activity,
+                'league'=>$_SESSION['league']
         	));
     }
 

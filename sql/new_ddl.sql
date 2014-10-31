@@ -572,3 +572,7 @@ ADD UNIQUE INDEX `unique_1` (`league_id` ASC, `email` ASC, `league` ASC);
 
 ALTER TABLE `fantasy`.`membership_transactions` 
 CHANGE COLUMN `transaction_name` `transaction_name` VARCHAR(255) NULL DEFAULT NULL ;
+
+ALTER TABLE `fantasy`.`activity_logs` 
+ADD COLUMN `league` VARCHAR(5) NULL DEFAULT 'epl' AFTER `log_type`;
+

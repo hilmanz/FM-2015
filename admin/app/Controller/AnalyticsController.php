@@ -73,8 +73,9 @@ class AnalyticsController extends AppController {
 		$this->render('response');
 	}
 
-	public function active_players_epl(){
-		$rs = $this->Analytics->active_players_epl();
+	public function active_players($league = 'epl')
+	{
+		$rs = $this->Analytics->active_user($league);
 		
 		for($i=0;$i<sizeof($rs);$i++){
 			if($rs[$i]['dt']!=null){
@@ -90,8 +91,25 @@ class AnalyticsController extends AppController {
 		$this->render('response');
 	}
 
-	public function active_players_ita(){
-		$rs = $this->Analytics->active_players_ita();
+	public function daily_registration_players_epl(){
+		$rs = $this->Analytics->daily_registration_players_epl();
+		
+		for($i=0;$i<sizeof($rs);$i++){
+			if($rs[$i]['dt']!=null){
+				$categories[] = $rs[$i]['dt'];
+				$xValue[] = intval($rs[$i]['total']);	
+			}
+		}
+		$this->layout = "ajax";
+		$this->set('response',
+					array('status'=>1,
+						  'data'=>array('categories'=>$categories,
+						  				'values'=>$xValue)));
+		$this->render('response');
+	}
+
+	public function daily_registration_players_ita(){
+		$rs = $this->Analytics->daily_registration_players_ita();
 		
 		for($i=0;$i<sizeof($rs);$i++){
 			if($rs[$i]['dt']!=null){

@@ -2,8 +2,19 @@
 	User Analytics
 </h3>
 <div class="row">
-	Total : <?=number_format($rs_epl[0][0]['total'])?>
 	<div class="active_players_epl">
+	</div>
+	<!-- end of unique player daily -->
+</div>
+<div class="row">
+	<div class="active_players_ita">
+	</div>
+	<!-- end of unique player daily -->
+</div>
+
+<div class="row">
+	Total : <?=number_format($rs_epl[0][0]['total'])?>
+	<div class="daily_registration_players_epl">
 	</div>
 	<!-- end of unique player daily -->
 </div>
@@ -116,6 +127,8 @@
 $(function () {
 	active_players_epl();
 	active_players_ita();
+	daily_registration_players_epl();
+	daily_registration_players_ita();
 	unique_user_daily();
 	unique_user_weekly();
 	unique_user_monthly();
@@ -256,11 +269,43 @@ function daily_registrations(){
 }
 
 function active_players_epl(){
-	api_call('<?=$this->Html->url("/analytics/active_players_epl")?>',
+	api_call('<?=$this->Html->url("/analytics/active_players/epl")?>',
 			function(response){
 				if(response.status==1){
 					addChart({
 						target:'.active_players_epl',
+						categories: response.data.categories,
+						xValue: response.data.values,
+						xText: "Tanggal",
+						yText: "Total",
+						title: 'Active Player EPL'
+					});
+				}	
+			});
+}
+function active_players_ita(){
+	api_call('<?=$this->Html->url("/analytics/active_players/ita")?>',
+			function(response){
+				if(response.status==1){
+					addChart({
+						target:'.active_players_ita',
+						categories: response.data.categories,
+						xValue: response.data.values,
+						xText: "Tanggal",
+						yText: "Total",
+						title: 'Active Player SERIE A'
+					});
+				}	
+			});
+}
+
+
+function daily_registration_players_epl(){
+	api_call('<?=$this->Html->url("/analytics/daily_registration_players_epl")?>',
+			function(response){
+				if(response.status==1){
+					addChart({
+						target:'.daily_registration_players_epl',
 						categories: response.data.categories,
 						xValue: response.data.values,
 						xText: "Tanggal",
@@ -270,12 +315,12 @@ function active_players_epl(){
 				}	
 			});
 }
-function active_players_ita(){
-	api_call('<?=$this->Html->url("/analytics/active_players_ita")?>',
+function daily_registration_players_ita(){
+	api_call('<?=$this->Html->url("/analytics/daily_registration_players_ita")?>',
 			function(response){
 				if(response.status==1){
 					addChart({
-						target:'.active_players_ita',
+						target:'.daily_registration_players_ita',
 						categories: response.data.categories,
 						xValue: response.data.values,
 						xText: "Tanggal",

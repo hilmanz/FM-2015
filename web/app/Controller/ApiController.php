@@ -4336,7 +4336,6 @@ class ApiController extends AppController {
 		$this->render('default');
 	}
 	//below is the list of `tebak-skor` minigame APIs
-	//below is the list of `tebak-skor` minigame APIs
 	public function submit_bet($game_id){
 
 		$game_id = Sanitize::clean($game_id);

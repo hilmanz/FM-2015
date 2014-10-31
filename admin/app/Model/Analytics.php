@@ -51,7 +51,7 @@ class Analytics extends AppModel {
 		return $results;
 	}
 
-	public function active_players_epl()
+	public function daily_registration_players_epl()
 	{
 		$sql = "SELECT DATE(register_date) AS dt,COUNT(id) AS total 
 				FROM ffgame.game_users a
@@ -69,13 +69,35 @@ class Analytics extends AppModel {
 		return $results;
 	}
 
-	public function active_players_ita()
+	public function daily_registration_players_ita()
 	{
 		$sql = "SELECT DATE(register_date) AS dt,COUNT(id) AS total 
 				FROM ffgame_ita.game_users a
 				GROUP BY DATE(register_date) ORDER BY id ASC LIMIT 1000";
 		$rs = $this->query($sql);
 		
+		$results = array();
+		for($i=0;$i<sizeof($rs);$i++){
+			$p = $rs[$i][0];
+			$p['total'] = $rs[$i][0]['total'];
+			$results[] = $p;
+		}
+
+		
+		return $results;
+	}
+
+	public function active_user($league = 'epl')
+	{
+		$sql = "SELECT 
+				    DATE_FORMAT(log_dt, '%Y-%m-%d') AS dt, COUNT(user_id) AS total
+				FROM
+				    fantasy.activity_logs
+				WHERE league='{$league}' AND log_type='LOGIN' 
+				AND DATE(log_dt) > DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+				GROUP BY DATE_FORMAT(log_dt, '%Y-%m-%d')";
+		$rs = $this->query($sql);
+
 		$results = array();
 		for($i=0;$i<sizeof($rs);$i++){
 			$p = $rs[$i][0];
