@@ -39,10 +39,17 @@
                                     <td>
                                         Rp. <?=number_format($total_ongkir)?>
                                     </td>
-                                    <td>
+                                    <td rowspan="2">
                                         <a class="button" href="<?=$ecash_url?>">
                                             Bayar dengan ECash Mandiri
                                         </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Admin Fee</td>
+                                    <td>-</td>
+                                    <td>
+                                        Rp. <?=number_format($admin_fee)?>
                                     </td>
                                 </tr>
                             </tbody>

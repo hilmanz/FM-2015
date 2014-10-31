@@ -259,6 +259,7 @@ class MerchandisesController extends AppController {
 
 	}
 	private function payOngkirPage($order_id){
+		$admin_fee = Configure::read('PO_ADMIN_FEE');
 		$ongkir = $this->Ongkir->find('all',
 									array('limit'=>10000,
 									'order'=>array('Ongkir.kecamatan'=>'ASC')));
@@ -288,6 +289,7 @@ class MerchandisesController extends AppController {
 			}
 		}
 		$total_ongkir = $kg * @$city['cost'];
+		$amount = $total_ongkir + $admin_fee;
 
 		$this->set('city',@$city);
 		$this->set('total_ongkir',$total_ongkir);
@@ -297,7 +299,7 @@ class MerchandisesController extends AppController {
 		//ecash url
 		$rs = $this->Game->getEcashUrl(array(
 			'transaction_id'=>$transaction_id,
-			'amount'=>$total_ongkir,
+			'amount'=>$amount,
 			'clientIpAddress'=>$this->request->clientIp(false),
 			'description'=>'Shipping Fee #'.$transaction_id,
 			'source'=>'FMPAY'
@@ -309,6 +311,7 @@ class MerchandisesController extends AppController {
 
 		$this->set('transaction_id',$transaction_id);
 		$this->set('ecash_url',$rs['data']);
+		$this->set('admin_fee', $admin_fee);
 
 		$this->Session->write($transaction_id,$order_id);
 	}

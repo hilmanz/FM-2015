@@ -3996,7 +3996,7 @@ class ApiController extends AppController {
 		$rs = $this->MerchandiseOrder->findById($order_id);
 		$this->layout="ajax";
 
-
+		$admin_fee = Configure::read('PO_ADMIN_FEE');
 		if(isset($fb_profile) && $rs['MerchandiseOrder']['fb_id'] == $fb_profile['id']){
 			$rs['MerchandiseOrder']['data'] = unserialize($rs['MerchandiseOrder']['data']);
 				
@@ -4010,11 +4010,11 @@ class ApiController extends AppController {
 			//add suffix -1 to define that its the payment for shipping for these po number.
 			$transaction_id =  $rs['MerchandiseOrder']['po_number'].'-1';
 			
-			
+			$amount = $rs['MerchandiseOrder']['ongkir_value'] + $admin_fee;
 			//ecash url
 			$ecash_url = $this->Game->getEcashUrl(array(
 				'transaction_id'=>$transaction_id,
-				'amount'=>$rs['MerchandiseOrder']['ongkir_value'],
+				'amount'=>$amount,
 				'clientIpAddress'=>$this->request->clientIp(),
 				'description'=>'Shipping Fee #'.$transaction_id,
 				'source'=>'SSPAY'

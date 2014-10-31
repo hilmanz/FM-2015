@@ -21,12 +21,14 @@ class PaymentController extends AppController {
 	public function index()
 	{
 		$pro_league_user = $this->User->find('count', array('conditions' => array(
-											'paid_member' => 1)));
+											'paid_member' => 1),
+											'fields' => 'DISTINCT User.id'));
 
 		$active_proleague_user = $this->User->find('count', array('conditions' => array(
 												'paid_member' => 1,
 												'paid_member_status' => 1
-											)));
+											),
+											'fields' => 'DISTINCT User.id'));
 
 		$rs_transaction = $this->MembershipTransaction->find('all', array('limit' => 100000));
 
