@@ -5475,6 +5475,10 @@ class ApiController extends AppController {
 				}catch(Exception $e){
 					$dataSource->rollback();
 					Cakelog::write('error', 'api.register_supersoccer insert error msg: '.$e->getMessage());
+					$this->set('response',
+									array('status'=>0, 
+										'message' => 'Akun Anda Sudah Terdaftar Sebelumnya'
+									));
 				}
 
 			}
