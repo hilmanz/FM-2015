@@ -3996,7 +3996,7 @@ class ApiController extends AppController {
 		$rs = $this->MerchandiseOrder->findById($order_id);
 		$this->layout="ajax";
 
-		$admin_fee = Configure::read('PO_ADMIN_FEE');
+		$admin_fee = Configure::read('PO_ADMIN_ONGKIR_FEE');
 		if(isset($fb_profile) && $rs['MerchandiseOrder']['fb_id'] == $fb_profile['id']){
 			$rs['MerchandiseOrder']['data'] = unserialize($rs['MerchandiseOrder']['data']);
 				
@@ -5532,6 +5532,28 @@ class ApiController extends AppController {
 		$email = trim($this->request->query['email']);
 
 		$rs_user = $this->User->findByEmail($email);
+		$data = array();
+		if(count($rs_user) > 0)
+		{
+			$data['id'] = $rs_user['User']['id'];
+			$data['fb_id'] = $rs_user['User']['fb_id'];
+			$data['name'] = $rs_user['User']['name'];
+			$data['email'] = $rs_user['User']['email'];
+
+			$this->set('response',array('status'=>1, 'data' => $data));
+		}
+		else
+		{
+			$this->set('response',array('status'=>1, 'data' => null));
+		}
+		$this->render('default');
+	}
+
+	public function check_fbid()
+	{
+		$fb_id = trim($this->request->query['fb_id']);
+
+		$rs_user = $this->User->findByFb_id($fb_id);
 		$data = array();
 		if(count($rs_user) > 0)
 		{

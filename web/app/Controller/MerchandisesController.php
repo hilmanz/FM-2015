@@ -259,7 +259,7 @@ class MerchandisesController extends AppController {
 
 	}
 	private function payOngkirPage($order_id){
-		$admin_fee = Configure::read('PO_ADMIN_FEE');
+		$admin_fee = Configure::read('PO_ADMIN_ONGKIR_FEE');
 		$ongkir = $this->Ongkir->find('all',
 									array('limit'=>10000,
 									'order'=>array('Ongkir.kecamatan'=>'ASC')));
