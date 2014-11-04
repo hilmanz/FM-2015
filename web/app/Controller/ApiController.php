@@ -28,6 +28,8 @@ require_once APP.DS.'Vendor'.DS.'password-hash.php';
 
 class ApiController extends AppController {
 
+	public $components = array('ActivityLog');
+
 /**
  * Controller name
  *
@@ -2537,7 +2539,7 @@ class ApiController extends AppController {
 		//retrieve the total rows
 		unset($options['limit']);
 		unset($options['offset']);
-		$total_rows = count($rs);
+		$total_rows = $this->MerchandiseItem->find('count',$options);
 		
 		//check the stock for each items
 		for($i=0;$i<sizeof($rs);$i++){
@@ -5361,6 +5363,7 @@ class ApiController extends AppController {
 															'coins'=>$cash,
 															'access_token'=>$access_token)
 											));
+				$this->ActivityLog->writeLog($rs_user['User']['id'],'LOGIN');
 			}
 			else
 			{
@@ -5375,6 +5378,24 @@ class ApiController extends AppController {
 		$this->render('default');
 
 	}
+
+	public function login_supersoccer_facebook()
+	{
+		$user_id = Sanitize::clean($this->request->query('user_id'));
+		$rs_user = $this->User->findById($user_id);
+
+		if(count($rs_user) > 0)
+		{
+			$this->set('response',array('status'=>1));
+			$this->ActivityLog->writeLog($rs_user['User']['id'],'LOGIN');
+		}
+		else
+		{
+			$this->set('response',array('status'=>0));
+		}
+		$this->render('default');
+	}
+
 
 	/*
 	* API for login user from register_supersoccer
