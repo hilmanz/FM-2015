@@ -37,7 +37,13 @@ class MerchandisesController extends AppController {
 		$this->MerchandiseItem->bindModel(
 			array('belongsTo'=>array('MerchandiseCategory'))
 		);
-		$rs = $this->MerchandiseItem->find('all',array('offset'=>$start,'limit'=>$limit));
+		$rs = $this->MerchandiseItem->find('all',array(
+											'conditions'=>array(
+												'n_status != 2'
+											),
+											'offset'=>$start,
+											'limit'=>$limit
+										));
 		
 		//for each items, we need to calculate its stock availability.
 		//so we need the total purchased item so far each.
@@ -52,6 +58,28 @@ class MerchandisesController extends AppController {
 		$this->render('response');
 		
 	}
+
+	public function remove_items()
+	{
+		$this->layout = 'ajax';
+		$id = $this->request->query['id'];
+		$this->loadModel('MerchandiseItem');
+		$rs_update = $this->MerchandiseItem->updateAll(
+					    array('MerchandiseItem.n_status' => 2),
+					    array('MerchandiseItem.id' => $id)
+					);
+
+		if($rs_update)
+		{
+			$this->set('response',array('status'=>1));
+		}
+		else
+		{
+			$this->set('response',array('status'=>0));
+		}
+		$this->render('response');
+	}
+
 	public function edit($id){
 		$this->loadModel('MerchandiseItem');
 		$this->loadModel('MerchandiseOrder');

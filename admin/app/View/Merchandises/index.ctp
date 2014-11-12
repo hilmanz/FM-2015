@@ -44,7 +44,8 @@ $edit_url = $this->Html->url('/merchandises/edit/');
 									response.data[i].MerchandiseItem.price_money,
 									response.data[i].stock,
 									response.data[i].MerchandiseItem.n_status,
-									'<a href="<?=$edit_url?>'+response.data[i].MerchandiseItem.id+'">Edit</a>'
+									'<a href="<?=$edit_url?>'+response.data[i].MerchandiseItem.id+'">Edit</a>&nbsp;\
+									<a href="javascript:;" class="delete_rows" data-id="'+response.data[i].MerchandiseItem.id+'">Delete</a>',
 								]);
 						}
 						start = response.next_offset;
@@ -79,6 +80,21 @@ $edit_url = $this->Html->url('/merchandises/edit/');
 				{ "sTitle": "Action"}
 			]
 		} );
+
+		init_event();
 	}
 	getdata();
+	function init_event()
+	{
+		$('a.delete_rows').on('click', function(){
+			var id = $(this).attr('data-id');
+			var target_element = $(this).parent().parent();
+			api_call("<?=$this->Html->url('/merchandises/remove_items/?id=')?>"+id,
+			function(response){
+				if(response.status==1){
+					$(target_element).hide();
+				}
+			});
+		});
+	}
 </script>
