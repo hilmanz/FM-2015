@@ -20,7 +20,7 @@
 </div>
 <div class="row">
 	Total : <?=number_format($rs_ita[0][0]['total'])?>
-	<div class="active_players_ita">
+	<div class="daily_registration_players_ita">
 	</div>
 	<!-- end of unique player daily -->
 </div>

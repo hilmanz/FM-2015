@@ -96,5 +96,16 @@ $edit_url = $this->Html->url('/merchandises/edit/');
 				}
 			});
 		});
+		$('a.paginate_enabled_previous').on('click', function(){
+			init_event();
+		});
+
+		$('a.paginate_enabled_next').on('click', function(){
+			init_event();
+		});
+
+		$('.dataTables_filter').on('change', function(){
+			init_event();
+		});
 	}
 </script>

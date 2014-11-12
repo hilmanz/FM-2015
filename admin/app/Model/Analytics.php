@@ -55,7 +55,7 @@ class Analytics extends AppModel {
 	{
 		$sql = "SELECT DATE(register_date) AS dt,COUNT(id) AS total 
 				FROM ffgame.game_users a
-				GROUP BY DATE(register_date) ORDER BY id ASC LIMIT 1000";
+				GROUP BY DATE(register_date) ORDER BY id ASC LIMIT 100";
 		$rs = $this->query($sql);
 		
 		$results = array();
@@ -73,7 +73,7 @@ class Analytics extends AppModel {
 	{
 		$sql = "SELECT DATE(register_date) AS dt,COUNT(id) AS total 
 				FROM ffgame_ita.game_users a
-				GROUP BY DATE(register_date) ORDER BY id ASC LIMIT 1000";
+				GROUP BY DATE(register_date) ORDER BY id ASC LIMIT 100";
 		$rs = $this->query($sql);
 		
 		$results = array();

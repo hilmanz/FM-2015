@@ -15,8 +15,9 @@ class Weekly_point extends AppModel {
 		),
 	);
 	public function getWeeklyPoints($team_id,$league='epl'){
+		$frontend_schema = Configure::read('FRONTEND_SCHEMA');
 		$poin = $this->query("
-	    		SELECT matchday,SUM(points+extra_points) AS total FROM fantasy.weekly_points 
+	    		SELECT matchday,SUM(points+extra_points) AS total FROM {$frontend_schema}.weekly_points 
 				WHERE team_id = {$team_id} AND league='{$league}' 
 				GROUP BY matchday;");
 		$rs = array();

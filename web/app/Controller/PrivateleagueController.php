@@ -282,8 +282,9 @@ class PrivateleagueController extends AppController {
 
 		$trx_code = $this->request->query['trx'];
 		$param = unserialize(decrypt_param($trx_code));
+		$frontend_schema = Configure::read('FRONTEND_SCHEMA');
 
-		$rs_team = $this->League->query("SELECT id FROM fantasy.teams 
+		$rs_team = $this->League->query("SELECT id FROM ".$frontend_schema.".teams 
 								WHERE user_id='{$rs_user['User']['id']}' 
 								AND league='{$param['league']}'");
 
@@ -441,6 +442,8 @@ class PrivateleagueController extends AppController {
 												GROUP BY b.team_id
 												ORDER BY b.total_points DESC
 												LIMIT 1000");
+
+		
 
 		$this->set('rs_leaderboard', $rs_leaderboard);
 	}

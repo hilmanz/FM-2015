@@ -36,9 +36,10 @@ class League extends AppModel {
 	//check user if has create or joined private league
 	public function checkUser($email, $team_id, $league)
 	{
+		$frontend_schema = Configure::read('FRONTEND_SCHEMA');
 		$result = array();
 
-		$rs1 = $this->query("SELECT * FROM fantasy.league_invitations 
+		$rs1 = $this->query("SELECT * FROM {$frontend_schema}.league_invitations 
 							WHERE email='{$email}' AND n_status NOT IN (2) 
 							AND league='{$league}' LIMIT 1");
 
@@ -57,7 +58,7 @@ class League extends AppModel {
 			return $result;
 		}
 
-		$rs2 = $this->query("SELECT * FROM fantasy.league_member 
+		$rs2 = $this->query("SELECT * FROM {$frontend_schema}.league_member 
 							WHERE team_id='{$team_id}' AND league='{$league}' LIMIT 1");
 
 		if(count($rs2) > 0)

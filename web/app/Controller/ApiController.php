@@ -5388,10 +5388,12 @@ class ApiController extends AppController {
 		{
 			$this->set('response',array('status'=>1));
 			$this->ActivityLog->writeLog($rs_user['User']['id'],'LOGIN');
+			Cakelog::write('debug', 'api.login_supersoccer_facebook '.json_encode($rs_user));
 		}
 		else
 		{
 			$this->set('response',array('status'=>0));
+			Cakelog::write('debug', 'api.login_supersoccer_facebook error '.json_encode($rs_user));
 		}
 		$this->render('default');
 	}
