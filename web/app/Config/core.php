@@ -190,7 +190,7 @@
 	Configure::write('Session', array(
 		'defaults' => 'php',
 		'cookieTimeout'	=> 0,
-		'autoRegenerate'=>true,
+		'autoRegenerate'=>false,
 		'timeout'=>60*60*5
 	));
 
