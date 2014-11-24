@@ -413,7 +413,7 @@ class PlayerReport extends AppModel {
 			$game_team_id = $rs[$n]['GameData']['GameTeam']['id'];
 			
 			$r = $this->query("SELECT * FROM team_summary Summary
-								WHERE game_team_id={$game_team_id} LIMIT 1;",false);
+								WHERE game_team_id='{$game_team_id}' LIMIT 1;",false);
 			
 			$rs[$n]['ImportPlayerCounts'] = intval(@$r[0]['Summary']['import_player_counts']);
 

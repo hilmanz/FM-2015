@@ -611,7 +611,7 @@ class PlayersController extends AppController {
 			if($this->is_in_category($map,'games',$stats_name)){
               	$statsgroup['games'][$stats_name] = $_stats;
           	}
-          	if($this->is_in_category($map,'goalkeeping',$stats_name)){
+          	if($this->is_in_category($map,'goalkeeper',$stats_name)){
               	$statsgroup['goalkeeping'][$stats_name] = $_stats;
           	}
           	if($this->is_in_category($map,'passing_and_attacking',$stats_name)){
