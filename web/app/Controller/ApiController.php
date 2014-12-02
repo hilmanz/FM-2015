@@ -635,6 +635,59 @@ class ApiController extends AppController {
 		$this->render('default');
 	}
 
+	public function team_points()
+	{
+		$this->layout = 'ajax';
+		$this->loadModel('Weekly_point');
+
+		$fb_id = Sanitize::clean($this->request->query('fb_id'));
+		$current_matchday = Sanitize::clean($this->request->query('gameweek'));
+		$user = $this->User->findByFb_id($fb_id);
+
+		if($current_matchday == NULL)
+		{
+			//current matchday
+			$matchday = $this->Game->query("SELECT matchday FROM ".$this->ffgamedb.".game_fixtures a
+												 WHERE period='FullTime' AND is_processed = 1 
+												 ORDER BY matchday DESC LIMIT 1");
+			$current_matchday = $matchday[0]['a']['matchday'] - 1;
+		}
+
+		$options = array('fields'=>'game_id',
+			'conditions'=>array('Weekly_point.team_id'=>$user['Team']['id'],
+								'Weekly_point.league'=>$_SESSION['league'],
+								'Weekly_point.matchday'=>$current_matchday),
+	        'limit' => 1);
+		$game_id = $this->Weekly_point->find('all',$options);
+
+		$current_game_id = $game_id[0]['Weekly_point']['game_id'];
+
+		$game_team_id = $this->Game->query("SELECT b.id FROM ".$this->ffgamedb.".game_users a 
+											INNER JOIN ".$this->ffgamedb.".game_teams b ON a.id = b.user_id 
+											WHERE a.fb_id = '{$fb_id}' LIMIT 1");
+
+		$players = $this->Game->getMatchDetailsByGameTeamId($game_team_id[0]['b']['id'],$current_game_id);
+
+		if($players['status'] == 1){
+			$response = array();
+			$total_points = 0;
+			foreach ($players['data'] as $key => $value)
+			{
+				$response[] = array('uid' => $key,
+									'name' => $value['name'],
+									'points' => $value['points']);
+				$total_points += $value['points'];
+			}
+
+			$this->set('response',array('status'=>1,'data'=>array('players' => $response, 
+																'total_points' => $total_points)));
+		}else{
+			$this->set('response',array('status'=>0,'message'=>'Terjadi Kesalahan !'));
+		}
+		
+		$this->render('default');
+	}
+
 	public function matchinfo($game_id){
 		$game_id = Sanitize::paranoid($game_id);
 
