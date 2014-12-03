@@ -665,6 +665,7 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 						var daily = {};
 						
 						if(result.length>0){
+							daily['stats'] = result;
 							for(var i in result){
 								if(typeof daily[result[i].game_id] === 'undefined'){
 									daily[result[i].game_id] = {
@@ -691,6 +692,7 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 																					  					result[i].stats_name,
 																					  					pos));
 											}
+
 										}
 									}
 								}

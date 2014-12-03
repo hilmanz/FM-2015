@@ -644,14 +644,18 @@ class ApiController extends AppController {
 		$current_matchday = Sanitize::clean($this->request->query('gameweek'));
 		$user = $this->User->findByFb_id($fb_id);
 
-		if($current_matchday == NULL)
+		$session_id = Configure::read('FM_SESSION_ID');
+
+		if($this->request->query('gameweek') == NULL)
 		{
 			//current matchday
 			$matchday = $this->Game->query("SELECT matchday FROM ".$this->ffgamedb.".game_fixtures a
 												 WHERE period='FullTime' AND is_processed = 1 
+												 AND session_id = '{$session_id}'
 												 ORDER BY matchday DESC LIMIT 1");
-			$current_matchday = $matchday[0]['a']['matchday'] - 1;
+			$current_matchday = $matchday[0]['a']['matchday'];
 		}
+		Cakelog::write('debug', 'Api.team_points matchday:'.json_encode($matchday));
 
 		$options = array('fields'=>'game_id',
 			'conditions'=>array('Weekly_point.team_id'=>$user['Team']['id'],
@@ -665,6 +669,7 @@ class ApiController extends AppController {
 		$game_team_id = $this->Game->query("SELECT b.id FROM ".$this->ffgamedb.".game_users a 
 											INNER JOIN ".$this->ffgamedb.".game_teams b ON a.id = b.user_id 
 											WHERE a.fb_id = '{$fb_id}' LIMIT 1");
+		Cakelog::write('debug', 'Api.team_points '.json_encode($game_team_id).' '.json_encode($game_id));
 
 		$players = $this->Game->getMatchDetailsByGameTeamId($game_team_id[0]['b']['id'],$current_game_id);
 
@@ -1013,6 +1018,303 @@ class ApiController extends AppController {
 		    }
 
 		    $profileStats = $this->getStatsIndividual('mistakes_and_errors',$pos,$modifiers,$map,$data['overall_stats']);
+		    $mistakes_and_errors = array();
+		    foreach($profileStats as $statsName=>$statsVal){
+		    	$statsName = stats_translated($statsName,'id');
+		    	$mistakes_and_errors[$statsName] = $statsVal;
+		    }
+
+			$stats = array(
+				'games'=>$games,
+				'passing_and_attacking'=>$passing_and_attacking,
+				'defending'=>$defending,
+				'goalkeeping'=>$goalkeeper,
+				'mistakes_and_errors'=>$mistakes_and_errors,
+
+			);
+		}else{
+			$stats = array();
+			$main_stats_vals = array();
+		}
+
+
+		$performance = 0;
+
+        if(sizeof($data['stats'])>0){
+            if(intval(@$data['stats'][sizeof($data['stats'])-1]['points'])!=0){
+
+            	$performance = getTransferValueBonus(
+                                $data['stats'][sizeof($data['stats'])-1]['performance'],
+                                $data['player']['transfer_value']);
+            }  
+        }
+        
+        $data['player']['transfer_value'] = $data['player']['transfer_value'] + $performance;
+
+		$response['player'] = array('info'=>$data['player'],
+									 'summary'=>$main_stats_vals,
+										'stats'=>$stats);
+
+		
+		$this->set('response',array('status'=>1,'data'=>$response));
+		$this->render('default');
+	}
+
+	public function player_points($player_id){
+		require_once APP . 'Vendor' . DS. 'stats.locale.php';
+		$this->loadModel('Point');
+		$this->loadModel('Weekly_point');
+
+		$api_session = $this->readAccessToken();
+		$fb_id = $api_session['fb_id'];
+		
+		$user = $this->User->findByFb_id($fb_id);
+
+		$current_matchday = $this->request->query('gameweek');
+		
+		if(strlen($user['User']['avatar_img'])<2){
+			$user['User']['avatar_img'] = "http://graph.facebook.com/".$fb_id."/picture";
+		}else{
+			$user['User']['avatar_img'] = Configure::read('avatar_web_url').'120x120_'.$user['User']['avatar_img'];
+		}
+		$game_team = $this->Game->getTeam($fb_id);
+		
+		$response = array();
+
+		$point = $this->Point->findByTeam_id($user['Team']['id']);
+
+		$response['user'] = array('id'=>$user['User']['id'],
+									'fb_id'=>$user['User']['fb_id'],
+									'name'=>$user['User']['name'],
+									'avatar_img'=>$user['User']['avatar_img']);
+
+		$response['stats']['points'] = ceil(floatval(@$point['Point']['points']) + floatval(@$point['Point']['extra_points']));
+		$response['stats']['rank'] = intval(@$point['Point']['rank']);
+
+		//budget
+		$budget = $this->Game->getBudget($game_team['id']);
+		$response['budget'] = $budget;
+
+		$response['stats']['club_value'] = intval($budget) + $response['stats']['points'];
+
+		//club
+		$club = $this->Team->findByUser_id($user['User']['id']);
+		$response['club'] = array('id'=>$club['Team']['id'],
+									'team_name'=>$club['Team']['team_name'],
+									'team_id'=>$club['Team']['team_id'],
+								  );
+
+		//get original club
+		$original_club = $this->Game->getClub($club['Team']['team_id']);
+		$this->set('original',$original_club);
+		$response['original_club'] = $original_club;
+
+
+		//player detail : 
+		$rs = $this->Game->get_team_player_info($fb_id,$player_id);
+
+		$session_id = Configure::read('FM_SESSION_ID');
+
+		if($this->request->query('gameweek') == NULL)
+		{
+			//current matchday
+			$matchday = $this->Game->query("SELECT matchday FROM ".$this->ffgamedb.".game_fixtures a
+												 WHERE period='FullTime' AND is_processed = 1 
+												 AND session_id = '{$session_id}'
+												 ORDER BY matchday DESC LIMIT 1");
+			$current_matchday = $matchday[0]['a']['matchday'];
+		}
+
+		$options = array('fields'=>'game_id',
+			'conditions'=>array('Weekly_point.team_id'=>$user['Team']['id'],
+								'Weekly_point.league'=>$_SESSION['league'],
+								'Weekly_point.matchday'=>$current_matchday),
+	        'limit' => 1);
+		$game_id = $this->Weekly_point->find('all',$options);
+
+		$current_game_id = $game_id[0]['Weekly_point']['game_id'];
+
+		$daily_stats = array();
+		foreach ($rs['data']['daily_stats']['stats'] as $key => $value) {
+			if($value['game_id'] == $current_game_id){
+				$daily_stats[] = $value;
+			}
+		}
+
+		$rs['data']['daily_stats']['stats'] = $daily_stats;
+		//stats modifier
+		$modifiers = $this->Game->query("SELECT * FROM ".$this->ffgamedb.".game_matchstats_modifier as Modifier");
+		
+		if($rs['status']==1){
+
+			if(isset($rs['data']['daily_stats'])&&sizeof($rs['data']['daily_stats'])>0){
+				
+				foreach($rs['data']['daily_stats'] as $n=>$v){
+					$fixture = $this->Team->query("SELECT matchday,match_date,
+										UNIX_TIMESTAMP(match_date) as ts
+										FROM ".$this->ffgamedb.".game_fixtures 
+										WHERE game_id='{$n}' 
+										LIMIT 1");
+
+					$rs['data']['daily_stats'][$n]['fixture'] = $fixture[0]['game_fixtures'];
+					$rs['data']['daily_stats'][$n]['fixture']['ts'] = $fixture[0][0]['ts'];
+				}
+			}
+
+			//generate stats from overall data.
+
+			
+
+		}
+		$games = array(
+		        'game_started'=>'game_started',
+		        'sub_on'=>'total_sub_on'
+		    );
+
+		$passing_and_attacking = array(
+		        'Freekick Goal'=>'att_freekick_goal',
+		        'Goal inside the box'=>'att_ibox_goal',
+		        'Goal Outside the Box'=>'att_obox_goal',
+		        'Penalty Goal'=>'att_pen_goal',
+		        'Freekick Shots'=>'att_freekick_post',
+		        'On Target Scoring Attempt'=>'ontarget_scoring_att',
+		        'Shot From Outside the Box'=>'att_obox_target',
+		        'big_chance_created'=>'big_chance_created',
+		        'big_chance_scored'=>'big_chance_scored',
+		        'goal_assist'=>'goal_assist',
+		        'total_assist_attempt'=>'total_att_assist',
+		        'Second Goal Assist'=>'second_goal_assist',
+		        'final_third_entries'=>'final_third_entries',
+		        'fouled_final_third'=>'fouled_final_third',
+		        'pen_area_entries'=>'pen_area_entries',
+		        'won_contest'=>'won_contest',
+		        'won_corners'=>'won_corners',
+		        'penalty_won'=>'penalty_won',
+		        'last_man_contest'=>'last_man_contest',
+		        'accurate_corners_intobox'=>'accurate_corners_intobox',
+		        'accurate_cross_nocorner'=>'accurate_cross_nocorner',
+		        'accurate_freekick_cross'=>'accurate_freekick_cross',
+		        'accurate_launches'=>'accurate_launches',
+		        'long_pass_own_to_opp_success'=>'long_pass_own_to_opp_success',
+		        'successful_final_third_passes'=>'successful_final_third_passes',
+		        'accurate_flick_on'=>'accurate_flick_on'
+		    );
+
+
+		$defending = array(
+		        'aerial_won'=>'aerial_won',
+		        'ball_recovery'=>'ball_recovery',
+		        'duel_won'=>'duel_won',
+		        'effective_blocked_cross'=>'effective_blocked_cross',
+		        'effective_clearance'=>'effective_clearance',
+		        'effective_head_clearance'=>'effective_head_clearance',
+		        'interceptions_in_box'=>'interceptions_in_box',
+		        'interception_won' => 'interception_won',
+		        'possession_won_def_3rd' => 'poss_won_def_3rd',
+		        'possession_won_mid_3rd' => 'poss_won_mid_3rd',
+		        'possession_won_att_3rd' => 'poss_won_att_3rd',
+		        'won_tackle' => 'won_tackle',
+		        'offside_provoked' => 'offside_provoked',
+		        'last_man_tackle' => 'last_man_tackle',
+		        'outfielder_block' => 'outfielder_block'
+		    );
+
+		$goalkeeper = array(
+		                'dive_catch'=> 'dive_catch',
+		                'dive_save'=> 'dive_save',
+		                'stand_catch'=> 'stand_catch',
+		                'stand_save'=> 'stand_save',
+		                'cross_not_claimed'=> 'cross_not_claimed',
+		                'good_high_claim'=> 'good_high_claim',
+		                'punches'=> 'punches',
+		                'good_one_on_one'=> 'good_one_on_one',
+		                'accurate_keeper_sweeper'=> 'accurate_keeper_sweeper',
+		                'gk_smother'=> 'gk_smother',
+		                'saves'=> 'saves',
+		                'goals_conceded'=>'goals_conceded'
+		                    );
+
+
+		$mistakes_and_errors = array(
+		            'penalty_conceded'=>'penalty_conceded',
+		            'red_card'=>'red_card',
+		            'yellow_card'=>'yellow_card',
+		            'challenge_lost'=>'challenge_lost',
+		            'dispossessed'=>'dispossessed',
+		            'fouls'=>'fouls',
+		            'overrun'=>'overrun',
+		            'total_offside'=>'total_offside',
+		            'unsuccessful_touch'=>'unsuccessful_touch',
+		            'error_lead_to_shot'=>'error_lead_to_shot',
+		            'error_lead_to_goal'=>'error_lead_to_goal'
+		            );
+		$map = array('games'=>$games,
+		              'passing_and_attacking'=>$passing_and_attacking,
+		              'defending'=>$defending,
+		              'goalkeeper'=>$goalkeeper,
+		              'mistakes_and_errors'=>$mistakes_and_errors
+		             );
+
+		$data = $rs['data'];
+		switch($data['player']['position']){
+		    case 'Forward':
+		        $pos = "f";
+		    break;
+		    case 'Midfielder':
+		        $pos = "m";
+		    break;
+		    case 'Defender':
+		        $pos = "d";
+		    break;
+		    default:
+		        $pos = 'g';
+		    break;
+		}
+		$total_points = 0;
+		$main_stats_vals = array('games'=>0,
+		                            'passing_and_attacking'=>0,
+		                            'defending'=>0,
+		                            'goalkeeper'=>0,
+		                            'mistakes_and_errors'=>0,
+		                         );
+
+
+		
+		if(isset($data['daily_stats']['stats'])){
+			foreach($data['daily_stats']['stats'] as $stats){
+		        $total_points += $stats['points'];
+		        $main_stats_vals[$stats['stats_category']]+= $stats['points'];
+		    }
+		    
+
+			
+		    $profileStats = $this->getStatsIndividual('games',$pos,$modifiers,$map,$data['daily_stats']['stats']);
+		    $games = array();
+		    foreach($profileStats as $statsName=>$statsVal){
+		    	$statsName = stats_translated($statsName,'id');
+		    	$games[$statsName] = $statsVal;
+		    }
+			$profileStats = $this->getStatsIndividual('passing_and_attacking',$pos,$modifiers,$map,$data['daily_stats']['stats']);
+		    $passing_and_attacking = array();
+		    foreach($profileStats as $statsName=>$statsVal){
+		    	$statsName = stats_translated($statsName,'id');
+		    	$passing_and_attacking[$statsName] = $statsVal;
+		    }
+		    $profileStats = $this->getStatsIndividual('defending',$pos,$modifiers,$map,$data['daily_stats']['stats']);
+		    $defending = array();
+		    foreach($profileStats as $statsName=>$statsVal){
+		    	$statsName = stats_translated($statsName,'id');
+		    	$defending[$statsName] = $statsVal;
+		    }
+           
+		    $profileStats = $this->getStatsIndividual('goalkeeper',$pos,$modifiers,$map,$data['daily_stats']['stats']);
+		    $goalkeeper = array();
+		    foreach($profileStats as $statsName=>$statsVal){
+		    	$statsName = stats_translated($statsName,'id');
+		    	$goalkeeper[$statsName] = $statsVal;
+		    }
+
+		    $profileStats = $this->getStatsIndividual('mistakes_and_errors',$pos,$modifiers,$map,$data['daily_stats']['stats']);
 		    $mistakes_and_errors = array();
 		    foreach($profileStats as $statsName=>$statsVal){
 		    	$statsName = stats_translated($statsName,'id');
