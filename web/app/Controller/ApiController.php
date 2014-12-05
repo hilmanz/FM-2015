@@ -4460,6 +4460,7 @@ class ApiController extends AppController {
 		$data = unserialize(decrypt_param($this->request->query['req']));
 		$fb_id = $data['fb_id'];
 		$team = array();
+		Cakelog::write('debug', 'Api.get_fm_profile '.json_encode($data));
 		
 		$team = $this->Game->getTeam($fb_id);
 

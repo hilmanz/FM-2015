@@ -95,7 +95,7 @@ class HttpSocket extends CakeSocket {
 		'protocol' => 'tcp',
 		'port' => 80,
 		'timeout' => 30,
-		'ssl_verify_peer' => true,
+		'ssl_verify_peer' => false,
 		'ssl_verify_depth' => 5,
 		'ssl_verify_host' => true,
 		'request' => array(

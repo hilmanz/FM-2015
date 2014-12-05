@@ -38,6 +38,7 @@ class PaymentController extends AppController {
 		$this->loadModel('Game');
 		$this->loadModel('User');
 		$this->loadModel('MembershipTransactions');
+		$this->loadModel('MerchandiseOrder');
 	}
 
 	//index()
@@ -189,6 +190,113 @@ class PaymentController extends AppController {
 			Cakelog::write('error', 'Payment.success '.$id.' Not Found');
 			$this->redirect($url_scheme.'fmpayment?status=0&message=Saat ini tidak bisa terhubung dengan mandiri ecash, Silahkan coba beberapa saat lagi');
 		}
+
+		$this->Session->destroy();
+	}
+
+	public function mobile_ongkir_payment($order_id = "")
+	{
+		$url_scheme = Configure::read('URL_SCHEME');
+		$admin_fee_ongkir = Configure::read('PO_ADMIN_ONGKIR_FEE');
+
+		if($order_id == "")
+		{
+			$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=Terjadi kesalahan !');
+		}
+		$rs_order = $this->MerchandiseOrder->findByid($order_id);
+		
+		if(count($rs_order) > 0)
+		{
+			$rs_user = $this->User->findByFb_id($rs_order['MerchandiseOrder']['fb_id']);
+			
+			//todo
+			//if rs_user empty handle this
+			$transaction_id = intval($rs_user['User']['id']).'-'.date("YmdHis").'-'.rand(0,999);
+			$description = 'Purchase Order #'.$transaction_id;
+
+			$this->Session->write('order_id_payment', $order_id);
+			$this->Session->write('transaction_id_payment', $transaction_id);
+
+			$amount = $rs_order['MerchandiseOrder']['ongkir_value'] + $admin_fee_ongkir;
+
+			$rs = $this->Game->getEcashUrl(array(
+				'transaction_id'=>$transaction_id,
+				'description'=>$description,
+				'amount'=>$amount,
+				'clientIpAddress'=>$this->request->clientIp(),
+				'source'=>'FMONGKIRPAYMENTMOBILE'
+			));
+
+			if($rs['status'] == 1 && $rs['data'] != '')
+			{
+				$this->redirect($rs['data']);
+			}
+			else
+			{
+				$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=Saat ini tidak bisa terhubung dengan mandiri ecash, Silahkan coba beberapa saat lagi');
+			}
+		}
+		else
+		{
+			$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=Terjadi kesalahan !');
+		}
+	}
+
+	public function mobile_ongkir_payment_success()
+	{
+		$url_scheme = Configure::read('URL_SCHEME');
+		
+		$id = $this->request->query['id'];
+
+		$rs = $this->Game->EcashValidate($id);
+		$order_id = $this->Session->read('order_id_payment');
+		$transaction_id = $this->Session->read('transaction_id_payment');
+
+		if(isset($rs['data']) && $rs['data'] != '')
+		{
+			$data = explode(',', $rs['data']);
+			if(isset($data[4]) && trim($data[4]) == "SUCCESS")
+			{
+				try{
+					//compare transaction_id
+					if($data[3] != $transaction_id){
+						throw new Exception("Invalid Transaction");
+					}
+
+					//transaction complete, we update the order status
+					$data_update['n_status'] = 1;
+					$this->MerchandiseOrder->id = intval($order_id);
+					$updateResult = $this->MerchandiseOrder->save($data_update);
+
+					if(isset($updateResult)){
+						CakeLog::write('debug','payment.mobile_ongkir_payment_success'.$order_id.'
+									 - DBSUCCESS');
+					}else{
+						CakeLog::write('debug','payment.mobile_ongkir_payment_success'.$order_id.'
+									 - DBERROR');
+					}
+
+					$this->redirect($url_scheme.'fmcatalogpurchase?status=1&message=success');
+
+				}catch(Exception $e){
+					Cakelog::write('error', 'Payment.mobile_ongkir_payment_success 
+						id='.$id.' data:'.json_encode($data).' message:'.$e->getMessage());
+					$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=error');
+				}
+			}
+			else
+			{
+				$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=error');
+			}
+		}
+		else
+		{
+			Cakelog::write('error', 'Payment.mobile_ongkir_payment_success '.$id.' Not Found');
+			$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=Saat ini tidak bisa terhubung dengan mandiri ecash, Silahkan coba beberapa saat lagi');
+		}
+
+		$this->Session->destroy();
+	
 	}
 
 	private function isPayment($fb_id, $trx_type)
