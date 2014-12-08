@@ -31,6 +31,8 @@ require_once APP.DS.'Vendor'.DS.'password-hash.php';
 require_once APP.DS.'Vendor'.DS.'autoload-mailgun.php';
 use Mailgun\Mailgun;
 
+require_once APP.DS.'Vendor'.DS.'phpmailer'.DS.'PHPMailerAutoload.php';
+
 /**
  * Static content controller
  *
@@ -894,11 +896,24 @@ class ProfileController extends AppController {
 									));
 
 		$Email = new CakeEmail('smtp');
-		$Email->from(array('noreply@sg.supersoccer.co.id' => 'supersoccer'));
-		$Email->to(trim($data['email']));
-		$Email->subject('Reset Password');
-		$Email->emailFormat('html');
-		if($Email->send($body))
+		$mail = new PHPMailer;
+
+		$mail->isSMTP();
+		$mail->Host = $Email->config()['host'];
+		$mail->SMTPAuth = true;
+		$mail->Username = $Email->config()['username'];
+		$mail->Password = $Email->config()['password'];
+		$mail->SMTPSecure = ($Email->config()['tls']) ? 'tls' : '';
+		$mail->Port = $Email->config()['port'];                     
+
+		$mail->From = $Email->config()['from'];
+		$mail->addAddress(trim($data['email']));            
+		$mail->isHTML(true);
+
+		$mail->Subject = 'Reset Password';
+		$mail->Body    = $body;
+
+		if($mail->send())
 		{
 			return true;
 		}
@@ -919,11 +934,25 @@ class ProfileController extends AppController {
 									));
 
 		$Email = new CakeEmail('smtp');
-		$Email->from(array('noreply@sg.supersoccer.co.id' => 'supersoccer'));
-		$Email->to(trim($data['email']));
-		$Email->subject('Kode Aktivasi');
-		$Email->emailFormat('html');
-		if($Email->send($body))
+		
+		$mail = new PHPMailer;
+
+		$mail->isSMTP();
+		$mail->Host = $Email->config()['host'];
+		$mail->SMTPAuth = true;
+		$mail->Username = $Email->config()['username'];
+		$mail->Password = $Email->config()['password'];
+		$mail->SMTPSecure = ($Email->config()['tls']) ? 'tls' : '';
+		$mail->Port = $Email->config()['port'];                     
+
+		$mail->From = $Email->config()['from'];
+		$mail->addAddress(trim($data['email']));            
+		$mail->isHTML(true);
+
+		$mail->Subject = 'Kode Aktivasi';
+		$mail->Body    = $body;
+
+		if($mail->send())
 		{
 			return true;
 		}
@@ -950,11 +979,25 @@ class ProfileController extends AppController {
 									));
 
 		$Email = new CakeEmail('smtp');
-		$Email->from(array('noreply@sg.supersoccer.co.id' => 'supersoccer'));
-		$Email->to(trim($data['email']));
-		$Email->subject('Kode Aktivasi');
-		$Email->emailFormat('html');
-		if($Email->send($body))
+
+		$mail = new PHPMailer;
+
+		$mail->isSMTP();
+		$mail->Host = $Email->config()['host'];
+		$mail->SMTPAuth = true;
+		$mail->Username = $Email->config()['username'];
+		$mail->Password = $Email->config()['password'];
+		$mail->SMTPSecure = ($Email->config()['tls']) ? 'tls' : '';
+		$mail->Port = $Email->config()['port'];                     
+
+		$mail->From = $Email->config()['from'];
+		$mail->addAddress(trim($data['email']));            
+		$mail->isHTML(true);
+
+		$mail->Subject = 'Kode Aktivasi';
+		$mail->Body    = $body;
+
+		if($mail->send())
 		{
 			return true;
 		}
