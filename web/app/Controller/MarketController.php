@@ -137,9 +137,9 @@ class MarketController extends AppController {
 	public function player($player_id){
 
 		$userData = $this->userData;
+		$userDetail = $this->userDetail;
 		//user data
-		$user = $this->User->findByFb_id($userData['fb_id']);
-		$this->set('user',$user['User']);
+		$this->set('user',$userDetail['User']);
 
 		//budget
 		$budget = $this->Game->getBudget($userData['team']['id']);
@@ -147,7 +147,8 @@ class MarketController extends AppController {
 		$this->set('team_bugdet',$budget);
 
 		//club
-		$club = $this->Team->findByUser_id($user['User']['id']);
+		$club = $userDetail;
+
 		$this->set('club',$club['Team']);
 
 		//player detail : 

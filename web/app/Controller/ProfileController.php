@@ -907,6 +907,7 @@ class ProfileController extends AppController {
 		$mail->Port = $Email->config()['port'];                     
 
 		$mail->From = $Email->config()['from'];
+		$mail->FromName = 'SUPERSOCCER';
 		$mail->addAddress(trim($data['email']));            
 		$mail->isHTML(true);
 
@@ -946,6 +947,7 @@ class ProfileController extends AppController {
 		$mail->Port = $Email->config()['port'];                     
 
 		$mail->From = $Email->config()['from'];
+		$mail->FromName = 'SUPERSOCCER';
 		$mail->addAddress(trim($data['email']));            
 		$mail->isHTML(true);
 
@@ -991,6 +993,7 @@ class ProfileController extends AppController {
 		$mail->Port = $Email->config()['port'];                     
 
 		$mail->From = $Email->config()['from'];
+		$mail->FromName = 'SUPERSOCCER';
 		$mail->addAddress(trim($data['email']));            
 		$mail->isHTML(true);
 
