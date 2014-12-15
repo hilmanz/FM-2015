@@ -153,6 +153,15 @@ class LoginController extends AppController {
 			}
 			
 		}
+		else
+		{
+			$ref_code = $this->request->query('ref_code');
+			if($ref_code != NULL || $ref_code != "")
+			{
+				$this->Session->write('REF_CODE', $ref_code);
+				$this->set('ref_code', $ref_code);
+			}
+		}
 	}
 
 	function error_email()

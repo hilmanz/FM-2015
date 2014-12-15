@@ -576,3 +576,8 @@ CHANGE COLUMN `transaction_name` `transaction_name` VARCHAR(255) NULL DEFAULT NU
 ALTER TABLE `fantasy`.`activity_logs` 
 ADD COLUMN `league` VARCHAR(5) NULL DEFAULT 'epl' AFTER `log_type`;
 
+ALTER TABLE `fantasy`.`users` 
+ADD COLUMN `ref_code` VARCHAR(64) NULL AFTER `paid_member_status`;
+
+ALTER TABLE `fantasy`.`users` 
+ADD INDEX `REF_CODE` (`ref_code` ASC);

@@ -673,7 +673,8 @@ class ApiController extends AppController {
 
 		$players = $this->Game->getMatchDetailsByGameTeamId($game_team_id[0]['b']['id'],$current_game_id);
 
-		if($players['status'] == 1){
+		if($players['status'] == 1)
+		{
 			$response = array();
 			$total_points = 0;
 			foreach ($players['data'] as $key => $value)
@@ -686,8 +687,11 @@ class ApiController extends AppController {
 
 			$this->set('response',array('status'=>1,'data'=>array('players' => $response, 
 																'total_points' => $total_points)));
-		}else{
-			$this->set('response',array('status'=>0,'message'=>'Terjadi Kesalahan !'));
+		}
+		else
+		{
+			$this->set('response',array('status'=>1,'data' => null, 
+										'message'=>'Loe nggak pasang formasi untuk pertandingan ini!'));
 		}
 		
 		$this->render('default');
@@ -710,9 +714,6 @@ class ApiController extends AppController {
 
 		$players = $this->Game->getMatchDetailsByGameTeamId($game_team['id'],$game_id);
 
-		
-		
-		
 		//poin modifiers
 		$rs = $this->Team->query("SELECT name,
 										g as Goalkeeper,
@@ -3827,44 +3828,55 @@ class ApiController extends AppController {
 		
 		$this->layout="ajax";
 
-		$param = unserialize(decrypt_param(@$this->request->data['param']));
-		if(!isset($this->request->data['param'])){
-			$item_id = $this->request->data['item_id'];
-			$qty = $this->request->data['qty'];
-			$param = array();
+		try{
+			$param = unserialize(decrypt_param(@$this->request->data['param']));
+			if(!isset($this->request->data['param'])){
+				$item_id = $this->request->data['item_id'];
+				$qty = $this->request->data['qty'];
+				$param = array();
 
-			for($i=0;$i<count($item_id);$i++){
-				$param[$i] = array('item_id' => $item_id[$i],
-									'qty' => $qty[$i]
-								);
+				for($i=0;$i<count($item_id);$i++){
+					$param[$i] = array('item_id' => $item_id[$i],
+										'qty' => $qty[$i]
+									);
+				}
 			}
-		}
-		$fb_id = intval($this->request->data['fb_id']);
-		CakeLog::write('debug','param '.json_encode($param));
-		$result = $this->pay_with_coins($fb_id,$game_team_id,$param);
-		CakeLog::write('debug',$game_team_id.'-team_id');
-		CakeLog::write('debug',$game_team_id,'data ->'.json_encode($this->request->data));
-		CakeLog::write('debug','catalog - '.json_encode($result));
-		$is_transaction_ok = $result['is_transaction_ok'];
-		$no_fund = @$result['no_fund'];
-		$order_id = @$result['order_id'];
-		
-		if($is_transaction_ok == true)
-		{
-			//check accross the items, we apply the perk for all digital items
-			$this->process_items($result['items'],$order_id);
-			$this->set('response',array('status'=>1,'data'=>$result));
-		}
-		else
-		{
+			$fb_id = intval($this->request->data['fb_id']);
+			CakeLog::write('debug','param '.json_encode($param));
+			$result = $this->pay_with_coins($fb_id,$game_team_id,$param);
+			CakeLog::write('debug',$game_team_id.'-team_id');
+			CakeLog::write('debug',$game_team_id,'data ->'.json_encode($this->request->data));
+			CakeLog::write('debug','catalog - '.json_encode($result));
+			$is_transaction_ok = $result['is_transaction_ok'];
+			$no_fund = @$result['no_fund'];
+			$order_id = @$result['order_id'];
+			
+			if($is_transaction_ok == true)
+			{
+				//check accross the items, we apply the perk for all digital items
+				$this->process_items($result['items'],$order_id);
+				$this->set('response',array('status'=>1,'data'=>$result));
+			}
+			else
+			{
+				$data_error = array(
+										"game_team_id" => $game_team_id,
+										"request_data" => $this->request->data,
+										"result" => $result
+									);
+				CakeLog::write('error', 'api.m_catalog_purchase '.json_encode($data_error));
+				$this->set('response',array('status'=>0));
+			}
+		}catch(Exception $e){
 			$data_error = array(
-									"game_team_id" => $game_team_id,
-									"request_data" => $this->request->data,
-									"result" => $result
-								);
-			CakeLog::write('error', 'api.catalog_purchase '.json_encode($data_error));
+										"game_team_id" => $game_team_id,
+										"request_data" => $this->request->data,
+										"result" => $result
+									);
+			CakeLog::write('error', 'api.m_catalog_purchase '.json_encode($data_error));
 			$this->set('response',array('status'=>0));
 		}
+		
 		$this->render('default');
 	}
 	/*
@@ -6918,6 +6930,68 @@ class ApiController extends AppController {
 
 		$this->set('response',$results);
 		$this->render('default');	
+	}
+
+	public function check_point_calculation()
+	{
+		try{
+			$current_matchday = Sanitize::clean($this->request->query('gameweek'));
+			$session_id = Configure::read('FM_SESSION_ID');
+
+			if($this->request->query('gameweek') == NULL)
+			{
+				//current matchday
+				$matchday = $this->Game->query("SELECT matchday FROM ".$this->ffgamedb.".game_fixtures a
+													 WHERE period='FullTime' AND is_processed = 1 
+													 AND session_id = '{$session_id}'
+													 ORDER BY matchday DESC LIMIT 1");
+				$current_matchday = $matchday[0]['a']['matchday'];
+			}
+
+			$rs_game_id = $this->Game->query("SELECT game_id FROM
+											".$this->ffgamedb.".game_fixtures
+											WHERE matchday = '{$current_matchday}' 
+											ORDER BY id ASC LIMIT 40");
+
+			$game_id = "";
+			foreach ($rs_game_id as $key => $value)
+			{
+				$game_id .= "'".$value['game_fixtures']['game_id']."',";
+			}
+			$game_id = rtrim($game_id, ',');
+
+
+			$rs_count = $this->Game->query("(SELECT 
+												COUNT(id) as total 
+											FROM 
+												".$this->ffgamestatsdb.".job_queue 
+											WHERE 
+												game_id IN (".$game_id.") 
+													AND n_status = 2) 
+											UNION 
+											(SELECT 
+												COUNT(id) as total 
+											FROM 
+												".$this->ffgamestatsdb.".job_queue_rank 
+											WHERE 
+												game_id IN (".$game_id.") 
+													AND n_status = 2)");
+
+			if(count($rs_count) == 1 && $rs_count[0][0]['total'] != 0)
+			{
+				$results = array('status'=>1,'data'=>array('status' => 1, 'gameweek' => $current_matchday));
+			}
+			else
+			{
+				$results = array('status'=>1,'data'=>array('status' => 0, 'gameweek' => $current_matchday));
+			}
+		}catch(Exception $e){
+			Cakelog::write('error', 'api.get_mobile_charge message:'.$e->getMessage());
+			$results = array('status'=>1,'data'=>array(null),'message' => $e->getMessage());
+		}
+		
+		$this->set('response',$results);
+		$this->render('default');
 	}
 
 }

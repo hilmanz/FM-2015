@@ -295,6 +295,9 @@ class ProfileController extends AppController {
 		$rs_user = $this->User->findByFb_id($user_fb['fb_id']);
 
 		$this->set('user_data', $rs_user['User']);
+		$ref_code = $this->Session->read('REF_CODE');
+
+		$this->set('ref_code', $ref_code);
 
 		if($this->request->is("post"))
 		{
@@ -317,7 +320,8 @@ class ProfileController extends AppController {
 						$this->redirect('/profile/create_password');
 					}else{
 						$this->Session->write('Userlogin.is_login', true);
-						$this->redirect('/profile/register_team');
+						//$this->redirect('/profile/register_team');
+						$this->redirect('/profile/success_page');
 					}
 				}catch(Exception $e){
 					Cakelog::write('error', 'profile.activation message:'.$e->getMessage());
@@ -328,6 +332,12 @@ class ProfileController extends AppController {
 				$this->Session->setFlash("Kode Aktivasi Salah");
 			}
 		}
+	}
+
+	public function success_page()
+	{
+		$ref_code = $this->Session->read('REF_CODE');
+		$this->set('ref_code', $ref_code);
 	}
 
 	public function create_team(){
@@ -572,6 +582,7 @@ class ProfileController extends AppController {
 					if(isset($this->request->data['not_facebook'])){
 						$fb_id_ori = NULL;
 					}
+					$ref_code = $this->Session->read('REF_CODE');
 
 					$data = array('fb_id_ori'=>$fb_id_ori,
 								  'fb_id'=>$user_fb['fb_id'],
@@ -590,7 +601,8 @@ class ProfileController extends AppController {
 								  'birthdate'=>$birthdate,
 								  'n_status'=>0,
 								  'register_completed'=>0,
-								  'activation_code' => date("Ymdhis").rand(100, 999)
+								  'activation_code' => date("Ymdhis").rand(100, 999),
+								  'ref_code' => $ref_code
 								  );
 
 					$this->Session->write('Userlogin.info',array('fb_id'=>$user_fb['fb_id'],
