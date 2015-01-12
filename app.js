@@ -154,6 +154,7 @@ app.get('/test',function(req,res){
 
 app.post('/team/lineup/save',[auth.canAccess],gameplay.setLineup);
 app.get('/team/lineup/:id',[auth.canAccess],gameplay.getLineup);
+//app.get('/team/getlineup/:id/:matchday',[auth.canAccess],gameplay.getLineupByMatchday);
 app.get('/team/list/:id',[auth.canAccess],gameplay.getPlayers);
 app.get('/team/player/:game_team_id/:id',[auth.canAccess],gameplay.player_team_data);
 app.get('/team/sponsors/:game_team_id',[auth.canAccess],gameplay.getActiveSponsors);

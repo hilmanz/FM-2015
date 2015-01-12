@@ -353,6 +353,7 @@ class ApiController extends AppController {
 			}else{
 				$this->set('response',array('status'=>404,'error'=>'method not found'));
 			}
+			
 		}else{
 			$this->set('response',array('status'=>0,'error'=>'you cannot update formation at these moment, please wait until the matches is over.'));
 		}
@@ -673,6 +674,30 @@ class ApiController extends AppController {
 
 		$players = $this->Game->getMatchDetailsByGameTeamId($game_team_id[0]['b']['id'],$current_game_id);
 
+		CakeLog::write('debug', 'api.team_points players '.json_encode($players));
+
+		$rs_player = $this->Game->query("SELECT * FROM game_team_lineups_history WHERE 
+										game_team_id ={$game_team_id[0]['b']['id']}
+										AND game_id = '{$current_game_id}'
+										LIMIT 16;");
+		$array_key = 'game_team_lineups_history';
+		
+		if(count($rs_player) == 0)
+		{
+			$array_key = 'game_team_lineups';
+			$rs_player = $this->Game->query("SELECT * FROM game_team_lineups WHERE 
+										game_team_id ={$game_team_id[0]['b']['id']}
+										AND matchday = '{$current_matchday}'
+										LIMIT 16;");
+		}
+
+		$player_position = array();
+		foreach ($rs_player as $key => $value)
+		{
+			$data_player_position =  $value[$array_key];
+			$player_position[$data_player_position['player_id']] = $data_player_position['position_no'];
+		}
+
 		if($players['status'] == 1)
 		{
 			$response = array();
@@ -681,7 +706,8 @@ class ApiController extends AppController {
 			{
 				$response[] = array('uid' => $key,
 									'name' => $value['name'],
-									'points' => $value['points']);
+									'points' => $value['points'],
+									'position_no' => $player_position[$key]);
 				$total_points += $value['points'];
 			}
 
@@ -1113,6 +1139,7 @@ class ApiController extends AppController {
 
 		//player detail : 
 		$rs = $this->Game->get_team_player_info($fb_id,$player_id);
+		Cakelog::write('debug', 'api.player_points rs '.json_encode($rs));
 
 		$session_id = Configure::read('FM_SESSION_ID');
 
@@ -1141,6 +1168,8 @@ class ApiController extends AppController {
 				$daily_stats[] = $value;
 			}
 		}
+
+		Cakelog::write('debug', 'api.player_points current_game_id '.$current_game_id.' team_id '.$user['Team']['id']);
 
 		$rs['data']['daily_stats']['stats'] = $daily_stats;
 		//stats modifier
@@ -3282,7 +3311,7 @@ class ApiController extends AppController {
 
 			$shopping_cart[$i]['data'] = $this->MerchandiseItem->findById($shopping_cart[$i]['item_id']);
 			$item = $shopping_cart[$i]['data']['MerchandiseItem'];
-			$kg += ceil(floatval($item['weight'])) * intval($shopping_cart[$i]['qty']);
+			$kg += floatval($item['weight']) * intval($shopping_cart[$i]['qty']);
 			$total_price += (intval($shopping_cart[$i]['qty']) * intval($item['price_money']));
 			CakeLog::write('debug', "aaaaaaaaaa".json_encode($item));
 			$category[$i] = $item['merchandise_category_id'];
@@ -3291,6 +3320,7 @@ class ApiController extends AppController {
 				$all_digital = false;
 			}
 		}
+		$kg = ceil($kg);
 
 
 		//book the item stocks
@@ -3379,6 +3409,517 @@ class ApiController extends AppController {
 		$this->render('default');
 	}
 
+	public function doku_create_order($game_team_id, $payment_channel)
+	{
+		$this->loadModel('MerchandiseItem');
+		$this->loadModel('MerchandiseCategory');
+		$this->loadModel('MerchandiseOrder');
+		$this->loadModel('Doku');
+
+		CakeLog::write('doku','doku_create_order '.json_encode($this->request->data));
+
+		$shopping_cart = unserialize(decrypt_param($this->request->data['param']));
+
+		$transaction_id = $this->request->data['transaction_id'];
+		
+		$description = 'Purchase Order #'.$transaction_id;
+		$fb_id = $this->request->data['fb_id'];
+
+		//get total money to be spent.
+		$total_price = 0;
+		$all_digital = true;
+		$kg = 0;
+		$category = array();
+		$basket = "Pembelian ";
+		for($i=0;$i<sizeof($shopping_cart);$i++){
+
+			$shopping_cart[$i]['data'] = $this->MerchandiseItem->findById($shopping_cart[$i]['item_id']);
+			$item = $shopping_cart[$i]['data']['MerchandiseItem'];
+			$basket .= $item['name'].','.$item['price_money'].','.$item['id'].','.$item['price_money'].';';
+			$kg += floatval($item['weight']) * intval($shopping_cart[$i]['qty']);
+			$total_price += (intval($shopping_cart[$i]['qty']) * intval($item['price_money']));
+			$category[$i] = $item['merchandise_category_id'];
+			//is there any non-digital item ?
+			if($item['merchandise_type']==0){
+				$all_digital = false;
+			}
+		}
+		$basket = rtrim($basket,',');
+		$kg = ceil($kg);
+
+
+		//book the item stocks
+		$this->book_items($shopping_cart,$transaction_id,$game_team_id,$fb_id);
+		
+		$admin_fee = Configure::read('PO_ADMIN_FEE');
+		$enable_ongkir = true;
+		if(count($shopping_cart) > 1)
+		{
+			$admin_fee = Configure::read('PO_ADMIN_FEE');
+		}
+		else
+		{
+			//check enable or disable admin fee
+			$rs_adminfee = $shopping_cart[0]['data']['MerchandiseItem'];
+			if($rs_adminfee['enable_admin_fee'] != 1)
+			{
+				$admin_fee = 0;
+			}
+			else
+			{
+				//check value of admin_fee
+				if($rs_adminfee['admin_fee'] == 0)
+				{
+					$admin_fee = Configure::read('PO_ADMIN_FEE');
+				}
+				else
+				{
+					$admin_fee = $rs_adminfee['admin_fee'];
+				}
+			}
+
+			//check ongkir
+			if($rs_adminfee['enable_ongkir'] == 0)
+			{
+				$enable_ongkir = false;
+			}
+		}
+
+		$contain_tiket = $this->check_category_ticket($category);
+
+		if($contain_tiket){
+			$admin_fee = 5000;
+			$enable_ongkir = false;
+		}
+
+		if($all_digital){
+			$admin_fee = 0;
+		}
+		$total_price += $admin_fee;
+
+		//include ongkir
+		$total_ongkir = 0;
+		if($enable_ongkir)
+		{
+			$ongkirList = $this->getOngkirList();
+			foreach($ongkirList as $ongkir){
+				if($ongkir['Ongkir']['id'] == intval($this->request->data['city_id'])){
+					$total_ongkir = intval($ongkir['Ongkir']['cost']);
+					break;
+				}
+			}
+		}
+
+		$total_price += ($kg*$this->request->data['ongkos_kirim']);
+
+		$transaction_data = array('profile'=>$this->request->data,
+								 'shopping_cart'=>$shopping_cart,
+								 'base_ongkir_value'=>$total_ongkir);
+
+		$doku_mid = Configure::read('DOKU_MALLID');
+		$doku_sharedkey = Configure::read('DOKU_SHAREDKEY');
+		$hash_words = sha1(number_format($total_price,2,'.','').
+						  $doku_mid.
+						  $doku_sharedkey.
+						  str_replace('-', '', $transaction_id));
+		$trx_session_id = sha1(time());
+		$data = array('MALLID'=>$doku_mid,
+						'CHAINMERCHANT'=>'NA',
+						'AMOUNT'=>number_format($total_price,2,'.',''),
+						'PURCHASEAMOUNT'=>number_format($total_price,2,'.',''),
+						'TRANSIDMERCHANT'=>str_replace('-', '', $transaction_id),
+						'WORDS'=>$hash_words,
+						'REQUESTDATETIME'=>date("YmdHis"),
+						'CURRENCY'=>'360',
+						'PURCHASECURRENCY'=>'360',
+						'SESSIONID'=>$trx_session_id,
+						'NAME'=>$this->request->data['first_name'].' '.$this->request->data['last_name'],
+						'EMAIL'=>$this->request->data['email'],
+						'ADDITIONALDATA'=>encrypt_param($transaction_id),
+						'PAYMENTCHANNEL'=>$payment_channel,
+						'BASKET'=>$basket
+						);
+
+		try{
+
+			$rs_order = $this->MerchandiseOrder->findByPo_number($transaction_id);
+			$rs_user = $this->User->findByFb_id($fb_id);
+			$dataSource = $this->MerchandiseOrder->getDataSource();
+			$dataSource->begin();
+
+			$payment_method = 'cc';
+			if($payment_channel != '01'){
+				$payment_method = 'va';
+			}
+			if(count($rs_order) > 0){
+				$rs_doku = $this->Doku->findByPo_number($transaction_id);
+				throw new Exception("entry already exists");
+			}
+
+			$this->MerchandiseOrder->create();
+			$rs_order = $this->MerchandiseOrder->save(array(
+					'fb_id'=>$this->request->data['fb_id'],
+					'po_number'=>$transaction_id,
+					'game_team_id'=>intval($game_team_id),
+					'user_id'=>$rs_user['User']['id'],
+					'first_name'=>$this->request->data['first_name'],
+					'last_name'=>$this->request->data['last_name'],
+					'ktp'=>$this->request->data['ktp'],
+					'email'=>$this->request->data['email'],
+					'phone'=>$this->request->data['phone'],
+					'city'=>$this->request->data['kota'],
+					'address'=>$this->request->data['address'],
+					'province'=>$this->request->data['province'],
+					'country'=>$this->request->data['country'],
+					'zip'=>$this->request->data['zip'],
+					'order_date'=>date('Y-m-d H:i:s'),
+					'data'=>serialize($shopping_cart),
+					'payment_method'=>$payment_method,
+					'total_sale'=>$total_price,
+					'ongkir_id'=>$this->request->data['city_id'],
+					'ongkir_value' => $total_ongkir,
+					'n_status' => 0
+			));
+
+
+			$this->Doku->create();
+			$rs_doku = $this->Doku->save(array(
+					'catalog_order_id'=>$this->MerchandiseOrder->getInsertID(),
+					'po_number'=>$transaction_id,
+					'transidmerchant'=>str_replace('-', '', $transaction_id),
+					'totalamount'=>number_format($total_price,2,'.',''),
+					'words'=>$hash_words,
+					'statustype'=>'',
+					'response_code'=>'',
+					'approvalcode'=>'',
+					'trxstatus'=>'Requested',
+					'payment_channel'=>$payment_channel,
+					'paymentcode'=>'',
+					'session_id'=>$trx_session_id,
+					'bank_issuer'=>'',
+					'creditcard'=>'',
+					'payment_date_time'=>date("Y-m-d H:i:s"),
+					'verifyid'=>'',
+					'verifyscore'=>'',
+					'verifystatus'=>'',
+			));
+			CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] create doku entry '.json_encode($rs_doku));
+			$dataSource->commit();
+
+		}catch(Exception $e){
+			$dataSource->rollback();
+			CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] error '.$e->getMessage());
+
+			try{
+				$dataSource2 = $this->MerchandiseOrder->getDataSource();
+				$dataSource2->begin();
+				//update
+				$this->MerchandiseOrder->id = $rs_order['MerchandiseOrder']['id'];
+
+				$this->MerchandiseOrder->save(array(
+						'fb_id'=>$this->request->data['fb_id'],
+						'po_number'=>$transaction_id,
+						'game_team_id'=>intval($game_team_id),
+						'user_id'=>$rs_user['User']['id'],
+						'first_name'=>$this->request->data['first_name'],
+						'last_name'=>$this->request->data['last_name'],
+						'ktp'=>$this->request->data['ktp'],
+						'email'=>$this->request->data['email'],
+						'phone'=>$this->request->data['phone'],
+						'city'=>$this->request->data['kota'],
+						'address'=>$this->request->data['address'],
+						'province'=>$this->request->data['province'],
+						'country'=>$this->request->data['country'],
+						'zip'=>$this->request->data['zip'],
+						'order_date'=>date('Y-m-d H:i:s'),
+						'data'=>serialize($shopping_cart),
+						'payment_method'=>$payment_method,
+						'total_sale'=>$total_price,
+						'ongkir_id'=>$this->request->data['city_id'],
+						'ongkir_value' => $total_ongkir,
+						'n_status' => 0
+				));
+
+				$this->Doku->id = $rs_doku['Doku']['id'];
+		    	$this->Doku->save(array(
+						'catalog_order_id'=>$rs_order['MerchandiseOrder']['id'],
+						'po_number'=>$transaction_id,
+						'transidmerchant'=>str_replace('-', '', $transaction_id),
+						'totalamount'=>number_format($total_price,2,'.',''),
+						'words'=>$hash_words,
+						'statustype'=>'',
+						'response_code'=>'',
+						'approvalcode'=>'',
+						'trxstatus'=>'Requested',
+						'payment_channel'=>$payment_channel,
+						'paymentcode'=>'',
+						'session_id'=>$trx_session_id,
+						'bank_issuer'=>'',
+						'creditcard'=>'',
+						'payment_date_time'=>date("Y-m-d H:i:s"),
+						'verifyid'=>'',
+						'verifyscore'=>'',
+						'verifystatus'=>'',
+				));
+				CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] 
+									update doku entry order_id '.$rs_order['MerchandiseOrder']['id']);
+				$dataSource2->commit();
+			}catch(Exception $e2){
+				$dataSource2->rollback();
+				//overide data variable
+				$data = NULL;
+				CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] error doku entry '.json_encode($rs_doku));
+			}
+		}
+
+		$this->layout="ajax";
+		$this->set('response',array('status'=>1,'data'=>$data));
+		$this->render('default');
+
+	}
+
+	public function doku_notify()
+	{
+		$this->loadModel('MerchandiseItem');
+		$this->loadModel('MerchandiseOrder');
+		$this->loadModel('Doku');
+
+		$data = $this->request->data;
+
+
+		$doku_mid = Configure::read('DOKU_MALLID');
+		$doku_sharedkey = Configure::read('DOKU_SHAREDKEY');
+
+		$message = "CONTINUE";
+		try{
+			if(isset($data['TRANSIDMERCHANT']))
+			{
+				$TRANSIDMERCHANT = $data['TRANSIDMERCHANT'];
+			}
+			else
+			{
+				throw new Exception("TRANSIDMERCHANT NOT SET");	
+			}
+
+			$totalamount = $data['AMOUNT'];
+		    $words    = $data['WORDS'];
+		    $statustype = $data['STATUSTYPE'];
+		    $response_code = $data['RESPONSECODE'];
+		    $approvalcode   = $data['APPROVALCODE'];
+		    $status         = $data['RESULTMSG'];
+		    $paymentchannel = $data['PAYMENTCHANNEL'];
+		    $paymentcode = $data['PAYMENTCODE'];
+		    $session_id = $data['SESSIONID'];
+		    $bank_issuer = $data['BANK'];
+		    $cardnumber = $data['MCN'];
+		    $payment_date_time = $data['PAYMENTDATETIME'];
+		    $verifyid = $data['VERIFYID'];
+		    $verifyscore = $data['VERIFYSCORE'];
+		    $verifystatus = $data['VERIFYSTATUS'];
+
+		    $doku = $this->Doku->findByTransidmerchant($TRANSIDMERCHANT);
+		    $data['catalog_order_id'] = $doku['Doku']['catalog_order_id'];
+
+   		    $valid_words = sha1($totalamount.$doku_mid.$doku_sharedkey.$TRANSIDMERCHANT.$status.$verifystatus);
+   		    if($valid_words!=$words)
+   		    {
+   		    	CakeLog::write('doku','api.doku_notify - '.date("Y-m-d H:i:s").' - ERROR - INVALID WORDS - EXPECTING : '.$valid_words.' : '.json_encode($data));
+   		    	throw new Exception("INVALID WORDS");
+   		    }
+
+	    	if($doku['Doku']['trxstatus']=='Requested' && $doku['Doku']['session_id'] == $session_id)
+	    	{
+		    	CakeLog::write('doku','api.doku_notify - '.date("Y-m-d H:i:s").' - FOUND TRANSACTION : '.json_encode($data));
+
+		    	$this->Doku->id = $doku['Doku']['id'];
+		    	$this->Doku->save(
+		    		array(
+							'totalamount'=>$totalamount,
+							'words'=>$words,
+							'statustype'=>$statustype,
+							'response_code'=>$response_code,
+							'approvalcode'=>$approvalcode,
+							'trxstatus'=>$status,
+							'payment_channel'=>$paymentchannel,
+							'paymentcode'=>$paymentcode,
+							'session_id'=>$session_id,
+							'bank_issuer'=>$bank_issuer,
+							'creditcard'=>$cardnumber,
+							'payment_date_time'=>$payment_date_time,
+							'verifyid'=>$verifyid,
+							'verifyscore'=>$verifyscore,
+							'verifystatus'=>$verifystatus)
+		    	);
+
+		    	if(!$this->update_transaction($data))
+		    	{
+		    		throw new Exception("Error Processing Request");
+		    	}
+
+		    }
+		    else if($doku['Doku']['trxstatus']=='SUCCESS' && $doku['Doku']['session_id'] == $session_id)
+		    {
+		    	CakeLog::write('doku','NOTIFY - '.date("Y-m-d H:i:s").' - TRANSACTION ALREADY PROCESSED AND SUCCEED : '.json_encode($data));
+		    }
+		    else if($doku['Doku']['trxstatus']=='FAILED' && $doku['Doku']['session_id'] == $session_id && $status == 'SUCCESS')
+		    {
+		    	//jika transaksi sudah di flag FAILED, tapi ada transaksi baru yg flagnya SUCCESS
+		    	//selama session_id nya sama kita anggap valid.
+		    	$this->Doku->id = $doku['Doku']['id'];
+		    	$this->Doku->save(
+		    		array(
+							'totalamount'=>$totalamount,
+							'words'=>$words,
+							'statustype'=>$statustype,
+							'response_code'=>$response_code,
+							'approvalcode'=>$approvalcode,
+							'trxstatus'=>$status,
+							'payment_channel'=>$paymentchannel,
+							'paymentcode'=>$paymentcode,
+							'session_id'=>$session_id,
+							'bank_issuer'=>$bank_issuer,
+							'creditcard'=>$cardnumber,
+							'payment_date_time'=>$payment_date_time,
+							'verifyid'=>$verifyid,
+							'verifyscore'=>$verifyscore,
+							'verifystatus'=>$verifystatus)
+		    	);
+		    	CakeLog::write('doku','api.doku_notify - '.date("Y-m-d H:i:s").' - UPDATE doku entry (was failed)'.json_encode($data));
+		    	
+		    	if(!$this->update_transaction($data))
+		    	{
+		    		throw new Exception("Error Processing Request");
+		    	}
+	
+		    }
+		    else
+		    {
+		    	CakeLog::write('doku','api.doku_notify - '.date("Y-m-d H:i:s").' - ERROR - MISSING TRANSACTION : '.json_encode($data));
+		    	throw new Exception("Error Processing Request");
+		    }
+		}catch(Exception $e){
+			CakeLog::write('doku','api.doku_notify - 
+							'.date("Y-m-d H:i:s").' - ERROR - TRANSACTION message: '.$e->getMessage().'
+							data'.json_encode($data));
+			$message = "STOP";
+		}
+
+		$this->layout="ajax";
+		$this->set('response',array('status'=>1,'data'=>$data,'message'=>$message));
+		$this->render('default');
+
+	}
+
+	public function get_doku_transaction($session_id)
+	{
+		$this->loadModel("Doku");
+		$this->loadModel("MerchandiseOrder");
+
+		$rs_doku = $this->Doku->findBySession_id($session_id);
+		$rs_order = $this->MerchandiseOrder->findById($rs_doku['Doku']['catalog_order_id']);
+		$rs_merge = array_merge($rs_doku, $rs_order);
+
+		$this->layout = "ajax";
+		$this->set('response', array('status'=>1, 'data'=>$rs_merge));
+		$this->render('default');
+	}
+
+	public function update_doku_order()
+	{
+		try{
+			$this->loadModel("Doku");
+			$data = $this->request->data;
+			CakeLog::write('doku', 'api.update_doku_order data:'.json_encode($data));
+
+			$this->Doku->query("UPDATE ".Configure::read('FRONTEND_SCHEMA').".doku SET 
+								paymentcode='{$data['paymentcode']}' 
+								WHERE session_id='{$data['session_id']}'");
+			
+	    	$status = 1;
+		}catch(Exception $e){
+			CakeLog::write('doku', 'api.update_doku_order data:'.json_encode($data).' message:'.$e->getMessage());
+			$status = 0;
+		}
+		$this->layout = "ajax";
+		$this->set('response', array('status'=>$status, 'data'=>$data));
+		$this->render('default');
+	}
+
+	//step
+	//1. cek stock
+	//2. reduce stok
+	//3. update MerchandiseOrder status
+	private function update_transaction($data){
+		CakeLog::write('doku','api.update_transaction - '.date("Y-m-d H:i:s").' - UPDATE TRANSACTION '.json_encode($data));
+		$this->loadModel('MerchandiseOrder');
+		$this->loadModel('MerchandiseItem');
+		$this->loadModel('Doku');
+
+		$catalog_order_id = intval($data['catalog_order_id']);
+		
+		try{
+			$dataSource = $this->MerchandiseOrder->getDataSource();
+			$dataSource->begin();
+
+			if($data['RESULTMSG']=='SUCCESS' && $data['RESPONSECODE']=='0000')
+			{
+				$rs_order = $this->MerchandiseOrder->findById($catalog_order_id);
+				$shopping_cart = unserialize($rs_order['MerchandiseOrder']['data']);
+
+				//reduce stock broo
+				foreach ($shopping_cart as $key => $value)
+				{
+					$rs_item = $this->MerchandiseItem->findById($value['item_id']);
+					if($rs_item['MerchandiseItem']['stock'] < intval($value['qty']))
+					{
+						throw new Exception("Stok tidak cukup");
+					}
+					else
+					{
+						$stock = $rs_item['MerchandiseItem']['stock'] - intval($value['qty']);
+						$this->MerchandiseItem->id = $value['item_id'];
+						$this->MerchandiseItem->save(
+				    		array(
+									'stock'=>$stock
+								)
+				    	);
+					}//end if
+				}//end foreach
+
+				Cakelog::write('doku', 'api.update_transaction reduce stock berhasil');
+			}
+			else
+			{
+				throw new Exception("Error Processing Request");
+			}
+
+			$this->MerchandiseOrder->id = $catalog_order_id;
+			$this->MerchandiseOrder->save(
+	    		array(
+						'n_status'=>1
+					)
+	    	);
+
+			$dataSource->commit();
+			return true;
+		}catch(Exception $e){
+			$dataSource->rollback();
+
+			$this->MerchandiseOrder->id = $catalog_order_id;
+			$this->MerchandiseOrder->save(
+	    		array(
+						'n_status'=>4
+					)
+	    	);
+
+	    	Cakelog::write('doku', 'api.update_transaction error message '.$e->getMessage().' 
+	    				data '.json_encode($data));
+
+	    	return false;
+		}
+
+	}
+
 
 	/*
 	*return true if order contain ticket category
@@ -3395,6 +3936,8 @@ class ApiController extends AppController {
 
 		return false;
 	}
+
+
 
 	
 	/*
@@ -3962,7 +4505,7 @@ class ApiController extends AppController {
 			}
 			$shopping_cart[$i]['data'] = $this->MerchandiseItem->findById($shopping_cart[$i]['item_id']);
 			$item = $shopping_cart[$i]['data']['MerchandiseItem'];
-			$kg += ceil(floatval($item['weight'])) * intval($shopping_cart[$i]['qty']);
+			$kg += floatval($item['weight']) * intval($shopping_cart[$i]['qty']);
 			$total_coins += (intval($shopping_cart[$i]['qty']) * intval($item['price_credit']));
 			//is there any non-digital item ?
 			if($item['merchandise_type']==0){
@@ -3972,6 +4515,7 @@ class ApiController extends AppController {
 				$all_stock_ok = false;
 			}
 		}
+		$kg = ceil($kg);
 		$cash = $this->Game->getCash($fb_id);
 		CakeLog::write('debug',$game_team_id.' cash : '.$cash);
 		CakeLog::write('debug',$game_team_id.' total coins : '.$total_coins);

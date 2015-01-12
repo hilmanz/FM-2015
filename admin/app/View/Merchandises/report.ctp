@@ -45,7 +45,7 @@
 				<table width="100%">
 					<tr>
 						<td width="10%">
-							<input id="pending" type="checkbox" name="n_status[]" value="1">
+							<input id="pending" type="checkbox" name="n_status[]" value="0">
 						</td>
 						<td>
 							<label for="pending">Pending</label>
@@ -53,7 +53,7 @@
 					</tr>
 					<tr>
 						<td>
-							<input id="ready" type="checkbox" name="n_status[]" value="2">
+							<input id="ready" type="checkbox" name="n_status[]" value="1">
 						</td>
 						<td>
 							<label for="ready">Order Accepted, Ready to Ship</label>
@@ -61,7 +61,7 @@
 					</tr>
 					<tr>
 						<td>
-							<input id="delivered" type="checkbox" name="n_status[]" value="3">
+							<input id="delivered" type="checkbox" name="n_status[]" value="2">
 						</td>
 						<td>
 							<label for="delivered">Delivered</label>

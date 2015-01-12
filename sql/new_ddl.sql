@@ -581,3 +581,12 @@ ADD COLUMN `ref_code` VARCHAR(64) NULL AFTER `paid_member_status`;
 
 ALTER TABLE `fantasy`.`users` 
 ADD INDEX `REF_CODE` (`ref_code` ASC);
+
+ALTER TABLE `fantasy`.`activity_logs` 
+ADD COLUMN `ref_code` VARCHAR(64) NULL AFTER `league`;
+
+ALTER TABLE `fantasy`.`activity_logs` 
+ADD INDEX `IDX_REF_CODE` (`ref_code` ASC);
+
+ALTER TABLE `fantasy`.`doku` 
+CHANGE COLUMN `paymentcode` `paymentcode` VARCHAR(50) NULL DEFAULT NULL ;

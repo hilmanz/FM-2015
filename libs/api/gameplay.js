@@ -116,6 +116,79 @@ function getLineup(redisClient,game_team_id,callback){
 	});
 	
 }
+
+//get current lineup setup
+/*function getLineupByMatchday(redisClient,game_team_id,matchday,callback){
+	prepareDb(function(conn){
+		async.waterfall(
+			[
+				function(callback){
+					//check if we have the cached data
+					console.log('LINEUP','CHECKING LINEUP');
+					console.log('LINEUP','REDIS KEY : ','game_team_lineup_'+league+'_'+game_team_id+'_'+matchday);
+					redisClient.get('game_team_lineup_'+league+'_'+game_team_id+'_'+matchday,function(err,lineup){
+						var rs = JSON.parse(lineup);
+						console.log('LINEUP','-->',rs);
+						callback(err,rs);
+					});
+					//
+				},
+				function(cachedData,callback){
+					if(cachedData!=null){
+						callback(null,cachedData);	
+					}else{
+						conn.query("SELECT a.matchday,a.player_id,a.position_no,\
+						b.name,b.position,b.known_name \
+						FROM "+config.database.database+".game_team_lineups a\
+						INNER JOIN "+config.database.database+".master_player b\
+						ON a.player_id = b.uid\
+						INNER JOIN "+config.database.database+".game_team_players c\
+						ON c.game_team_id = a.game_team_id AND\
+						c.player_id = a.player_id\
+						WHERE a.game_team_id=? \
+						AND a.matchday = ? \
+						LIMIT 16;",
+						[game_team_id, matchday],
+						function(err,rs){
+								redisClient.set(
+									'game_team_lineup_'+league+'_'+game_team_id+'_'+matchday
+									,JSON.stringify(rs)
+									,function(err,lineup){
+										console.log('LINEUP','store to cache',rs);
+										callback(err,rs);
+									});
+						});
+					}
+
+					
+				},
+				function(result,callback){
+					conn.query("SELECT formation FROM "+config.database.database+".game_team_formation\
+								WHERE game_team_id = ? LIMIT 1",
+					[game_team_id],
+					function(err,rs){
+							var formation = '4-4-2'; //default formation
+							if(rs.length>0){
+								formation = rs[0].formation;	
+							}
+							callback(err,{
+									lineup:result,
+									formation:formation
+								});
+					});
+				}
+			],
+		function(err,result){
+			conn.release();
+			
+			callback(err,result);
+			
+		});
+	});
+	
+}
+*/
+
 function setLineup(redisClient,game_team_id,setup,formation,done){
 	prepareDb(function(conn){
 		var players = [];
@@ -2661,6 +2734,7 @@ exports.getPlayerDetail = getPlayerDetail;
 exports.getPlayerTeamStats = getPlayerTeamStats;
 exports.getPlayerStats = getPlayerStats;
 exports.getLineup = getLineup;
+//exports.getLineupByMatchday = getLineupByMatchday;
 exports.setLineup = setLineup;
 exports.getPlayers = getPlayers;
 exports.getBudget = getBudget;

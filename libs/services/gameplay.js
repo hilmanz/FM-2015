@@ -27,6 +27,17 @@ exports.getLineup = function(req,res){
 			}
 	});
 }
+/*exports.getLineupByMatchday = function(req,res){
+	gameplay.getLineupByMatchday(req.redisClient,req.params.id,req.params.matchday
+		function(err,rs){
+			if(rs!=null){
+				res.send(200,rs);
+			}else{
+				//send the default configurations
+				res.send(200,{lineup:[],formation:'4-4-2'});
+			}
+	});
+}*/
 exports.getPlayers = function(req,res){
 	gameplay.setRedisClient(req.redisClient);
 	gameplay.getPlayers(req.params.id,function(err,rs){

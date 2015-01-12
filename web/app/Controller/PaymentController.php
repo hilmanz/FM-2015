@@ -137,9 +137,9 @@ class PaymentController extends AppController {
 			{
 				try{
 					//compare transaction_id
-					if($data[3] != $transaction_id){
+					/*if($data[3] != $transaction_id){
 						throw new Exception("Invalid Transaction");
-					}
+					}*/
 
 					$transaction_name = 'Purchase Order #'.$data[3];
 					$transaction_type = 'UNLOCK '.$trx_type;

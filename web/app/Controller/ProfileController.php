@@ -312,6 +312,16 @@ class ProfileController extends AppController {
 	                                                                'fb_id' => $user_fb['fb_id']
 	                                                        )
 	                                                );
+					if($ref_code != NULL){
+						$log_dt = date("Y-m-d H:i:s");
+
+						$this->User->query("INSERT INTO activity_logs(user_id,log_dt,
+										log_type,league,ref_code)
+										VALUES({$rs_user['User']['id']},'{$log_dt}',
+										'REGISTRATION_SUCCESS',NULL,'{$ref_code}')");
+
+
+					}
 	                Cakelog::write('debug','profile.activation rs:'.json_encode($rs));
 					Cakelog::write('debug','profile.activation rs_user:'.json_encode($rs_user));
 					
@@ -640,6 +650,15 @@ class ProfileController extends AppController {
 							$this->User->create();
 							$rs = $this->User->save($data);
 							$user_data = $rs['User'];
+
+							if($ref_code != NULL){
+								$log_dt = date("Y-m-d H:i:s");
+								$this->User->query("INSERT INTO activity_logs(user_id,log_dt,
+												log_type,league,ref_code)
+												VALUES({$user_data['id']},'{$log_dt}',
+												'REGISTER',NULL,'{$ref_code}')");
+							}
+							
 						}
 						
 						if(isset($rs['User']) || isset($check2['User'])){

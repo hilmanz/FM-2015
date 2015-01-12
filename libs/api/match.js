@@ -115,6 +115,7 @@ function getMatchResultForUserTeam(game_team_id,game_id,done){
 											}
 											p[player.player_id] = {
 												name:player.name,
+												game_id:player.game_id,
 												position:player.position,
 												points:total_points,
 												original_team_id : player.original_team_id,

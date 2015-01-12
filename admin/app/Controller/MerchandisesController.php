@@ -924,6 +924,14 @@ class MerchandisesController extends AppController {
 												DATE(order_date) <= "'.$end_date.'"
 												LIMIT 100000');
 
+	        	Cakelog::write('debug', 'Merchandise.export SELECT *
+												FROM merchandise_orders
+												WHERE payment_method IN ("'.$in_payment.'") 
+												AND n_status IN ('.$in_status.') AND
+												DATE(order_date) >= "'.$start_date.'" AND 
+												DATE(order_date) <= "'.$end_date.'"
+												LIMIT 100000');
+
 		        $data = array();
 		        foreach ($rs_report as $key => $value)
 		        {
