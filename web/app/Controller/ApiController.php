@@ -705,6 +705,7 @@ class ApiController extends AppController {
 			foreach ($players['data'] as $key => $value)
 			{
 				$response[] = array('uid' => $key,
+									'game_id' => $value['game_id'],
 									'name' => $value['name'],
 									'points' => $value['points'],
 									'position_no' => $player_position[$key]);
@@ -1097,7 +1098,7 @@ class ApiController extends AppController {
 		
 		$user = $this->User->findByFb_id($fb_id);
 
-		$current_matchday = $this->request->query('gameweek');
+		$game_id = $this->request->query('game_id');
 		
 		if(strlen($user['User']['avatar_img'])<2){
 			$user['User']['avatar_img'] = "http://graph.facebook.com/".$fb_id."/picture";
@@ -1143,24 +1144,8 @@ class ApiController extends AppController {
 
 		$session_id = Configure::read('FM_SESSION_ID');
 
-		if($this->request->query('gameweek') == NULL)
-		{
-			//current matchday
-			$matchday = $this->Game->query("SELECT matchday FROM ".$this->ffgamedb.".game_fixtures a
-												 WHERE period='FullTime' AND is_processed = 1 
-												 AND session_id = '{$session_id}'
-												 ORDER BY matchday DESC LIMIT 1");
-			$current_matchday = $matchday[0]['a']['matchday'];
-		}
 
-		$options = array('fields'=>'game_id',
-			'conditions'=>array('Weekly_point.team_id'=>$user['Team']['id'],
-								'Weekly_point.league'=>$_SESSION['league'],
-								'Weekly_point.matchday'=>$current_matchday),
-	        'limit' => 1);
-		$game_id = $this->Weekly_point->find('all',$options);
-
-		$current_game_id = $game_id[0]['Weekly_point']['game_id'];
+		$current_game_id = $game_id;
 
 		$daily_stats = array();
 		foreach ($rs['data']['daily_stats']['stats'] as $key => $value) {
@@ -7209,6 +7194,8 @@ class ApiController extends AppController {
 		$message = '';
 		if($this->request->is("post"))
 		{
+			Cakelog::write('error', 'api.cash_transaction data'.json_encode($this->request->data));
+
 			$fb_id = $this->request->data['fb_id'];
 			$transaction_name = $this->request->data['transaction_name'];
 			$amount = intval($this->request->data['amount']);
