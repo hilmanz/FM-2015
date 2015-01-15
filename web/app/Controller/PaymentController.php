@@ -20,7 +20,10 @@
  * @since         CakePHP(tm) v 0.2.9
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
-App::uses('Controller', 'Controller');
+
+require_once APP . 'Vendor' . DS. 'lib/Predis/Autoloader.php';
+App::uses('AppController', 'Controller');
+App::uses('Sanitize', 'Utility');
 //require_once APP.DS.'Vendor'.DS.'common.php';
 
 /**
@@ -31,6 +34,7 @@ App::uses('Controller', 'Controller');
  */
 class PaymentController extends AppController {
 	public $name = 'Payment';
+	protected $redisClient;
 
 	public function beforeFilter()
 	{
@@ -39,6 +43,14 @@ class PaymentController extends AppController {
 		$this->loadModel('User');
 		$this->loadModel('MembershipTransactions');
 		$this->loadModel('MerchandiseOrder');
+
+		Predis\Autoloader::register();
+		$this->redisClient = new Predis\Client(array(
+											    'host'     => Configure::read('REDIS.Host'),
+											    'port'     => Configure::read('REDIS.Port'),
+											    'database' => Configure::read('REDIS.Database')
+											));
+
 	}
 
 	//index()
@@ -77,9 +89,14 @@ class PaymentController extends AppController {
 			$transaction_id = intval($rs_user['User']['id']).'-'.date("YmdHis").'-'.rand(0,999);
 			$description = 'Purchase Order #'.$transaction_id;
 
-			$this->Session->write('fb_id_payment', $fb_id);
-			$this->Session->write('trx_type_payment', $trx_type);
-			$this->Session->write('transaction_id_payment', $transaction_id);
+			$data_redis = array(
+								'fb_id' => $fb_id,
+								'payment_type' => $trx_type,
+								'transaction_id' => $transaction_id
+							);
+
+			$this->redisClient->set($transaction_id, serialize($data_redis));
+			$this->redisClient->expire($transaction_id, 24*60*60);//expires in 1 day
 
 			$rs = $this->Game->getEcashUrl(array(
 				'transaction_id'=>$transaction_id,
@@ -88,6 +105,7 @@ class PaymentController extends AppController {
 				'clientIpAddress'=>$this->request->clientIp(),
 				'source'=>'FMPAYMENTMOBILE'
 			));
+			Cakelog::write('debug', 'payment.index rs '.json_encode($rs));
 
 			if($rs['status'] == 1 && $rs['data'] != '')
 			{
@@ -118,11 +136,14 @@ class PaymentController extends AppController {
 		$id = $this->request->query['id'];
 
 		$rs = $this->Game->EcashValidate($id);
-		$fb_id = $this->Session->read('fb_id_payment');
-		$trx_type = $this->Session->read('trx_type_payment');
-		$transaction_id = $this->Session->read('transaction_id_payment');
 
-		$array_session = array('fb_id' => $fb_id, 'trx_type' => $trx_type);
+		$data = explode(',', $rs['data']);
+		$redis_content = unserialize($this->redisClient->get($data[3]));
+
+		$fb_id = $redis_content['fb_id'];
+		$trx_type = $redis_content['payment_type'];
+		$transaction_id = $redis_content['transaction_id'];
+		
 
 		$is_payment = $this->isPayment($fb_id, 'UNLOCK '.$trx_type);
 
@@ -132,14 +153,11 @@ class PaymentController extends AppController {
 
 		if(isset($rs['data']) && $rs['data'] != '')
 		{
-			$data = explode(',', $rs['data']);
 			if(isset($data[4]) && trim($data[4]) == "SUCCESS")
 			{
 				try{
-					//compare transaction_id
-					/*if($data[3] != $transaction_id){
-						throw new Exception("Invalid Transaction");
-					}*/
+
+					$array_session = array('fb_id' => $fb_id, 'trx_type' => $trx_type);
 
 					$transaction_name = 'Purchase Order #'.$data[3];
 					$transaction_type = 'UNLOCK '.$trx_type;
@@ -172,11 +190,13 @@ class PaymentController extends AppController {
 
 					$this->MembershipTransactions->save($save_data);
 
+					$this->redisClient->del($data[3]);
 					$this->redirect($url_scheme.'fmpayment?status=1&message=success');
 
 				}catch(Exception $e){
 					Cakelog::write('error', 'Payment.success 
 						id='.$id.' data:'.json_encode($data).' message:'.$e->getMessage());
+					$this->redisClient->del($data[3]);
 					$this->redirect($url_scheme.'fmpayment?status=0&message=error');
 				}
 			}
@@ -191,7 +211,6 @@ class PaymentController extends AppController {
 			$this->redirect($url_scheme.'fmpayment?status=0&message=Saat ini tidak bisa terhubung dengan mandiri ecash, Silahkan coba beberapa saat lagi');
 		}
 
-		$this->Session->destroy();
 	}
 
 	public function mobile_ongkir_payment($order_id = "")
