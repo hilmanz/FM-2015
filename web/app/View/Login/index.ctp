@@ -32,6 +32,7 @@
       channelUrl : '//<?=$DOMAIN?>/channel.html', // Channel file for x-domain comms
       status     : true,                                 // Check Facebook Login status
       xfbml      : true,                                  // Look for social plugins on the page
+      version    : 'v2.0',
       cookie : true
     });
 
@@ -44,7 +45,7 @@
      var js, fjs = d.getElementsByTagName(s)[0];
      if (d.getElementById(id)) {return;}
      js = d.createElement(s); js.id = id;
-     js.src = "//connect.facebook.net/en_US/all.js";
+     js.src = "//connect.facebook.com/en_US/sdk.js";
      fjs.parentNode.insertBefore(js, fjs);
    }(document, 'script', 'facebook-jssdk'));
 </script>
