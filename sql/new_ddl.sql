@@ -602,3 +602,7 @@ CREATE TABLE `fantasy`.`activity_logs_summary` (
   KEY `IDX_USER_LOG` (`user_id`,`log_dt`,`log_type`),
   KEY `IDX_REF_CODE` (`ref_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+ALTER TABLE `fantasy`.`doku` 
+ADD COLUMN `additionaldata` VARCHAR(45) NULL AFTER `verifystatus`;

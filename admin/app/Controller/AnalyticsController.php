@@ -22,12 +22,12 @@ class AnalyticsController extends AppController {
 
 	public function index(){
 		//get the top teams
-		$team_used = $this->Analytics->team_used();
-		$this->set('team_used',$team_used);
+		//$team_used = $this->Analytics->team_used();
+		//$this->set('team_used',$team_used);
 
 		//get players ordered by the most usage
-		$player_used = $this->Analytics->player_used();
-		$this->set('player_used',$player_used);		
+		//$player_used = $this->Analytics->player_used();
+		//$this->set('player_used',$player_used);		
 
 		//get formation used
 		$formation_used = $this->Analytics->formation_used();

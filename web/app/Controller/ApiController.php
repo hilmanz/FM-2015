@@ -3420,7 +3420,7 @@ class ApiController extends AppController {
 
 			$shopping_cart[$i]['data'] = $this->MerchandiseItem->findById($shopping_cart[$i]['item_id']);
 			$item = $shopping_cart[$i]['data']['MerchandiseItem'];
-			$basket .= $item['name'].','.$item['price_money'].','.$item['id'].','.$item['price_money'].';';
+			$basket .= htmlspecialchars($item['name']).','.$item['price_money'].','.$item['id'].','.$item['price_money'].';';
 			$kg += floatval($item['weight']) * intval($shopping_cart[$i]['qty']);
 			$total_price += (intval($shopping_cart[$i]['qty']) * intval($item['price_money']));
 			$category[$i] = $item['merchandise_category_id'];
@@ -3803,6 +3803,8 @@ class ApiController extends AppController {
 		$rs_doku = $this->Doku->findBySession_id($session_id);
 		$rs_order = $this->MerchandiseOrder->findById($rs_doku['Doku']['catalog_order_id']);
 		$rs_merge = array_merge($rs_doku, $rs_order);
+
+		Cakelog::write('doku', 'get_doku_transaction rs_merge '.json_encode($rs_merge));
 
 		$this->layout = "ajax";
 		$this->set('response', array('status'=>1, 'data'=>$rs_merge));

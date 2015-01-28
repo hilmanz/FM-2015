@@ -892,7 +892,7 @@ class MerchandisesController extends AppController {
 
 			$shopping_cart[$i]['data'] = $this->MerchandiseItem->findById($shopping_cart[$i]['item_id']);
 			$item = $shopping_cart[$i]['data']['MerchandiseItem'];
-			$basket .= $item['name'].','.$item['price_money'].','.$item['id'].','.$item['price_money'].';';
+			$basket .= htmlspecialchars($item['name']).','.$item['price_money'].','.$item['id'].','.$item['price_money'].';';
 			$kg += floatval($item['weight']) * intval($shopping_cart[$i]['qty']);
 			$total_price += (intval($shopping_cart[$i]['qty']) * intval($item['price_money']));
 			$category[$i] = $item['merchandise_category_id'];
@@ -975,6 +975,7 @@ class MerchandisesController extends AppController {
 						  $doku_sharedkey.
 						  str_replace('-', '', $transaction_id));
 		$trx_session_id = sha1(time());
+		$additionaldata = 'fm-onlinecatalog';
 		$data = array('MALLID'=>$doku_mid,
 						'CHAINMERCHANT'=>'NA',
 						'AMOUNT'=>number_format($total_price,2,'.',''),
@@ -987,7 +988,7 @@ class MerchandisesController extends AppController {
 						'SESSIONID'=>$trx_session_id,
 						'NAME'=>$this->request->data['first_name'].' '.$this->request->data['last_name'],
 						'EMAIL'=>$this->request->data['email'],
-						'ADDITIONALDATA'=>encrypt_param($transaction_id),
+						'ADDITIONALDATA'=>'fm-onlinecatalog',
 						'PAYMENTCHANNEL'=>$payment_channel,
 						'BASKET'=>$basket
 						);
@@ -1054,6 +1055,7 @@ class MerchandisesController extends AppController {
 					'verifyid'=>'',
 					'verifyscore'=>'',
 					'verifystatus'=>'',
+					'additionaldata'=>$additionaldata
 			));
 			CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] create doku entry '.json_encode($rs_doku));
 			$dataSource->commit();
@@ -1112,6 +1114,7 @@ class MerchandisesController extends AppController {
 						'verifyid'=>'',
 						'verifyscore'=>'',
 						'verifystatus'=>'',
+						'additionaldata'=>$additionaldata
 				));
 				CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] 
 									update doku entry order_id '.$rs_order['MerchandiseOrder']['id']);
@@ -1135,6 +1138,37 @@ class MerchandisesController extends AppController {
 			$this->redirect($target);	
 		}
 	}
+
+	public function success()
+	{
+		$pending = false;
+		$session_id = decrypt_param($this->request->query['sid']);
+		$rs_doku = $this->get_doku_transaction($session_id);
+		$this->set('rs_doku', $rs_doku);
+		if(isset($this->request->query['pending']))
+		{
+			$pending = true;
+		}
+		$this->set('is_pending', $pending);
+	}
+
+	public function failure()
+	{
+
+	}
+
+	private function get_doku_transaction($session_id)
+	{
+		$this->loadModel("Doku");
+		$this->loadModel("MerchandiseOrder");
+
+		$rs_doku = $this->Doku->findBySession_id($session_id);
+		$rs_order = $this->MerchandiseOrder->findById($rs_doku['Doku']['catalog_order_id']);
+		$rs_merge = array_merge($rs_doku, $rs_order);
+
+		return $rs_merge;
+	}
+
 	public function payment(){
 		
 
