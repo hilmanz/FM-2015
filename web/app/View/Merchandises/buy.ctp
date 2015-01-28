@@ -199,7 +199,9 @@
 							<input type="radio" name="payment_method" value="coins" checked="checked"/> Coins
 							<?php endif;?>
 							<?php if($can_use_ecash):?>
-							<input type="radio" name="payment_method" value="ecash"/> Ecash Mandiri (Rupiah)
+							<input type="radio" name="payment_method" value="ecash"/> Ecash Mandiri (Rupiah)<br />
+							<input type="radio" name="payment_method" value="bank_transfer"/> Transfer Bank<br />
+							<input type="radio" name="payment_method" value="kartu_kredit"/> Kartu Kredit(Visa/Master)
 							<?php endif;?>
 							</div>
 						</div><!-- end .row -->

@@ -479,6 +479,8 @@ class AppController extends Controller {
 
 		if($this->request->params['action']!='auth' && $this->request->params['action'] != 'login'){
 			$access_token = @$_REQUEST['access_token'];
+			print_r($_REQUEST);
+			exit();
 
 			
 			if(!$this->validateAPIAccessToken($access_token) || strlen($access_token) < 2){

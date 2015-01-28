@@ -346,8 +346,18 @@ class ProfileController extends AppController {
 
 	public function success_page()
 	{
+		$this->loadModel('User');
+		$user_fb = $this->Session->read('Userlogin.info');
+		$rs_user = $this->User->findByFb_id($user_fb['fb_id']);
+
 		$ref_code = $this->Session->read('REF_CODE');
 		$this->set('ref_code', $ref_code);
+		$log_dt = date("Y-m-d H:i:s");
+		
+		$this->User->query("INSERT INTO activity_logs(user_id,log_dt,
+										log_type,league,ref_code)
+										VALUES({$rs_user['User']['id']},'{$log_dt}',
+										'SUCCESS_PAGE',NULL,'{$ref_code}')");
 	}
 
 	public function create_team(){

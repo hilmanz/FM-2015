@@ -590,3 +590,15 @@ ADD INDEX `IDX_REF_CODE` (`ref_code` ASC);
 
 ALTER TABLE `fantasy`.`doku` 
 CHANGE COLUMN `paymentcode` `paymentcode` VARCHAR(50) NULL DEFAULT NULL ;
+
+CREATE TABLE `fantasy`.`activity_logs_summary` (
+  `id` bigint(21) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(21) DEFAULT NULL,
+  `log_dt` datetime DEFAULT NULL,
+  `log_type` varchar(64) DEFAULT 'LOGIN',
+  `league` varchar(5) DEFAULT 'epl',
+  `ref_code` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IDX_USER_LOG` (`user_id`,`log_dt`,`log_type`),
+  KEY `IDX_REF_CODE` (`ref_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

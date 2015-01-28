@@ -7,14 +7,15 @@ class ActivityLogComponent extends Component {
       
         $this->model = $controller->ActivityLogs;
 	}
-    public function writeLog($user_id, $activity) {
+    public function writeLog($user_id, $activity, $ref_code = NULL) {
 
         $this->model->create();
         $this->model->save(array(
         		'user_id'=>$user_id,
         		'log_dt'=>date("Y-m-d H:i:s"),
         		'log_type'=>$activity,
-                'league'=>$_SESSION['league']
+                'league'=>$_SESSION['league'],
+                'ref_code' => $ref_code
         	));
     }
 

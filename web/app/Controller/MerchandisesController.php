@@ -485,10 +485,13 @@ class MerchandisesController extends AppController {
 		}
 		//recheck the stock of all items.
 		$stock_status = $this->recheckStockBeforePayment();
-		$po_number = $this->userData['team']['id'].'-'.date("ymdhis");
-		$this->Session->write('PO_NUMBER',$po_number);
 
-		Cakelog::write('debug', 'Merchandise.buy - write po_number:'.$po_number.' team id:'.$this->userData['team']['id']);
+		if($this->Session->read('PO_NUMBER') == NULL){
+			$po_number = $this->userData['team']['id'].'-'.date("ymdhis");
+			$this->Session->write('PO_NUMBER',$po_number);
+		}
+
+		Cakelog::write('debug', 'Merchandise.buy - write po_number:'.$this->Session->read('PO_NUMBER').' team id:'.$this->userData['team']['id']);
 
 		if($stock_status){
 
@@ -530,12 +533,12 @@ class MerchandisesController extends AppController {
 
 			$this->set('can_use_ecash',$can_use_ecash);
 			$this->set('can_use_coin',$can_use_coin);
-			$this->set('po_number',$po_number);
+			$this->set('po_number',$this->Session->read('PO_NUMBER'));
 
 
 			//book item stocks
 			//display the cart content
-			$this->book_items($shopping_cart,$po_number);
+			$this->book_items($shopping_cart,$this->Session->read('PO_NUMBER'));
 		}else{
 
 		}
@@ -667,7 +670,17 @@ class MerchandisesController extends AppController {
 				{
 					$this->process_with_coins($po_number);
 				}
-			}else{
+			}
+			else if($this->request->data['payment_method']=='bank_transfer' || 
+				$this->request->data['payment_method']=='kartu_kredit')
+			{
+				$this->pay_with_doku($po_number);
+				$doku_api = Configure::read('DOKU_API');
+				$this->set('doku_api', $doku_api);
+				$this->render('doku');
+			}
+			else
+			{
 				$this->pay_with_ecash($po_number);
 				$this->render('ecash');
 			}
@@ -833,6 +846,287 @@ class MerchandisesController extends AppController {
 		$view = new View();
 		$this->set('ecash_url',$view->Html->url('/merchandises/ecash?r='.$hashed_url));
 	}
+
+	private function pay_with_doku($po_number){
+
+		$this->loadModel('MerchandiseItem');
+		$this->loadModel('MerchandiseCategory');
+		$this->loadModel('MerchandiseOrder');
+		$this->loadModel('Doku');
+
+		//attach chosen delivery city
+		$this->set('city_id',$this->Session->read('city_id'));
+
+		$profile_order	 		= $this->request->data;
+
+		//attach ongkos kirim list.
+		$this->getOngkirList();
+
+		$result = array('is_transaction_ok'=>false,
+						'no_fund'=>false);
+
+		$payment_channel = '01';
+		if($this->request->data['payment_method'] == "bank_transfer")
+		{
+			$payment_channel = '05';
+		}
+
+		//display the cart content
+		$shopping_cart = $this->Session->read('shopping_cart');
+
+		CakeLog::write('doku','doku_create_order '.json_encode($this->request->data));
+
+		$transaction_id = $po_number;
+		
+		$description = 'Purchase Order #'.$transaction_id;
+		$user_login = $this->Session->read('Userlogin');
+		$fb_id = $user_login['info']['fb_id'];
+
+		//get total money to be spent.
+		$total_price = 0;
+		$all_digital = true;
+		$kg = 0;
+		$category = array();
+		$basket = "Pembelian ";
+		for($i=0;$i<sizeof($shopping_cart);$i++){
+
+			$shopping_cart[$i]['data'] = $this->MerchandiseItem->findById($shopping_cart[$i]['item_id']);
+			$item = $shopping_cart[$i]['data']['MerchandiseItem'];
+			$basket .= $item['name'].','.$item['price_money'].','.$item['id'].','.$item['price_money'].';';
+			$kg += floatval($item['weight']) * intval($shopping_cart[$i]['qty']);
+			$total_price += (intval($shopping_cart[$i]['qty']) * intval($item['price_money']));
+			$category[$i] = $item['merchandise_category_id'];
+			//is there any non-digital item ?
+			if($item['merchandise_type']==0){
+				$all_digital = false;
+			}
+		}
+		$basket = rtrim($basket,',');
+		$kg = ceil($kg);
+		
+		$admin_fee = Configure::read('PO_ADMIN_FEE');
+		$enable_ongkir = true;
+		if(count($shopping_cart) > 1)
+		{
+			$admin_fee = Configure::read('PO_ADMIN_FEE');
+		}
+		else
+		{
+			//check enable or disable admin fee
+			$rs_adminfee = $shopping_cart[0]['data']['MerchandiseItem'];
+			if($rs_adminfee['enable_admin_fee'] != 1)
+			{
+				$admin_fee = 0;
+			}
+			else
+			{
+				//check value of admin_fee
+				if($rs_adminfee['admin_fee'] == 0)
+				{
+					$admin_fee = Configure::read('PO_ADMIN_FEE');
+				}
+				else
+				{
+					$admin_fee = $rs_adminfee['admin_fee'];
+				}
+			}
+
+			//check ongkir
+			if($rs_adminfee['enable_ongkir'] == 0)
+			{
+				$enable_ongkir = false;
+			}
+		}
+
+
+		if($all_digital){
+			$admin_fee = 0;
+		}
+		$total_price += $admin_fee;
+
+		//include ongkir
+		$total_ongkir = 0;
+		if($enable_ongkir)
+		{
+			foreach($this->ongkirList as $ongkir){
+				if($ongkir['Ongkir']['id'] == intval($this->Session->read('city_id'))){
+					$total_ongkir = intval($ongkir['Ongkir']['cost']);
+					break;
+				}
+			}
+		}
+
+		$total_price += ($kg*$total_ongkir);
+		
+		$this->set('transaction_id',$transaction_id);
+		$this->set('shopping_cart',$shopping_cart);
+		//add shipping and handling cost
+		$this->set('admin_fee',$admin_fee);
+		$this->set('enable_ongkir', $enable_ongkir);
+
+		$transaction_data = array('profile'=>$this->request->data,
+								 'shopping_cart'=>$shopping_cart,
+								 'base_ongkir_value'=>$total_ongkir);
+
+		$doku_mid = Configure::read('DOKU_MALLID');
+		$doku_sharedkey = Configure::read('DOKU_SHAREDKEY');
+		$hash_words = sha1(number_format($total_price,2,'.','').
+						  $doku_mid.
+						  $doku_sharedkey.
+						  str_replace('-', '', $transaction_id));
+		$trx_session_id = sha1(time());
+		$data = array('MALLID'=>$doku_mid,
+						'CHAINMERCHANT'=>'NA',
+						'AMOUNT'=>number_format($total_price,2,'.',''),
+						'PURCHASEAMOUNT'=>number_format($total_price,2,'.',''),
+						'TRANSIDMERCHANT'=>str_replace('-', '', $transaction_id),
+						'WORDS'=>$hash_words,
+						'REQUESTDATETIME'=>date("YmdHis"),
+						'CURRENCY'=>'360',
+						'PURCHASECURRENCY'=>'360',
+						'SESSIONID'=>$trx_session_id,
+						'NAME'=>$this->request->data['first_name'].' '.$this->request->data['last_name'],
+						'EMAIL'=>$this->request->data['email'],
+						'ADDITIONALDATA'=>encrypt_param($transaction_id),
+						'PAYMENTCHANNEL'=>$payment_channel,
+						'BASKET'=>$basket
+						);
+
+		try{
+
+			$rs_order = $this->MerchandiseOrder->findByPo_number($transaction_id);
+			$rs_user = $this->User->findByFb_id($fb_id);
+			$dataSource = $this->MerchandiseOrder->getDataSource();
+			$dataSource->begin();
+
+			$payment_method = 'cc';
+			if($payment_channel != '01'){
+				$payment_method = 'va';
+			}
+			if(count($rs_order) > 0){
+				$rs_doku = $this->Doku->findByPo_number($transaction_id);
+				throw new Exception("entry already exists");
+			}
+
+			$this->MerchandiseOrder->create();
+			$rs_order = $this->MerchandiseOrder->save(array(
+					'fb_id'=>$fb_id,
+					'po_number'=>$transaction_id,
+					'game_team_id'=>intval($this->userData['team']['id']),
+					'user_id'=>$rs_user['User']['id'],
+					'first_name'=>$this->request->data['first_name'],
+					'last_name'=>$this->request->data['last_name'],
+					'ktp'=>$this->request->data['ktp'],
+					'email'=>$this->request->data['email'],
+					'phone'=>$this->request->data['phone'],
+					'city'=>$this->request->data['city'],
+					'address'=>$this->request->data['address'],
+					'province'=>$this->request->data['province'],
+					'country'=>$this->request->data['country'],
+					'zip'=>$this->request->data['zip'],
+					'order_date'=>date('Y-m-d H:i:s'),
+					'data'=>serialize($shopping_cart),
+					'payment_method'=>$payment_method,
+					'total_sale'=>$total_price,
+					'ongkir_id'=>$this->Session->read('city_id'),
+					'ongkir_value' => $total_ongkir,
+					'n_status' => 0
+			));
+
+
+			$this->Doku->create();
+			$rs_doku = $this->Doku->save(array(
+					'catalog_order_id'=>$this->MerchandiseOrder->getInsertID(),
+					'po_number'=>$transaction_id,
+					'transidmerchant'=>str_replace('-', '', $transaction_id),
+					'totalamount'=>number_format($total_price,2,'.',''),
+					'words'=>$hash_words,
+					'statustype'=>'',
+					'response_code'=>'',
+					'approvalcode'=>'',
+					'trxstatus'=>'Requested',
+					'payment_channel'=>$payment_channel,
+					'paymentcode'=>'',
+					'session_id'=>$trx_session_id,
+					'bank_issuer'=>'',
+					'creditcard'=>'',
+					'payment_date_time'=>date("Y-m-d H:i:s"),
+					'verifyid'=>'',
+					'verifyscore'=>'',
+					'verifystatus'=>'',
+			));
+			CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] create doku entry '.json_encode($rs_doku));
+			$dataSource->commit();
+
+		}catch(Exception $e){
+			$dataSource->rollback();
+			CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] error '.$e->getMessage());
+
+			try{
+				$dataSource2 = $this->MerchandiseOrder->getDataSource();
+				$dataSource2->begin();
+				//update
+				$this->MerchandiseOrder->id = $rs_order['MerchandiseOrder']['id'];
+
+				$this->MerchandiseOrder->save(array(
+						'fb_id'=>$fb_id,
+						'po_number'=>$transaction_id,
+						'game_team_id'=>intval($this->userData['team']['id']),
+						'user_id'=>$rs_user['User']['id'],
+						'first_name'=>$this->request->data['first_name'],
+						'last_name'=>$this->request->data['last_name'],
+						'ktp'=>$this->request->data['ktp'],
+						'email'=>$this->request->data['email'],
+						'phone'=>$this->request->data['phone'],
+						'city'=>$this->request->data['city'],
+						'address'=>$this->request->data['address'],
+						'province'=>$this->request->data['province'],
+						'country'=>$this->request->data['country'],
+						'zip'=>$this->request->data['zip'],
+						'order_date'=>date('Y-m-d H:i:s'),
+						'data'=>serialize($shopping_cart),
+						'payment_method'=>$payment_method,
+						'total_sale'=>$total_price,
+						'ongkir_id'=>$this->Session->read('city_id'),
+						'ongkir_value' => $total_ongkir,
+						'n_status' => 0
+				));
+
+				$this->Doku->id = $rs_doku['Doku']['id'];
+		    	$this->Doku->save(array(
+						'catalog_order_id'=>$rs_order['MerchandiseOrder']['id'],
+						'po_number'=>$transaction_id,
+						'transidmerchant'=>str_replace('-', '', $transaction_id),
+						'totalamount'=>number_format($total_price,2,'.',''),
+						'words'=>$hash_words,
+						'statustype'=>'',
+						'response_code'=>'',
+						'approvalcode'=>'',
+						'trxstatus'=>'Requested',
+						'payment_channel'=>$payment_channel,
+						'paymentcode'=>'',
+						'session_id'=>$trx_session_id,
+						'bank_issuer'=>'',
+						'creditcard'=>'',
+						'payment_date_time'=>date("Y-m-d H:i:s"),
+						'verifyid'=>'',
+						'verifyscore'=>'',
+						'verifystatus'=>'',
+				));
+				CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] 
+									update doku entry order_id '.$rs_order['MerchandiseOrder']['id']);
+				$dataSource2->commit();
+			}catch(Exception $e2){
+				$dataSource2->rollback();
+				//overide data variable
+				$data = NULL;
+				CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] error doku entry '.json_encode($rs_doku));
+			}
+		}
+		$this->set('order_doku', $data);
+
+	}
+
 	public function ecash(){
 		//on the last minute, we recheck the stock again, just for sure.
 		$stock_status = $this->recheckStockBeforePayment();

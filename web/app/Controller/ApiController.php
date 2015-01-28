@@ -6343,7 +6343,8 @@ class ApiController extends AppController {
 					  'birthdate'=>$data['birthdate'],
 					  'n_status'=>0,
 					  'register_completed'=>0,
-					  'activation_code' => date("Ymdhis").rand(100, 999)
+					  'activation_code' => date("Ymdhis").rand(100, 999),
+					  'ref_code' => $data['ref_code']
 					  );
 
 		//make sure that the fb_id is unregistered
@@ -6375,6 +6376,7 @@ class ApiController extends AppController {
 
 					$rs = $this->User->save($data_save);
 					$user_data = $rs['User'];
+					$this->ActivityLog->writeLog($user_data['id'], 'REGISTER', $data['ref_code']);
 
 					$this->User->query("INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
 										(fb_id,transaction_dt,transaction_name,amount,details)

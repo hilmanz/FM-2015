@@ -139,7 +139,7 @@ class Stats extends AppModel {
 	private function getMatchResults($team_id,$competition_id,$season_id){
 		$sql = "SELECT game_id,matchday,period,result_winner,home_team,home_score,away_team,away_score 
 				FROM optadb.matchinfo 
-				WHERE competition_id = '{$competition_id}' AND season_id={$season_id} 
+				WHERE competition_id IN ('c8','c21') AND season_id={$season_id} 
 				AND (home_team='{$team_id}' OR away_team='{$team_id}') 
 				LIMIT 50";
 		return $this->query($sql,false);
@@ -156,7 +156,7 @@ class Stats extends AppModel {
 	public function getGameIds($competition_id,$season_id){
 		$sql = "SELECT game_id
 				FROM optadb.matchinfo 
-				WHERE competition_id = '{$competition_id}' AND season_id={$season_id}
+				WHERE competition_id IN ('c8','c21') AND season_id={$season_id}
 				LIMIT 400";
 		$rs = $this->query($sql,false);
 		$game_ids = array();
@@ -169,7 +169,7 @@ class Stats extends AppModel {
 	public function getPlayerOnlyGameIds($player_id,$competition_id,$season_id){
 		$sql = "SELECT game_id
 				FROM optadb.matchinfo a
-				WHERE competition_id = '{$competition_id}' AND season_id={$season_id}
+				WHERE competition_id IN ('c8','c21') AND season_id={$season_id}
 				AND EXISTS (SELECT 1 FROM optadb.player_stats b 
 							WHERE b.game_id = a.game_id AND player_id='{$player_id}')
 				AND period='FullTime' LIMIT 400";
