@@ -1141,6 +1141,8 @@ class MerchandisesController extends AppController {
 
 	public function success()
 	{
+		$this->Session->delete('shopping_cart');
+		$this->Session->delete('city_id');
 		$pending = false;
 		$session_id = decrypt_param($this->request->query['sid']);
 		$rs_doku = $this->get_doku_transaction($session_id);
@@ -1154,7 +1156,8 @@ class MerchandisesController extends AppController {
 
 	public function failure()
 	{
-
+		$this->Session->delete('shopping_cart');
+		$this->Session->delete('city_id');
 	}
 
 	private function get_doku_transaction($session_id)

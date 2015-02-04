@@ -606,3 +606,11 @@ CREATE TABLE `fantasy`.`activity_logs_summary` (
 
 ALTER TABLE `fantasy`.`doku` 
 ADD COLUMN `additionaldata` VARCHAR(45) NULL AFTER `verifystatus`;
+
+ALTER TABLE `fantasy`.`membership_transactions` 
+DROP INDEX `UNIQUE_TRANSACTION` ,
+ADD UNIQUE INDEX `UNIQUE_TRANSACTION` (`transaction_name` ASC);
+
+ALTER TABLE `fantasy`.`membership_transactions` 
+ADD COLUMN `n_status` INT(1) NULL DEFAULT 1 AFTER `league`;
+
