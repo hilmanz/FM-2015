@@ -353,11 +353,13 @@ class ProfileController extends AppController {
 		$ref_code = $this->Session->read('REF_CODE');
 		$this->set('ref_code', $ref_code);
 		$log_dt = date("Y-m-d H:i:s");
-		
-		$this->User->query("INSERT INTO activity_logs(user_id,log_dt,
+		if(isset($rs_user['User'])){
+			$this->User->query("INSERT IGNORE INTO activity_logs(user_id,log_dt,
 										log_type,league,ref_code)
 										VALUES({$rs_user['User']['id']},'{$log_dt}',
-										'SUCCESS_PAGE',NULL,'{$ref_code}')");
+										'SUCCESS_PAGE',NULL,'{$ref_code}');");
+		}
+		
 	}
 
 	public function create_team(){
@@ -984,7 +986,7 @@ class ProfileController extends AppController {
 		$mail->SMTPAuth = true;
 		$mail->Username = $Email->config()['username'];
 		$mail->Password = $Email->config()['password'];
-		$mail->SMTPSecure = ($Email->config()['tls']) ? 'tls' : '';
+		$mail->SMTPSecure = (@$Email->config()['tls']) ? 'tls' : '';
 		$mail->Port = $Email->config()['port'];                     
 
 		$mail->From = $Email->config()['from'];

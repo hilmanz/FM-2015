@@ -60,12 +60,16 @@ class EmailConfig {
 
 	public $smtp = array(
 		'transport' => 'Smtp',
-	    'host' => 'sg.supersoccer.co.id',
-	    'port' => 587,
-	    'username' => 'test',
-	    'password' => 'password',
-	    'log' => true,
-	    'tls' => true
+		'from' => array('postmaster@sandbox41bb8d0d9d124f7b9372803938eeb394.mailgun.org' => 'My Site'),
+		'host' => 'smtp.mailgun.org',
+		'port' => 25,
+		'timeout' => 30,
+		'username' => 'postmaster@sandbox41bb8d0d9d124f7b9372803938eeb394.mailgun.org',
+		'password' => 'f2702907229b92aadb202554b87281e8',
+		'client' => null,
+		'log' => false,
+		'charset' => 'utf-8',
+		'headerCharset' => 'utf-8',
 	);
 
 
