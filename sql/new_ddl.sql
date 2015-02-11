@@ -614,3 +614,6 @@ ADD UNIQUE INDEX `UNIQUE_TRANSACTION` (`transaction_name` ASC);
 ALTER TABLE `fantasy`.`membership_transactions` 
 ADD COLUMN `n_status` INT(1) NULL DEFAULT 1 AFTER `league`;
 
+
+/*fix bug rank and points melambat */
+ALTER TABLE `fantasy`.`game_transactions` ADD INDEX `IDX_FB_ID` (`fb_id`);
