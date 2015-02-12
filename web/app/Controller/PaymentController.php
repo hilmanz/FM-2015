@@ -66,7 +66,7 @@ class PaymentController extends AppController {
 
 		if($this->request->query('fb_id') == NULL && $this->request->query('trx_type') == NULL)
 		{
-			$this->redirect($url_scheme.'fmpayment?status=1&message=Already, owned !');
+			$this->redirect($url_scheme.'fmpayment?status=0&message=Terjadi Kesalahan !');
 		}
 
 		$fb_id = trim($this->request->query('fb_id'));
@@ -74,8 +74,9 @@ class PaymentController extends AppController {
 
 		$is_payment = $this->isPayment($fb_id, 'UNLOCK '.$trx_type);
 
-		if($is_payment){
-			$this->redirect($url_scheme.'fmpayment?status=0&message=Terjadi Kesalahan !');
+		if($is_payment)
+		{
+			$this->redirect($url_scheme.'fmpayment?status=0&message=Already, owned !');
 		}
 
 		if(array_key_exists($trx_type, $charge))
@@ -213,6 +214,133 @@ class PaymentController extends AppController {
 
 	}
 
+	//doku fm payment like trivia, unlock catalog 123, ongkir payment
+
+	public function doku()
+	{
+		$this->loadModel('Doku');
+		$charge = Configure::read('MOBILE_CHARGE');
+		$url_scheme = Configure::read('URL_SCHEME');
+
+		if($this->request->query('fb_id') == NULL 
+			&& $this->request->query('trx_type') == NULL
+			&& $this->request->query('payment_method') == NULL)
+		{
+			$this->redirect($url_scheme.'fmpayment?status=0&message=Terjadi Kesalahan !');
+		}
+
+		$fb_id = trim($this->request->query('fb_id'));
+		$trx_type = strtoupper($this->request->query('trx_type'));
+		$payment_method = trim($this->request->query('payment_method'));
+
+		$is_payment = $this->isPayment($fb_id, 'UNLOCK '.$trx_type);
+
+		if($is_payment)
+		{
+			$this->redirect($url_scheme.'fmpayment?status=1&message=Already, owned !');
+		}
+
+		if(array_key_exists($trx_type, $charge))
+		{
+			$amount = $charge[$trx_type];
+
+			$rs_user = $this->User->findByFb_id($fb_id);
+
+			$payment_channel = '01';
+			if($payment_method == "va")
+			{
+				$payment_channel = '05';
+			}
+
+
+			//todo
+			//if rs_user empty handle this
+			$transaction_id = intval($rs_user['User']['id']).'-'.rand(0,999);
+			$transaction_id_merchant = str_replace('-', '', $transaction_id);
+
+			$doku_api = Configure::read('DOKU_API');
+			$doku_mid = Configure::read('DOKU_MALLID');
+			$doku_sharedkey = Configure::read('DOKU_SHAREDKEY');
+			$hash_words = sha1(number_format($amount,2,'.','').
+							  $doku_mid.
+							  $doku_sharedkey.
+							  $transaction_id_merchant);
+			$trx_session_id = sha1(time());
+			$additionaldata = 'app-purchase';
+			$basket = 'UNLOCK '.$trx_type.','.$amount.','.$amount.','.$amount.';';
+
+			$doku_param = array('MALLID'=>$doku_mid,
+								'CHAINMERCHANT'=>'NA',
+								'AMOUNT'=>number_format($amount,2,'.',''),
+								'PURCHASEAMOUNT'=>number_format($amount,2,'.',''),
+								'TRANSIDMERCHANT'=>$transaction_id_merchant,
+								'WORDS'=>$hash_words,
+								'REQUESTDATETIME'=>date("YmdHis"),
+								'CURRENCY'=>'360',
+								'PURCHASECURRENCY'=>'360',
+								'SESSIONID'=>$trx_session_id,
+								'NAME'=>$rs_user['User']['name'],
+								'EMAIL'=>$rs_user['User']['email'],
+								'ADDITIONALDATA'=>$additionaldata,
+								'PAYMENTCHANNEL'=>$payment_channel,
+								'BASKET'=>$basket,
+							);
+
+			$doku_data = array(
+							'catalog_order_id'=>NULL,
+							'po_number'=>$transaction_id,
+							'transidmerchant'=>$transaction_id_merchant,
+							'totalamount'=>number_format($amount,2,'.',''),
+							'words'=>$hash_words,
+							'statustype'=>'',
+							'response_code'=>'',
+							'approvalcode'=>'',
+							'trxstatus'=>'Requested',
+							'payment_channel'=>$payment_channel,
+							'paymentcode'=>'',
+							'session_id'=>$trx_session_id,
+							'bank_issuer'=>'',
+							'creditcard'=>'',
+							'payment_date_time'=>date("Y-m-d H:i:s"),
+							'verifyid'=>'',
+							'verifyscore'=>'',
+							'verifystatus'=>'',
+							'additionaldata'=>$additionaldata
+					);
+
+			//save to Doku table
+			$this->Doku->create();
+			$rs_doku = $this->Doku->save($doku_data);
+
+			$data_redis = array('doku_data' => $doku_data,
+								'doku_param' => $doku_param,
+								'fb_id' => $fb_id,
+								'trx_type' => $trx_type,
+								'amount' => $amount
+								);
+
+
+
+			$this->redisClient->set($transaction_id_merchant, serialize($data_redis));
+
+			$this->redisClient->expire($transaction_id_merchant, 24*60*60);//expires in 1 day
+			if($payment_channel == '05')
+			{
+				$this->redisClient->expire($transaction_id_merchant, 6*60*60);//expires in 6 hours
+			}
+			
+			Cakelog::write('debug', 'payment.doku data_redis '.json_encode($data_redis));
+
+			$this->set('doku_param', $doku_param);
+			$this->set('doku_api', $doku_api);
+			$this->set('basket', 'UNLOCK '.$trx_type);
+		}
+		else
+		{
+			$this->redirect($url_scheme.'fmpayment?status=0&message=Terjadi Kesalahan !');
+		}
+	}
+
 	public function mobile_ongkir_payment($order_id = "")
 	{
 		$url_scheme = Configure::read('URL_SCHEME');
@@ -227,33 +355,131 @@ class PaymentController extends AppController {
 		if(count($rs_order) > 0)
 		{
 			$rs_user = $this->User->findByFb_id($rs_order['MerchandiseOrder']['fb_id']);
-			
-			//todo
-			//if rs_user empty handle this
-			$transaction_id = intval($rs_user['User']['id']).'-'.date("YmdHis").'-'.rand(0,999);
-			$description = 'Purchase Order #'.$transaction_id;
-
-			$this->Session->write('order_id_payment', $order_id);
-			$this->Session->write('transaction_id_payment', $transaction_id);
-
-			$amount = $rs_order['MerchandiseOrder']['ongkir_value'] + $admin_fee_ongkir;
-
-			$rs = $this->Game->getEcashUrl(array(
-				'transaction_id'=>$transaction_id,
-				'description'=>$description,
-				'amount'=>$amount,
-				'clientIpAddress'=>$this->request->clientIp(),
-				'source'=>'FMONGKIRPAYMENTMOBILE'
-			));
-
-			if($rs['status'] == 1 && $rs['data'] != '')
+			$payment_method = $this->request->query('payment_method');
+			if($payment_method !== NULL)
 			{
-				$this->redirect($rs['data']);
+				$this->loadModel('Doku');
+				$payment_channel = '01';
+				if($payment_method == "va")
+				{
+					$payment_channel = '05';
+				}
+
+				$transaction_id = intval($rs_user['User']['id']).'-0000'.date("YmdHis").'-'.rand(0,999);
+				$transaction_id_merchant = str_replace('-', '', $transaction_id);
+				$amount = $rs_order['MerchandiseOrder']['ongkir_value'] + $admin_fee_ongkir;
+
+				$doku_api = Configure::read('DOKU_API');
+				$doku_mid = Configure::read('DOKU_MALLID');
+				$doku_sharedkey = Configure::read('DOKU_SHAREDKEY');
+				$hash_words = sha1(number_format($amount,2,'.','').
+								  $doku_mid.
+								  $doku_sharedkey.
+								  $transaction_id_merchant);
+				$trx_session_id = sha1(time());
+				$additionaldata = 'mobile-ongkir-payment';
+				$po_number = $rs_order['MerchandiseOrder']['po_number'];
+				$basket = 'ONGKIR PAYMENT PO#'.$po_number.','.$amount.','.$amount.','.$amount.';';
+
+				$doku_param = array('MALLID'=>$doku_mid,
+									'CHAINMERCHANT'=>'NA',
+									'AMOUNT'=>number_format($amount,2,'.',''),
+									'PURCHASEAMOUNT'=>number_format($amount,2,'.',''),
+									'TRANSIDMERCHANT'=>$transaction_id_merchant,
+									'WORDS'=>$hash_words,
+									'REQUESTDATETIME'=>date("YmdHis"),
+									'CURRENCY'=>'360',
+									'PURCHASECURRENCY'=>'360',
+									'SESSIONID'=>$trx_session_id,
+									'NAME'=>$rs_user['User']['name'],
+									'EMAIL'=>$rs_user['User']['email'],
+									'ADDITIONALDATA'=>$additionaldata,
+									'PAYMENTCHANNEL'=>$payment_channel,
+									'BASKET'=>$basket,
+								);
+
+				$doku_data = array(
+								'catalog_order_id'=>$rs_order['MerchandiseOrder']['id'],
+								'po_number'=>$po_number,
+								'transidmerchant'=>$transaction_id_merchant,
+								'totalamount'=>number_format($amount,2,'.',''),
+								'words'=>$hash_words,
+								'statustype'=>'',
+								'response_code'=>'',
+								'approvalcode'=>'',
+								'trxstatus'=>'Requested',
+								'payment_channel'=>$payment_channel,
+								'paymentcode'=>'',
+								'session_id'=>$trx_session_id,
+								'bank_issuer'=>'',
+								'creditcard'=>'',
+								'payment_date_time'=>date("Y-m-d H:i:s"),
+								'verifyid'=>'',
+								'verifyscore'=>'',
+								'verifystatus'=>'',
+								'additionaldata'=>$additionaldata
+						);
+
+				//save to Doku table
+				$this->Doku->create();
+				$rs_doku = $this->Doku->save($doku_data);
+
+				$data_redis = array('doku_data' => $doku_data,
+									'doku_param' => $doku_param,
+									'order_id' => $order_id,
+									'trx_type' => $basket,
+									'amount' => $amount
+									);
+
+
+
+				$this->redisClient->set($transaction_id_merchant, serialize($data_redis));
+
+				$this->redisClient->expire($transaction_id_merchant, 24*60*60);//expires in 1 day
+				if($payment_channel == '05')
+				{
+					$this->redisClient->expire($transaction_id_merchant, 6*60*60);//expires in 6 hours
+				}
+
+				$this->set('doku_param', $doku_param);
+				$this->set('doku_api', $doku_api);
+				$this->set('basket', 'ONGKIR PAYMENT PO#'.$po_number);
+
+				Cakelog::write('debug', 'payment.mobile_ongkir_payment data_redis '.json_encode($data_redis));
+				$this->render('doku_ongkir_payment');
+
 			}
 			else
 			{
-				$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=Saat ini tidak bisa terhubung dengan mandiri ecash, Silahkan coba beberapa saat lagi');
+				//todo
+				//if rs_user empty handle this
+				$transaction_id = intval($rs_user['User']['id']).'-'.date("YmdHis").'-'.rand(0,999);
+				$description = 'Purchase Order #'.$transaction_id;
+
+				$this->Session->write('order_id_payment', $order_id);
+				$this->Session->write('transaction_id_payment', $transaction_id);
+
+				$amount = $rs_order['MerchandiseOrder']['ongkir_value'] + $admin_fee_ongkir;
+
+				$rs = $this->Game->getEcashUrl(array(
+					'transaction_id'=>$transaction_id,
+					'description'=>$description,
+					'amount'=>$amount,
+					'clientIpAddress'=>$this->request->clientIp(),
+					'source'=>'FMONGKIRPAYMENTMOBILE'
+				));
+
+				if($rs['status'] == 1 && $rs['data'] != '')
+				{
+					$this->redirect($rs['data']);
+				}
+				else
+				{
+					$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=Saat ini tidak bisa terhubung dengan mandiri ecash, Silahkan coba beberapa saat lagi');
+				}
 			}
+
+			
 		}
 		else
 		{

@@ -718,7 +718,7 @@ class ApiController extends AppController {
 		else
 		{
 			$this->set('response',array('status'=>1,'data' => null, 
-										'message'=>'Loe nggak pasang formasi untuk pertandingan ini!'));
+										'message'=>'Point loe sedang di proses atau loe gak pasang formasi di matchday ini'));
 		}
 		
 		$this->render('default');
@@ -3712,7 +3712,7 @@ class ApiController extends AppController {
    		    	throw new Exception("INVALID WORDS");
    		    }
 
-	    	if($doku['Doku']['trxstatus']=='Requested' && $doku['Doku']['session_id'] == $session_id)
+	    	if($doku['Doku']['trxstatus']=='Requested' && $doku['Doku']['session_id'] == $session_id && $status != 'FAILED')
 	    	{
 		    	CakeLog::write('doku','api.doku_notify - '.date("Y-m-d H:i:s").' - FOUND TRANSACTION : '.json_encode($data));
 
@@ -3735,12 +3735,31 @@ class ApiController extends AppController {
 							'verifyscore'=>$verifyscore,
 							'verifystatus'=>$verifystatus)
 		    	);
-
-		    	if(!$this->update_transaction($data))
+				if($doku['Doku']['additionaldata'] == 'app-purchase')
 		    	{
-		    		throw new Exception("Error Processing Request");
+					$rs_redis = $this->redisClient->get($TRANSIDMERCHANT);
+					$data_redis = unserialize($rs_redis);
+					$this->app_purchase($data_redis);
+					Cakelog::write('debug', 'redis data '.$rs_redis);
 		    	}
+		    	else if($doku['Doku']['additionaldata'] == 'mobile-ongkir-payment')
+		    	{
+		    		$rs_redis = $this->redisClient->get($TRANSIDMERCHANT);
+		    		$data_redis = unserialize($rs_redis);
 
+		    		//set n_status = 1
+		    		$this->MerchandiseOrder->id = $data_redis['order_id'];
+
+		    		$this->MerchandiseOrder->save(array('n_status' => 1));
+		    	}
+		    	else
+		    	{
+		    		if(!$this->update_transaction($data))
+			    	{
+			    		throw new Exception("Error Processing Request");
+			    	}
+		    	}
+		    	
 		    }
 		    else if($doku['Doku']['trxstatus']=='SUCCESS' && $doku['Doku']['session_id'] == $session_id)
 		    {
@@ -3771,11 +3790,31 @@ class ApiController extends AppController {
 		    	);
 		    	CakeLog::write('doku','api.doku_notify - '.date("Y-m-d H:i:s").' - UPDATE doku entry (was failed)'.json_encode($data));
 		    	
-		    	if(!$this->update_transaction($data))
+		    	if($doku['Doku']['additionaldata'] == 'app-purchase')
 		    	{
-		    		throw new Exception("Error Processing Request");
+					$rs_redis = $this->redisClient->get($TRANSIDMERCHANT);
+					$data_redis = unserialize($rs_redis);
+					$this->app_purchase($data_redis);
+					Cakelog::write('debug', 'redis data '.$rs_redis);
 		    	}
-	
+		    	else if($doku['Doku']['additionaldata'] == 'mobile-ongkir-payment')
+		    	{
+		    		$rs_redis = $this->redisClient->get($TRANSIDMERCHANT);
+		    		$data_redis = unserialize($rs_redis);
+
+		    		//set n_status = 1
+		    		$this->MerchandiseOrder->id = $data_redis['order_id'];
+
+		    		$this->MerchandiseOrder->save(array('n_status' => 1));
+		    	}
+		    	else
+		    	{
+		    		if(!$this->update_transaction($data))
+			    	{
+			    		throw new Exception("Error Processing Request");
+			    	}
+		    	}
+		    	
 		    }
 		    else
 		    {
@@ -3829,6 +3868,15 @@ class ApiController extends AppController {
 		}
 		$this->layout = "ajax";
 		$this->set('response', array('status'=>$status, 'data'=>$data));
+		$this->render('default');
+	}
+
+	public function get_url_scheme()
+	{
+		$url_scheme = Configure::read('URL_SCHEME');
+		$data = array('url_scheme' => $url_scheme);
+		$this->layout = "ajax";
+		$this->set('response', array('status'=>1, 'data'=>$data));
 		$this->render('default');
 	}
 
@@ -3903,6 +3951,43 @@ class ApiController extends AppController {
 	    				data '.json_encode($data));
 
 	    	return false;
+		}
+
+	}
+
+	private function app_purchase($data)
+	{
+		$this->loadModel('MembershipTransactions');
+		$transaction_name = 'Purchase Order #'.$data['doku_data']['po_number'];
+		$transaction_type = 'UNLOCK '.$data['trx_type'];
+		$insert_data = array(
+								'fb_id' => $data['fb_id'],
+								'transaction_dt' => date("Y-m-d H:i:s"),
+								'transaction_name' => $transaction_name,
+								'transaction_type' =>$transaction_type,
+								'amount' => $data['amount'],
+								'details' => serialize($data)
+							);
+		$fb_id = $data['fb_id'];
+		$array_session = array('fb_id' => $fb_id, 'trx_type' => $data['trx_type']);
+
+		$this->MembershipTransactions->create();
+		$this->MembershipTransactions->save($insert_data);
+
+		//notif to mobile apps
+		$url_mobile_notif = Configure::read('URL_MOBILE_NOTIF').'fm_payment_notification';
+
+		$result_mobile = curlPost($url_mobile_notif,$array_session);
+		$result_mobile = json_decode($result_mobile, TRUE);
+
+		if($result_mobile['code'] == 1){
+			Cakelog::write('debug', 
+			'Payment.success result_mobile:'.json_encode($result_mobile).
+			' data:'.json_encode($data).' fb_id:'.$fb_id);
+		}else{
+			Cakelog::write('error', 
+			'Payment.success result_mobile:'.json_encode($result_mobile).
+			' data:'.json_encode($data).' fb_id:'.$fb_id);
 		}
 
 	}

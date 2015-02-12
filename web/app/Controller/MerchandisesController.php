@@ -988,7 +988,7 @@ class MerchandisesController extends AppController {
 						'SESSIONID'=>$trx_session_id,
 						'NAME'=>$this->request->data['first_name'].' '.$this->request->data['last_name'],
 						'EMAIL'=>$this->request->data['email'],
-						'ADDITIONALDATA'=>'fm-onlinecatalog',
+						'ADDITIONALDATA'=>$additionaldata,
 						'PAYMENTCHANNEL'=>$payment_channel,
 						'BASKET'=>$basket
 						);
@@ -1057,6 +1057,7 @@ class MerchandisesController extends AppController {
 					'verifystatus'=>'',
 					'additionaldata'=>$additionaldata
 			));
+			
 			CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] create doku entry '.json_encode($rs_doku));
 			$dataSource->commit();
 
