@@ -234,6 +234,7 @@ function unique_id($id)
   return $id;
 }
 function curlGet($url,$params,$cookie_file='',$timeout=15){
+  
   if(count($params) > 0){
     $url .= "?".http_build_query($params);
   }

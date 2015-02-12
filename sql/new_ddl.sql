@@ -619,3 +619,6 @@ DROP INDEX `UNIQUE_CATALOG_ORDER_ID` ;
 
 ALTER TABLE `fantasy`.`doku` 
 CHANGE COLUMN `catalog_order_id` `catalog_order_id` BIGINT(21) NULL ;
+
+/*fix bug rank and points melambat */
+ALTER TABLE `fantasy`.`game_transactions` ADD INDEX `IDX_FB_ID` (`fb_id`);

@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  *	thumbnail class
  *  purpose : the Class for making a Thumbnail..
