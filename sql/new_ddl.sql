@@ -614,3 +614,8 @@ ADD UNIQUE INDEX `UNIQUE_TRANSACTION` (`transaction_name` ASC);
 ALTER TABLE `fantasy`.`membership_transactions` 
 ADD COLUMN `n_status` INT(1) NULL DEFAULT 1 AFTER `league`;
 
+ALTER TABLE `fantasy`.`doku` 
+DROP INDEX `UNIQUE_CATALOG_ORDER_ID` ;
+
+ALTER TABLE `fantasy`.`doku` 
+CHANGE COLUMN `catalog_order_id` `catalog_order_id` BIGINT(21) NULL ;

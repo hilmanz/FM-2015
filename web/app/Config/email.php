@@ -59,8 +59,9 @@ class EmailConfig {
 	);*/
 
 	public $smtp = array(
-		'transport' => 'Smtp',
+	    'transport' => 'Smtp',
 	    'host' => 'sg.supersoccer.co.id',
+	    'from' => 'noreply@sg.supersoccer.co.id',
 	    'port' => 587,
 	    'username' => 'test',
 	    'password' => 'password',
