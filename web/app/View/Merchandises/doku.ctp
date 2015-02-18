@@ -104,7 +104,7 @@ $pic = Configure::read('avatar_web_url').
 			                    			}
 			                    		}
 		                    		}
-		                    		$total_ongkos = $ongkos * $kg;
+		                    		$total_ongkos = $ongkos * ceil($kg);
 		                    		?>
 		                        	Rp. <?=number_format($total_ongkos)?>
 		                        </td>

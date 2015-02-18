@@ -35,11 +35,18 @@
                             <tbody>
                                 <tr>
                                     <td>Ongkos Kirim</td>
-                                    <td><?=h($city['city'])?></td>
+                                    <td><?=$city?></td>
                                     <td>
                                         Rp. <?=number_format($total_ongkir)?>
                                     </td>
                                     <td rowspan="2">
+                                        <a class="button" href="<?=$this->Html->url('/merchandises/pay/ongkir/'.$rs['MerchandiseOrder']['id'].'/va');?>">
+                                            Bayar dengan Transfer Bank
+                                        </a>
+                                        <a class="button" href="<?=$this->Html->url('/merchandises/pay/ongkir/'.$rs['MerchandiseOrder']['id'].'/cc');?>">
+                                            Bayar dengan Kartu Kredit
+                                        </a>
+                                        <center>Atau</center>
                                         <a class="button" href="<?=$ecash_url?>">
                                             Bayar dengan ECash Mandiri
                                         </a>

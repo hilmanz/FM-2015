@@ -344,16 +344,25 @@ class PaymentController extends AppController {
 	public function mobile_ongkir_payment($order_id = "")
 	{
 		$url_scheme = Configure::read('URL_SCHEME');
-		$admin_fee_ongkir = Configure::read('PO_ADMIN_ONGKIR_FEE');
 
 		if($order_id == "")
 		{
 			$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=Terjadi kesalahan !');
 		}
-		$rs_order = $this->MerchandiseOrder->findByid($order_id);
+
+		$rs_order = $this->MerchandiseOrder->find('first', array(
+				    	'conditions' => array(
+				    			'id' => $order_id,
+				    			'payment_method' => 'coins'
+				    	)));
 		
 		if(count($rs_order) > 0)
 		{
+			$admin_fee_ongkir = $rs_order['MerchandiseOrder']['total_admin_fee'];
+
+			//add suffix -1 to define that its the payment for shipping for these po number.
+			$transaction_id =  $rs_order['MerchandiseOrder']['po_number'].'-1';
+
 			$rs_user = $this->User->findByFb_id($rs_order['MerchandiseOrder']['fb_id']);
 			$payment_method = $this->request->query('payment_method');
 			if($payment_method !== NULL)
@@ -365,9 +374,8 @@ class PaymentController extends AppController {
 					$payment_channel = '05';
 				}
 
-				$transaction_id = intval($rs_user['User']['id']).'-0000'.date("YmdHis").'-'.rand(0,999);
 				$transaction_id_merchant = str_replace('-', '', $transaction_id);
-				$amount = $rs_order['MerchandiseOrder']['ongkir_value'] + $admin_fee_ongkir;
+				$amount = $rs_order['MerchandiseOrder']['total_ongkir'] + $admin_fee_ongkir;
 
 				$doku_api = Configure::read('DOKU_API');
 				$doku_mid = Configure::read('DOKU_MALLID');
@@ -381,22 +389,6 @@ class PaymentController extends AppController {
 				$po_number = $rs_order['MerchandiseOrder']['po_number'];
 				$basket = 'ONGKIR PAYMENT PO#'.$po_number.','.$amount.','.$amount.','.$amount.';';
 
-				$doku_param = array('MALLID'=>$doku_mid,
-									'CHAINMERCHANT'=>'NA',
-									'AMOUNT'=>number_format($amount,2,'.',''),
-									'PURCHASEAMOUNT'=>number_format($amount,2,'.',''),
-									'TRANSIDMERCHANT'=>$transaction_id_merchant,
-									'WORDS'=>$hash_words,
-									'REQUESTDATETIME'=>date("YmdHis"),
-									'CURRENCY'=>'360',
-									'PURCHASECURRENCY'=>'360',
-									'SESSIONID'=>$trx_session_id,
-									'NAME'=>$rs_user['User']['name'],
-									'EMAIL'=>$rs_user['User']['email'],
-									'ADDITIONALDATA'=>$additionaldata,
-									'PAYMENTCHANNEL'=>$payment_channel,
-									'BASKET'=>$basket,
-								);
 
 				$doku_data = array(
 								'catalog_order_id'=>$rs_order['MerchandiseOrder']['id'],
@@ -420,9 +412,34 @@ class PaymentController extends AppController {
 								'additionaldata'=>$additionaldata
 						);
 
-				//save to Doku table
-				$this->Doku->create();
-				$rs_doku = $this->Doku->save($doku_data);
+				try{
+					//save to Doku table
+					$this->Doku->create();
+					$rs_doku = $this->Doku->save($doku_data);
+				}catch(Exception $e){
+					//catch here because mostly duplicate entry key
+					$rs_doku = $this->Doku->findByTransidmerchant($transaction_id_merchant);
+					$trx_session_id = $rs_doku['Doku']['session_id'];
+					$hash_words = $rs_doku['Doku']['words'];
+				}
+
+				$doku_param = array('MALLID'=>$doku_mid,
+									'CHAINMERCHANT'=>'NA',
+									'AMOUNT'=>number_format($amount,2,'.',''),
+									'PURCHASEAMOUNT'=>number_format($amount,2,'.',''),
+									'TRANSIDMERCHANT'=>$transaction_id_merchant,
+									'WORDS'=>$hash_words,
+									'REQUESTDATETIME'=>date("YmdHis"),
+									'CURRENCY'=>'360',
+									'PURCHASECURRENCY'=>'360',
+									'SESSIONID'=>$trx_session_id,
+									'NAME'=>$rs_user['User']['name'],
+									'EMAIL'=>$rs_user['User']['email'],
+									'ADDITIONALDATA'=>$additionaldata,
+									'PAYMENTCHANNEL'=>$payment_channel,
+									'BASKET'=>$basket,
+								);
+				
 
 				$data_redis = array('doku_data' => $doku_data,
 									'doku_param' => $doku_param,
@@ -453,13 +470,12 @@ class PaymentController extends AppController {
 			{
 				//todo
 				//if rs_user empty handle this
-				$transaction_id = intval($rs_user['User']['id']).'-'.date("YmdHis").'-'.rand(0,999);
 				$description = 'Purchase Order #'.$transaction_id;
 
 				$this->Session->write('order_id_payment', $order_id);
 				$this->Session->write('transaction_id_payment', $transaction_id);
 
-				$amount = $rs_order['MerchandiseOrder']['ongkir_value'] + $admin_fee_ongkir;
+				$amount = $rs_order['MerchandiseOrder']['total_ongkir'] + $admin_fee_ongkir;
 
 				$rs = $this->Game->getEcashUrl(array(
 					'transaction_id'=>$transaction_id,
@@ -478,8 +494,6 @@ class PaymentController extends AppController {
 					$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=Saat ini tidak bisa terhubung dengan mandiri ecash, Silahkan coba beberapa saat lagi');
 				}
 			}
-
-			
 		}
 		else
 		{

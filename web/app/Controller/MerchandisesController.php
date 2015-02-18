@@ -5,7 +5,7 @@
  */
 App::uses('AppController', 'Controller');
 App::uses('Sanitize', 'Utility');
-
+require_once APP . 'Vendor' . DS. 'lib/Predis/Autoloader.php';
 class MerchandisesController extends AppController {
 
 /**
@@ -47,6 +47,13 @@ class MerchandisesController extends AppController {
 		$this->set('sidebar_banner',$sidebar_banner);
 
 		$this->loadModel('Ongkir');
+		Predis\Autoloader::register();
+		$this->redisClient = new Predis\Client(array(
+											    'host'     => Configure::read('REDIS.Host'),
+											    'port'     => Configure::read('REDIS.Port'),
+											    'database' => Configure::read('REDIS.Database')
+											));
+
 		
 		if(!Configure::read('MERCHANDISE_ENABLE') 
 				&& $this->request->params['action'] != 'offline' 
@@ -138,7 +145,7 @@ class MerchandisesController extends AppController {
 	public function history(){
 		
 		$fb_id = $this->userDetail['User']['fb_id'];
-		$this->paginate = array('conditions'=>array('fb_id'=>$fb_id),
+		$this->paginate = array('conditions'=>array('fb_id'=>$fb_id, 'payment_method' => 'coins'),
 								  'order'=>array('MerchandiseOrder.id'=>'DESC'),
 								 'limit'=>20);
 		
@@ -163,7 +170,7 @@ class MerchandisesController extends AppController {
 
 
 	}
-	public function pay($type,$order_id=0){
+	public function pay($type,$order_id=0,$payment_method = NULL){
 
 		if($this->request->is("post"))
 		{
@@ -194,11 +201,180 @@ class MerchandisesController extends AppController {
 		}
 
 		if($type=='ongkir'){
-			$this->payOngkirPage($order_id);
+			if($payment_method == NULL)
+			{
+				$this->payOngkirPage($order_id);
+			}
+			else
+			{
+				$doku_data = $this->dokuOngkirPayment($this->userData['fb_id'], $order_id, $payment_method);
+				
+				$this->set('payment_method', 'Kartu Kredit');
+				if($payment_method == 'va'){
+					$this->set('payment_method', 'Transfer Bank');
+				}
+
+				$action_form = Configure::read('DOKU_API');
+				$this->set('action_form', $action_form);
+				$this->set('doku_data', $doku_data);
+				$this->render('doku_ongkir_payment');
+			}
+			
 		}else{
 			//ecash return page
 			$this->handlePayment();
 		}
+		
+	}
+
+	public function ongkir_payment_success()
+	{
+		$this->render('doku_ongkir_payment_success');
+	}
+
+	public function ongkir_payment_pending()
+	{
+		$paymentcode = decrypt_param($this->request->query('trx'));
+		$this->set('paymentcode', $paymentcode);
+		$this->render('doku_ongkir_payment_pending');
+	}
+
+	public function ongkir_payment_error()
+	{
+		$this->render('doku_ongkir_payment_error');
+	}
+
+	//param POST fb_id, order_id, payment_method
+	private function dokuOngkirPayment($fb_id, $order_id, $payment_method)
+	{
+		try{
+			$this->loadModel('MerchandiseOrder');
+			$this->loadModel('Doku');
+
+			$payment_channel = '01';
+			if($payment_method == "va")
+			{
+				$payment_channel = '05';
+			}
+
+			if($fb_id == NULL || $order_id == NULL)
+			{
+				throw new Exception("Error Param ");
+			}
+
+			$rs_order = $this->MerchandiseOrder->find('first', array(
+				    	'conditions' => array(
+				    			'id' => $order_id,
+				    			'payment_method' => 'coins'
+				    	)));
+
+			if(count($rs_order) == 0)
+			{
+				throw new Exception("Order not found param ");
+			}
+
+			if($rs_order['MerchandiseOrder']['fb_id'] != $fb_id)
+			{
+				throw new Exception("facebook id didn't match");
+			}
+
+			$trx_session_id = sha1(time());
+			$doku_mid = Configure::read('DOKU_MALLID');
+			$doku_sharedkey = Configure::read('DOKU_SHAREDKEY');
+
+			$po_number = $rs_order['MerchandiseOrder']['po_number'];
+
+			//add suffix -1 to define that its the payment for shipping for these po number.
+			$transaction_id =  $po_number.'-1';
+			$transaction_id_merchant = str_replace('-', '', $transaction_id);
+			$total_ongkir = $rs_order['MerchandiseOrder']['total_ongkir'];
+			$admin_fee = $rs_order['MerchandiseOrder']['total_admin_fee'];
+			$total_amount =  $total_ongkir + $admin_fee;
+
+			$hash_words = sha1(number_format($total_amount,2,'.','').
+						  $doku_mid.
+						  $doku_sharedkey.
+						  $transaction_id_merchant);
+
+			$basket = 'ONGKIR PAYMENT PO#'.$po_number.','.$total_amount.','.$total_amount.','.$total_amount.';';
+			$additionaldata = 'fm-ongkir-payment';
+			$doku_data = array(
+								'catalog_order_id'=>$order_id,
+								'po_number'=>$transaction_id,
+								'transidmerchant'=>$transaction_id_merchant,
+								'totalamount'=>number_format($total_amount,2,'.',''),
+								'words'=>$hash_words,
+								'statustype'=>'',
+								'response_code'=>'',
+								'approvalcode'=>'',
+								'trxstatus'=>'Requested',
+								'payment_channel'=>$payment_channel,
+								'paymentcode'=>'',
+								'session_id'=>$trx_session_id,
+								'bank_issuer'=>'',
+								'creditcard'=>'',
+								'payment_date_time'=>date("Y-m-d H:i:s"),
+								'verifyid'=>'',
+								'verifyscore'=>'',
+								'verifystatus'=>'',
+								'additionaldata'=> $additionaldata
+						);
+
+			try{
+				$this->Doku->create();
+				$this->Doku->save($doku_data);
+			}catch(Exception $f){
+				//catch here because mostly duplicate entry key
+				Cakelog::write('error', 'merchandise.dokuOngkirPayment nested try-catch'.$f->getMessage());
+				$rs_doku = $this->Doku->findByTransidmerchant($transaction_id_merchant);
+				$trx_session_id = $rs_doku['Doku']['session_id'];
+				$hash_words = $rs_doku['Doku']['words'];
+			}
+			
+			
+			$data_param = array('MALLID'=>$doku_mid,
+							'CHAINMERCHANT'=>'NA',
+							'AMOUNT'=>number_format($total_amount,2,'.',''),
+							'PURCHASEAMOUNT'=>number_format($total_amount,2,'.',''),
+							'TRANSIDMERCHANT'=>$transaction_id_merchant,
+							'WORDS'=>$hash_words,
+							'REQUESTDATETIME'=>date("YmdHis"),
+							'CURRENCY'=>'360',
+							'PURCHASECURRENCY'=>'360',
+							'SESSIONID'=>$trx_session_id,
+							'NAME'=>$rs_order['MerchandiseOrder']['first_name'].' '.$rs_order['MerchandiseOrder']['last_name'],
+							'EMAIL'=>$rs_order['MerchandiseOrder']['email'],
+							'ADDITIONALDATA'=>$additionaldata,
+							'PAYMENTCHANNEL'=>$payment_channel,
+							'BASKET'=>$basket
+						);
+
+			$data_redis = array('doku_data' => $doku_data,
+								'doku_param' => $doku_param,
+								'order_id' => $order_id,
+								'trx_type' => $basket,
+								'amount' => $total_amount
+								);
+
+
+
+			$this->redisClient->set($transaction_id_merchant, serialize($data_redis));
+
+			$this->redisClient->expire($transaction_id_merchant, 24*60*60);//expires in 1 day
+			if($payment_channel == '05')
+			{
+				$this->redisClient->expire($transaction_id_merchant, 6*60*60);//expires in 6 hours
+			}
+
+			$status = 1;
+
+		}catch(Exception $e){
+			$status = 0;
+			$data_param = NULL;
+			Cakelog::write('error', 'merchandise.dokuOngkirPayment '.$e->getMessage());
+		}
+
+		return $data_param;
 		
 	}
 	private function handlePayment(){
@@ -259,16 +435,18 @@ class MerchandisesController extends AppController {
 
 	}
 	private function payOngkirPage($order_id){
-		$admin_fee = Configure::read('PO_ADMIN_ONGKIR_FEE');
-		$ongkir = $this->Ongkir->find('all',
-									array('limit'=>10000,
-									'order'=>array('Ongkir.kecamatan'=>'ASC')));
-		$rs = $this->MerchandiseOrder->findById($order_id);
+		$rs = $this->MerchandiseOrder->find('first', array(
+				    	'conditions' => array(
+				    			'id' => $order_id,
+				    			'payment_method' => 'coins'
+				    	)));
 
 		if($rs['MerchandiseOrder']['ongkir_id'] == 0)
 		{
 			$this->set('ongkir', $ongkir);
 		}
+
+		$admin_fee = $rs['MerchandiseOrder']['total_admin_fee'];
 
 		$items = unserialize($rs['MerchandiseOrder']['data']);
 
@@ -279,19 +457,14 @@ class MerchandisesController extends AppController {
 				$merchandise_item =  $this->MerchandiseItem->findById($items[$i]['data']['MerchandiseItem']['id']);
 				$items[$i]['data']['MerchandiseItem']['weight'] = $merchandise_item['MerchandiseItem']['weight'];
 			}
-			$kg = intval($items[$i]['qty']) * ceil(floatval(@$items[$i]['data']['MerchandiseItem']['weight']));
 		}
 
 		$this->set('rs',$rs);
-		foreach($ongkir as $ok){
-			if($ok['Ongkir']['id'] == $rs['MerchandiseOrder']['ongkir_id']){
-				$city = $ok['Ongkir'];
-			}
-		}
-		$total_ongkir = $kg * @$city['cost'];
+		
+		$total_ongkir = $rs['MerchandiseOrder']['total_ongkir'];
 		$amount = $total_ongkir + $admin_fee;
 
-		$this->set('city',@$city);
+		$this->set('city',$rs['MerchandiseOrder']['city']);
 		$this->set('total_ongkir',$total_ongkir);
 
 		//add suffix -1 to define that its the payment for shipping for these po number.
@@ -743,45 +916,30 @@ class MerchandisesController extends AppController {
 		$total_price = 0;
 		$all_digital = true;
 		$kg = 0;
+		$total_admin_fee = 0;
 		for($i=0;$i<sizeof($shopping_cart);$i++){
 
 			$shopping_cart[$i]['data'] = $this->MerchandiseItem->findById($shopping_cart[$i]['item_id']);
 			$item = $shopping_cart[$i]['data']['MerchandiseItem'];
-			$kg += ceil(floatval($item['weight'])) * intval($shopping_cart[$i]['qty']);
+			$kg += floatval($item['weight']) * intval($shopping_cart[$i]['qty']);
 			$total_price += (intval($shopping_cart[$i]['qty']) * intval($item['price_money']));
+			$total_admin_fee += $item['admin_fee'];
 			//is there any non-digital item ?
 			if($item['merchandise_type']==0){
 				$all_digital = false;
 			}
 		}
+		$kg = ceil($kg);
 
-		$admin_fee = Configure::read('PO_ADMIN_FEE');
+		$admin_fee = $total_admin_fee;
 		$enable_ongkir = true;
 
 		if(count($shopping_cart) > 1)
 		{
-			$admin_fee = Configure::read('PO_ADMIN_FEE');
+			//$admin_fee = Configure::read('PO_ADMIN_FEE'); ->skip broo
 		}
 		else
 		{
-			//check enable or disable admin fee
-			$rs_adminfee = $shopping_cart[0]['data']['MerchandiseItem'];
-			if($rs_adminfee['enable_admin_fee'] != 1)
-			{
-				$admin_fee = 0;
-			}
-			else
-			{
-				//check value of admin_fee
-				if($rs_adminfee['admin_fee'] == 0)
-				{
-					$admin_fee = Configure::read('PO_ADMIN_FEE');
-				}
-				else
-				{
-					$admin_fee = $rs_adminfee['admin_fee'];
-				}
-			}
 
 			if($rs_adminfee['enable_ongkir'] == 0)
 			{
@@ -796,19 +954,19 @@ class MerchandisesController extends AppController {
 
 		$total_price += $admin_fee;
 		
-		$total_ongkir = 0;
 		if($enable_ongkir)
 		{
 			foreach($this->ongkirList as $ongkir){
 				if($ongkir['Ongkir']['id'] == intval($this->Session->read('city_id'))){
-					$total_ongkir = intval($ongkir['Ongkir']['cost']);
+					$base_ongkir = intval($ongkir['Ongkir']['cost']);
 					break;
 				}
 			}
 		}
 
 		//tambahkan harga ongkir kedalam total price
-		$total_price+= ($kg * $total_ongkir);
+		$total_ongkir = $kg * $base_ongkir;
+		$total_price += $total_ongkir;
 
 
 		$this->set('shopping_cart',$shopping_cart);
@@ -887,6 +1045,7 @@ class MerchandisesController extends AppController {
 		$all_digital = true;
 		$kg = 0;
 		$category = array();
+		$total_admin_fee = 0;
 		$basket = "Pembelian ";
 		for($i=0;$i<sizeof($shopping_cart);$i++){
 
@@ -894,6 +1053,7 @@ class MerchandisesController extends AppController {
 			$item = $shopping_cart[$i]['data']['MerchandiseItem'];
 			$basket .= htmlspecialchars($item['name']).','.$item['price_money'].','.$item['id'].','.$item['price_money'].';';
 			$kg += floatval($item['weight']) * intval($shopping_cart[$i]['qty']);
+			$total_admin_fee += $item['admin_fee'];
 			$total_price += (intval($shopping_cart[$i]['qty']) * intval($item['price_money']));
 			$category[$i] = $item['merchandise_category_id'];
 			//is there any non-digital item ?
@@ -904,32 +1064,15 @@ class MerchandisesController extends AppController {
 		$basket = rtrim($basket,',');
 		$kg = ceil($kg);
 		
-		$admin_fee = Configure::read('PO_ADMIN_FEE');
+		$admin_fee = $total_admin_fee;
 		$enable_ongkir = true;
 		if(count($shopping_cart) > 1)
 		{
-			$admin_fee = Configure::read('PO_ADMIN_FEE');
+			//$admin_fee = Configure::read('PO_ADMIN_FEE'); -> skip this process
 		}
 		else
 		{
 			//check enable or disable admin fee
-			$rs_adminfee = $shopping_cart[0]['data']['MerchandiseItem'];
-			if($rs_adminfee['enable_admin_fee'] != 1)
-			{
-				$admin_fee = 0;
-			}
-			else
-			{
-				//check value of admin_fee
-				if($rs_adminfee['admin_fee'] == 0)
-				{
-					$admin_fee = Configure::read('PO_ADMIN_FEE');
-				}
-				else
-				{
-					$admin_fee = $rs_adminfee['admin_fee'];
-				}
-			}
 
 			//check ongkir
 			if($rs_adminfee['enable_ongkir'] == 0)
@@ -945,18 +1088,18 @@ class MerchandisesController extends AppController {
 		$total_price += $admin_fee;
 
 		//include ongkir
-		$total_ongkir = 0;
 		if($enable_ongkir)
 		{
 			foreach($this->ongkirList as $ongkir){
 				if($ongkir['Ongkir']['id'] == intval($this->Session->read('city_id'))){
-					$total_ongkir = intval($ongkir['Ongkir']['cost']);
+					$base_ongkir = intval($ongkir['Ongkir']['cost']);
 					break;
 				}
 			}
 		}
 
-		$total_price += ($kg*$total_ongkir);
+		$total_ongkir = ($kg*$base_ongkir);
+		$total_price += $total_ongkir;
 		
 		$this->set('transaction_id',$transaction_id);
 		$this->set('shopping_cart',$shopping_cart);
@@ -1030,7 +1173,10 @@ class MerchandisesController extends AppController {
 					'payment_method'=>$payment_method,
 					'total_sale'=>$total_price,
 					'ongkir_id'=>$this->Session->read('city_id'),
-					'ongkir_value' => $total_ongkir,
+					'ongkir_value' => $base_ongkir,
+					'total_weight' => $kg,
+					'total_ongkir' => $total_ongkir,
+					'total_admin_fee' => $admin_fee,
 					'n_status' => 0
 			));
 
@@ -1091,7 +1237,10 @@ class MerchandisesController extends AppController {
 						'payment_method'=>$payment_method,
 						'total_sale'=>$total_price,
 						'ongkir_id'=>$this->Session->read('city_id'),
-						'ongkir_value' => $total_ongkir,
+						'ongkir_value' => $base_ongkir,
+						'total_weight' => $kg,
+						'total_ongkir' => $total_ongkir,
+						'total_admin_fee' => $admin_fee,
 						'n_status' => 0
 				));
 
@@ -1268,44 +1417,29 @@ class MerchandisesController extends AppController {
 		
 			$all_digital = true;
 			$kg = 0;
+			$total_admin_fee = 0;
 			for($i=0;$i<sizeof($shopping_cart);$i++){
 
 				$item = $shopping_cart[$i]['data']['MerchandiseItem'];
-				$kg += intval($shopping_cart[$i]['qty']) * ceil(floatval($item['weight']));
+				$kg += floatval($item['weight']) * intval($shopping_cart[$i]['qty']);
+				$total_admin_fee += $item['admin_fee'];
 				$total_price += (intval($shopping_cart[$i]['qty']) * intval($item['price_money']));
 				//is there any non-digital item ?
 				if($item['merchandise_type']==0){
 					$all_digital = false;
 				}
 			}
+			$kg = ceil($kg);
 			
-			$admin_fee = Configure::read('PO_ADMIN_FEE');
+			$admin_fee = $total_admin_fee;
 			$enable_ongkir = true;
 			if(count($shopping_cart) > 1)
 			{
-				$admin_fee = Configure::read('PO_ADMIN_FEE');
+				//$admin_fee = Configure::read('PO_ADMIN_FEE'); ->skip bro
 			}
 			else
 			{
 				//check enable or disable admin fee
-				$rs_adminfee = $shopping_cart[0]['data']['MerchandiseItem'];
-				if($rs_adminfee['enable_admin_fee'] != 1)
-				{
-					$admin_fee = 0;
-				}
-				else
-				{
-					//check value of admin_fee
-					if($rs_adminfee['admin_fee'] == 0)
-					{
-						$admin_fee = Configure::read('PO_ADMIN_FEE');
-					}
-					else
-					{
-						$admin_fee = $rs_adminfee['admin_fee'];
-					}
-				}
-
 				if($rs_adminfee['enable_ongkir'] == 0)
 				{
 					$enable_ongkir = false;
@@ -1317,22 +1451,20 @@ class MerchandisesController extends AppController {
 			}
 			$total_price += $admin_fee;
 
-			$total_ongkir = 0;
 			if($enable_ongkir)
 			{
 				foreach($this->ongkirList as $ongkir){
 					if($ongkir['Ongkir']['id'] == intval($this->Session->read('city_id'))){
-						$total_ongkir = intval($ongkir['Ongkir']['cost']);
+						$base_ongkir = intval($ongkir['Ongkir']['cost']);
 						break;
 					}
 				}
 			}
 			
-			$total_ongkir  = $total_ongkir * ceil(floatval($kg));
+			$total_ongkir  = $base_ongkir * $kg;
 
 			//tambahkan harga ongkir kedalam total price
 			$total_price+=$total_ongkir;
-
 
 			$data['fb_id'] = $this->userDetail['User']['fb_id'];
 			$data['merchandise_item_id'] = 0;
@@ -1343,7 +1475,10 @@ class MerchandisesController extends AppController {
 
 			//we need ongkir value
 			$ok = $this->Ongkir->findById($this->Session->read('city_id'));
-			$data['ongkir_value'] = $total_ongkir;
+			$data['ongkir_value'] = $base_ongkir;
+			$data['total_weight'] = $kg;
+			$data['total_ongkir'] = $total_ongkir;
+			$data['total_admin_fee'] = $total_admin_fee;
 			
 			if($all_digital){
 				$data['n_status'] = 3;	
@@ -1405,13 +1540,15 @@ class MerchandisesController extends AppController {
 			$all_digital = true;
 			$kg = 0;
 			$all_stock_ok = true;
+			$total_admin_fee = 0;
 			for($i=0;$i<sizeof($shopping_cart);$i++){
 				if($shopping_cart[$i]['qty']<=0){
 					$shopping_cart[$i]['qty'] = 1;
 				}
 				$shopping_cart[$i]['data'] = $this->MerchandiseItem->findById($shopping_cart[$i]['item_id']);
 				$item = $shopping_cart[$i]['data']['MerchandiseItem'];
-				$kg += intval($shopping_cart[$i]['qty']) * ceil(floatval($item['weight']));
+				$kg += floatval($item['weight']) * intval($shopping_cart[$i]['qty']);
+				$total_admin_fee += $item['admin_fee'];
 
 				$total_coins += (intval($shopping_cart[$i]['qty']) * intval($item['price_credit']));
 				//is there any non-digital item ?
@@ -1422,6 +1559,7 @@ class MerchandisesController extends AppController {
 					$all_stock_ok = false;
 				}
 			}
+			$kg = ceil($kg);
 			
 			//1. check if the coins are sufficient
 			if(intval($this->cash) >= $total_coins){
@@ -1444,10 +1582,13 @@ class MerchandisesController extends AppController {
 				$ok = $this->Ongkir->findById($this->Session->read('city_id'));
 
 
-				$data['ongkir_value'] = $kg * $ok['Ongkir']['cost'];
+				$data['ongkir_value'] = $ok['Ongkir']['cost'];
+				$data['total_weight'] = $kg;
+				$data['total_ongkir'] = $kg * $ok['Ongkir']['cost'];
+				$data['total_admin_fee'] = $total_admin_fee;
 			
 				if($all_digital){
-					$data['n_status'] = 3;	
+					$data['n_status'] = 3;
 				}else{
 					$data['n_status'] = 0;
 				}
@@ -1495,6 +1636,8 @@ class MerchandisesController extends AppController {
 			$result['no_fund'] = false;
 			$result['order_id'] = 0;
 		}
+
+		$this->Session->write('PO_NUMBER', NULL);
 		
 		return $result;
 	}

@@ -622,3 +622,10 @@ CHANGE COLUMN `catalog_order_id` `catalog_order_id` BIGINT(21) NULL ;
 
 /*fix bug rank and points melambat */
 ALTER TABLE `fantasy`.`game_transactions` ADD INDEX `IDX_FB_ID` (`fb_id`);
+
+ALTER TABLE `fantasy`.`merchandise_orders` 
+ADD COLUMN `total_ongkir` INT(21) NULL AFTER `ongkir_value`,
+ADD COLUMN `total_admin_fee` INT(21) NULL AFTER `total_ongkir`;
+
+ALTER TABLE `fantasy`.`merchandise_orders` 
+ADD COLUMN `total_weight` INT(3) NULL AFTER `ongkir_value`;

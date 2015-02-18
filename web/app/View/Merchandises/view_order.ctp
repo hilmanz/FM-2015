@@ -131,38 +131,7 @@
 		                        <td></td>
 		                        <td></td>
 		                        <td>
-
-                        <?php
-                        	$admin_fee = 0;
-                        	
-                        	if($rs['MerchandiseOrder']['payment_method']=='ecash'){
-                        		$admin_fee = Configure::read('PO_ADMIN_FEE');
-
-	                    		if($total_item < 2 && $total_item != 0)
-								{
-	                        		//check admin fee
-									if($items[0]['data']['MerchandiseItem']['enable_admin_fee'] == 1)
-									{
-										//check if value admin fee = 0 then use Configure
-										if($items[0]['data']['MerchandiseItem']['admin_fee'] != 0)
-										{
-											$admin_fee = $items[0]['data']['MerchandiseItem']['admin_fee'];
-										}
-									}
-									else
-									{
-										$admin_fee = 0;
-									}
-		                        }
-		                    }
-                        ?>
-
-		                        	<?php if($admin_fee==0):?>
-		                        	GRATIS
-		                        	<?php else:?>
-		                        	Rp. <?=number_format($admin_fee)?>
-		                        	<?php endif;?>
-		                        	
+		                        	<?=number_format($rs['MerchandiseOrder']['total_admin_fee'])?>
 		                        </td>
 		                    </tr>
 		                    <tr>
