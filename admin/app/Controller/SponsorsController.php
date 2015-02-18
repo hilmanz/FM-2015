@@ -241,7 +241,14 @@ class SponsorsController extends AppController {
 			$this->set('success',0);
 		}
 	}
+	public function remove_banner(){
+		$sponsor_id = $this->request->query['sponsor_id'];
+		$banner_id = $this->request->query['id'];
+		$this->loadModel('SponsorBanner');
+		$rs = $this->SponsorBanner->delete($banner_id);
+		$this->redirect('/sponsors/edit/'.$sponsor_id);
 
+	}
 	public function perks(){
 		$this->loadModel('Perk');
 		$rs = $this->Perk->find('all');
@@ -367,6 +374,8 @@ class SponsorsController extends AppController {
 			INNER JOIN users c
 			ON b.user_id = c.id 
 			WHERE 
+			a.league='{$_SESSION['league']}'
+			AND
 			rank > {$start_rank} 
 			AND rank <={$end_rank}
 			LIMIT {$start},20;";
@@ -437,9 +446,9 @@ class SponsorsController extends AppController {
 											$sponsor['invitation_email']));
 
 					$this->Game->query("INSERT INTO notifications
-												(content,url,dt,game_team_id)
+												(content,url,dt,game_team_id,league)
 												VALUES
-												('{$notif_msg}','#',NOW(),{$game_team_id});");
+												('{$notif_msg}','#',NOW(),{$game_team_id},'{$_SESSION['league']}');");
 					return 1;
 				}else{
 					return 0;

@@ -85,6 +85,16 @@ class DATABASE_CONFIG {
 		'prefix' => '',
 		'encoding' => 'utf8',
 	);
+	public $ffgame_ita = array(
+		'datasource' => 'Database/Mysql',
+		'persistent' => false,
+		'host' => 'localhost',
+		'login' => 'root',
+		'password' => 'root',
+		'database' => 'ffgame_ita',
+		'prefix' => '',
+		'encoding' => 'utf8',
+	);
 	public $test = array(
 		'datasource' => 'Database/Mysql',
 		'persistent' => false,
