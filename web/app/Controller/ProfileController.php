@@ -91,7 +91,7 @@ class ProfileController extends AppController {
 			$userData = $this->getUserData();
 			$this->loadModel('User');
 			//data user
-			$user = $this->User->findByFb_id($userData['fb_id']);
+			$user = $this->userDetail;
 			
 			$this->set('user',$user['User']);
 			$this->set('team',$user['Team']);
