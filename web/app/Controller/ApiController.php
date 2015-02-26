@@ -3327,7 +3327,7 @@ class ApiController extends AppController {
 			//check enable or disable admin fee
 
 			//check ongkir
-			if($rs_adminfee['enable_ongkir'] == 0)
+			if($item['enable_ongkir'] == 0)
 			{
 				$enable_ongkir = false;
 			}
@@ -3356,9 +3356,10 @@ class ApiController extends AppController {
 				}
 			}
 		}
+
 		$total_ongkir = $base_ongkir*$kg;
 		
-		$total_price += ($kg*$total_ongkir);
+		$total_price += $total_ongkir;
 
 		$transaction_data = array('profile'=>$this->request->data,
 								 'shopping_cart'=>$shopping_cart,
@@ -3435,7 +3436,7 @@ class ApiController extends AppController {
 		else
 		{
 			//check ongkir
-			if($rs_adminfee['enable_ongkir'] == 0)
+			if($item['enable_ongkir'] == 0)
 			{
 				$enable_ongkir = false;
 			}
@@ -4305,7 +4306,7 @@ class ApiController extends AppController {
 		else
 		{
 			//check ongkir
-			if($rs_adminfee['enable_ongkir'] == 0)
+			if($item['enable_ongkir'] == 0)
 			{
 				$enable_ongkir = false;
 			}

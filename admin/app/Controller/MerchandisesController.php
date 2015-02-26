@@ -416,7 +416,7 @@ class MerchandisesController extends AppController {
 		//get ongkir
 		$ongkir = $this->Ongkir->findById($rs['MerchandiseOrder']['ongkir_id']);
 		$this->set('ongkir',$ongkir['Ongkir']);
-		$this->set('admin_fee',Configure::read('PO_ADMIN_FEE'));
+		$this->set('admin_fee',$rs['MerchandiseOrder']['total_admin_fee']);
 		$this->set('rs',$rs);
 	}
 
@@ -936,20 +936,40 @@ class MerchandisesController extends AppController {
 		        foreach ($rs_report as $key => $value)
 		        {
 		        	$data_unserial = unserialize($value['merchandise_orders']['data']);
+		        	$total_qty = 0;
+		        	$item_detail = '';
+		        	foreach ($data_unserial as $key2 => $value2)
+		        	{
+		        		$total_qty += $value2['qty'];
+		        		$item_name = str_replace('"', '', $value2['data']['MerchandiseItem']['name']);
+
+		        		if($value['merchandise_orders']['payment_method'] != 'coins')
+		        		{
+		        			$item_detail .= $item_name.' x '.$value2['qty'].' @IDR '.$value2['data']['MerchandiseItem']
+		        														['price_money'].'
+';
+		        		}
+		        		else
+		        		{
+		        			$item_detail .= $item_name.' x '.$value2['qty'].' @COINS '.$value2['data']['MerchandiseItem']
+		        														['price_credit'].'
+';
+		        		}
+		        		
+		        	}
 
 		        	$data[$key]['merchandise_orders']['po_number'] = $value['merchandise_orders']['po_number'];
 		        	$data[$key]['merchandise_orders']['order_date'] = $value['merchandise_orders']['order_date'];
 		        	$data[$key]['merchandise_orders']['first_name'] = $value['merchandise_orders']['first_name'];
 		        	$data[$key]['merchandise_orders']['last_name'] = $value['merchandise_orders']['last_name'];
-		        	$data[$key]['merchandise_orders']['item_name'] = str_replace('"', '', $data_unserial[0]['data']['MerchandiseItem']['name']);
-		        	$data[$key]['merchandise_orders']['qty'] = $data_unserial[0]['qty'];
+		        	$data[$key]['merchandise_orders']['item_name'] = $item_detail;
+		        	$data[$key]['merchandise_orders']['qty'] = $total_qty;
 
-		        	$data[$key]['merchandise_orders']['price_coins'] = $data_unserial[0]['data']['MerchandiseItem']
-		        														['price_credit'];
-		        	$data[$key]['merchandise_orders']['price_money'] = $data_unserial[0]['data']['MerchandiseItem']
-		        														['price_money'];
 		        	$data[$key]['merchandise_orders']['payment_method'] = $value['merchandise_orders']['payment_method'];
 		        	$data[$key]['merchandise_orders']['ongkir'] = $value['merchandise_orders']['ongkir_value'];
+		        	$data[$key]['merchandise_orders']['total_weight'] = $value['merchandise_orders']['total_weight'];
+		        	$data[$key]['merchandise_orders']['total_ongkir'] = $value['merchandise_orders']['total_ongkir'];
+		        	$data[$key]['merchandise_orders']['total_admin_fee'] = $value['merchandise_orders']['total_admin_fee'];
 		        	$data[$key]['merchandise_orders']['total_sale'] = $value['merchandise_orders']['total_sale'];
 		        }
 
@@ -961,11 +981,12 @@ class MerchandisesController extends AppController {
 		                'first_name' => 'First Name',
 		                'last_name' => 'Last Name',
 		                'item_name' => 'Item Name',
-		                'qty' => 'Quantity',
-		                'price_coins' => 'Price Coins',
-		                'price_money' => 'Price Money',
+		                'qty' => 'Quantity Total',
 		                'payment_method' => 'Payment Method',
 		                'ongkir' => 'Ongkir',
+		                'total_weight' => 'Weight Total',
+		                'total_ongkir' => 'Ongkir Total',
+		                'total_admin_fee' => 'Admin Fee Total',
 		                'total_sale' => 'Total Sale'
 		            )
 		        );

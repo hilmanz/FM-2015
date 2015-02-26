@@ -36,6 +36,22 @@
 							<label for="coins">Coins</label>
 						</td>
 					</tr>
+					<tr>
+						<td>
+							<input id="cc" type="checkbox" name="payment_method[]" value="cc">
+						</td>
+						<td>
+							<label for="cc">Credit Card</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input id="va" type="checkbox" name="payment_method[]" value="va">
+						</td>
+						<td>
+							<label for="va">Bank Transfer</label>
+						</td>
+					</tr>
 				</table>
 			</td>
 		</tr>

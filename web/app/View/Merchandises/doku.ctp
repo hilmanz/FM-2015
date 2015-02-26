@@ -21,7 +21,7 @@ $pic = Configure::read('avatar_web_url').
 				<div class="col-contents">
 					<div class="tr widgets">
 						<h1>Kode Transaksi : <?=$transaction_id?></h1>
-						<h3>Loe akan diteruskan ke halaman pembayaran Mandiri E-Cash, silahkan klik tombol dibawah untuk melakukan pembayaran
+						<h3>Loe akan diteruskan ke halaman pembayaran, silahkan klik tombol dibawah untuk melakukan pembayaran
 						</h3>
 					</div>
 					<div class="tr widgets">

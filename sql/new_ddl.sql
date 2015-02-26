@@ -629,3 +629,9 @@ ADD COLUMN `total_admin_fee` INT(21) NULL AFTER `total_ongkir`;
 
 ALTER TABLE `fantasy`.`merchandise_orders` 
 ADD COLUMN `total_weight` INT(3) NULL AFTER `ongkir_value`;
+
+ALTER TABLE `fantasy`.`membership_transactions` 
+ADD COLUMN `po_number` VARCHAR(45) NULL AFTER `transaction_dt`;
+
+ALTER TABLE `fantasy`.`membership_transactions` 
+ADD COLUMN `payment_method` VARCHAR(45) NULL DEFAULT NULL AFTER `amount`;

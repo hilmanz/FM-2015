@@ -891,7 +891,8 @@ function isAccumulativeStatsOk(stats_name){
 
 //get match postponed status
 exports.getPostponedStatus = function(req,res){
-	req.redisClient.get('postponed-'+req.query.game_id,function(err,postponed){
+	req.redisClient.get('postponed-'+req.query.league+'_'+req.query.game_id,function(err,postponed){
+		console.log('postponed_status','postponed-'+req.query.league+'_'+req.query.game_id);
 		if(postponed==null){
 			res.json(200,{status:0});
 		}else{

@@ -54,8 +54,9 @@ class Analytics extends AppModel {
 	public function daily_registration_players_epl()
 	{
 		$sql = "SELECT DATE(register_date) AS dt,COUNT(id) AS total 
-				FROM ffgame.game_users a
-				GROUP BY DATE(register_date) ORDER BY id ASC LIMIT 100";
+				FROM ffgame.game_users a WHERE register_date BETWEEN '2014-10-01'
+				AND '2015-01-31'
+				GROUP BY DATE(register_date) ORDER BY id ASC LIMIT 150";
 		$rs = $this->query($sql);
 		
 		$results = array();
@@ -72,8 +73,9 @@ class Analytics extends AppModel {
 	public function daily_registration_players_ita()
 	{
 		$sql = "SELECT DATE(register_date) AS dt,COUNT(id) AS total 
-				FROM ffgame_ita.game_users a
-				GROUP BY DATE(register_date) ORDER BY id ASC LIMIT 100";
+				FROM ffgame_ita.game_users a WHERE register_date BETWEEN '2014-10-01'
+				AND '2015-01-31'
+				GROUP BY DATE(register_date) ORDER BY id ASC LIMIT 150";
 		$rs = $this->query($sql);
 		
 		$results = array();
@@ -133,10 +135,11 @@ class Analytics extends AppModel {
 				SELECT id,MONTH(log_dt) AS the_month, YEAR(log_dt) AS the_year,
 				user_id
 				FROM 
-				activity_logs
+				activity_logs WHERE log_dt BETWEEN '2014-05-01'
+				AND '2015-01-31'
 				GROUP BY MONTH(log_dt),user_id) a 
 				GROUP BY the_month
-				ORDER BY id DESC LIMIT 12";
+				ORDER BY id DESC LIMIT 20";
 		$rs = $this->query($sql);
 
 		$results = array();
@@ -161,7 +164,7 @@ class Analytics extends AppModel {
 				FROM 
 				activity_logs
 				GROUP BY WEEK(log_dt),user_id) a 
-				GROUP BY the_week ORDER BY id DESC LIMIT 12;";
+				GROUP BY the_week ORDER BY id DESC LIMIT 20;";
 		$rs = $this->query($sql);
 
 		$results = array();

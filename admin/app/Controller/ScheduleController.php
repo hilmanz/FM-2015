@@ -52,7 +52,7 @@ class ScheduleController extends AppController {
 									ON Fixture.home_id = Home.uid
 									INNER JOIN ".$_SESSION['ffgamedb'].".master_team Away
 									ON Fixture.away_id = Away.uid
-									WHERE Fixture.game_id='{$game_id}'
+									WHERE Fixture.game_id='{$game_id}' AND
 									Fixture.session_id='{$fm_session_id}'
 									LIMIT 1");
 

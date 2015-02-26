@@ -941,7 +941,7 @@ class MerchandisesController extends AppController {
 		else
 		{
 
-			if($rs_adminfee['enable_ongkir'] == 0)
+			if($item['enable_ongkir'] == 0)
 			{
 				$enable_ongkir = false;
 			}
@@ -1075,7 +1075,7 @@ class MerchandisesController extends AppController {
 			//check enable or disable admin fee
 
 			//check ongkir
-			if($rs_adminfee['enable_ongkir'] == 0)
+			if($item['enable_ongkir'] == 0)
 			{
 				$enable_ongkir = false;
 			}
@@ -1440,7 +1440,7 @@ class MerchandisesController extends AppController {
 			else
 			{
 				//check enable or disable admin fee
-				if($rs_adminfee['enable_ongkir'] == 0)
+				if($item['enable_ongkir'] == 0)
 				{
 					$enable_ongkir = false;
 				}

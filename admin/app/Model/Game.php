@@ -274,7 +274,7 @@ class Game extends AppModel {
 	}
 	public function getPostponedMatch($game_id){
 		$response = $this->api_call('/postponed_status',
-									array('game_id'=>$game_id));
+									array('game_id'=>$game_id,'league'=>$_SESSION['league']));
 		return $response;
 	}
 	//wrapper to redis
