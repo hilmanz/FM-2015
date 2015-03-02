@@ -81,7 +81,7 @@
          		     </div><!-- end #header -->
           		<?php endif;?>
                  <?php
-                if($USER_IS_LOGIN):
+                if($USER_IS_LOGIN && $register_is_completed==1):
             ?>
                 <div id="navigation">
                     <ul id="mainNav" class="sf-menu">

@@ -255,17 +255,21 @@ class LoginController extends AppController {
 			//get team 
 			$user_session['team'] = $this->Game->getTeam($user_session['fb_id']);
 			$this->Session->write('Userlogin.info',$user_session);
-
+			
 			//log time
 			$this->ActivityLog->logTime($rs['User']['id'],$this->Session,true);
+			
 			if($rs['User']['n_status'] == 0){
 				$this->Session->write('Userlogin.is_login', false);
 				$this->redirect('/profile/send_activation');
 			}else if($rs['User']['password'] == ""){
 				$this->Session->write('Userlogin.is_login', false);
 				$this->redirect('/profile/create_password');
+			}else if($rs['User']['paid_member']==-1){
+				$this->redirect('/upgrade/plan');
 			}else if($user_session['team']==null){
-			
+				
+				
 				$this->redirect('/profile/register_team');
 			}else if($user_session['team']!=null&&$user_session['register_completed']==0){
 				$this->redirect('/profile/register_staff');

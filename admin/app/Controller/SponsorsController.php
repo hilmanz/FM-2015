@@ -343,7 +343,7 @@ class SponsorsController extends AppController {
 		$ct = $this->Game->query("SELECT COUNT(a.id) AS total 
 								FROM points a
 								INNER JOIN teams b
-								ON a.team_id = b.id;");
+								ON a.team_id = b.id WHERE a.league='{$_SESSION['league']}';");
 		$total_users = $ct[0][0]['total'];
 		
 		switch($tier){

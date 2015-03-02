@@ -84,6 +84,7 @@ class AppController extends Controller {
 			$_SESSION['ffgamestatsdb'] = 'ffgame_stats';
 
 		}
+
 		/*
 		if($this->request->is('mobile') &&
 			$this->request->params['pass'][0]!='mobile'){
@@ -128,7 +129,6 @@ class AppController extends Controller {
 			if($this->isUserLogin()){
 				$this->userData = $this->getUserData();
 				
-				
 				$this->initPerks();
 				
 				//prepare everything up.
@@ -152,7 +152,8 @@ class AppController extends Controller {
 					)
 				);
 				$this->userDetail = $this->User->findByFb_id($this->userData['fb_id']);
-					
+				$this->set('register_is_completed',$this->userDetail['User']['register_completed']);
+
 				/*
 				if($this->userDetail['User']['n_status']==1 && 
 					$this->userDetail['User']['register_completed']==1 &&

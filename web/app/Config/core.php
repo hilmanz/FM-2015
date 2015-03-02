@@ -418,3 +418,34 @@ Configure::write('FRONTEND_SCHEMA','fantasy');
 
 Configure::write('DEBUG_CAN_UPDATE_FORMATION',true);
 Configure::write('FM_SESSION_ID',2014);
+
+
+Configure::write("SUBSCRIPTION_PLAN",array(
+	'free'=>array('name'=>'Play for Free','price'=>0,'admin_fee'=>0),
+	'pro1'=>array('name'=>'Pro League 25k','price'=>25000,'admin_fee'=>5000),
+	'pro2'=>array('name'=>'Pro League 50k','price'=>50000,'admin_fee'=>5000)
+));
+
+Configure::write('SUPERSOCCER_WEB', 'http://supersoccer.code18.us/');
+
+Configure::write('MOBILE_CHARGE', array(
+									'TRIVIA' => 1000,
+									'CATALOG_01' => 2000,
+									'CATALOG_02' => 3000,
+									'CATALOG_03' => 4000
+								));
+Configure::write('URL_SCHEME', 'com.arm-enterprises.supersoccer.england2014://');
+Configure::write('URL_MOBILE_NOTIF', 'http://staging-rwrbimtuqy.elasticbeanstalk.com/');
+Configure::write('PRIVATE_LEAGUE_PLAYER_MAX', 30);
+Configure::write('INNITY_CHANNEL', array(
+				'innt1001' => 'Entertainment',
+				'innt1002' => 'Automotive',
+				'innt1003' => 'Sports n Recreation',
+				'innt1004' => 'Games',
+				'innt1005' => 'Social n Community'
+				));
+
+//DOKU ENDPOINT
+Configure::write('DOKU_API','http://103.10.129.17/Suite/Receive');
+Configure::write('DOKU_MALLID',151);
+Configure::write('DOKU_SHAREDKEY','F51F48kJHack');

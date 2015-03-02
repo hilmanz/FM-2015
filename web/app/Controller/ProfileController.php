@@ -256,6 +256,9 @@ class ProfileController extends AppController {
 	
 	public function register_team(){
 		$userData = $this->getUserData();
+		
+		$paid_plan = $this->userDetail['User']['paid_plan'];
+
 		CakeLog::write('create_team',' ['.$_SESSION['league'].'] - register_team');
 		if(@$userData['register_completed']!=1 || $userData['team']==null){
 			$team = $this->Session->read('TeamRegister');
@@ -278,10 +281,11 @@ class ProfileController extends AppController {
 			}else{
 				$teams = $this->Game->getTeams();
 				$this->set('team_list',$teams);
+				$this->set('plan',$paid_plan);
 				$this->set('INITIAL_BUDGET',Configure::read('INITIAL_BUDGET'));
 			}
 		}else{
-			$this->redirect("/");
+			$this->redirect("/?error=501");
 		}
 	}
 
@@ -623,6 +627,7 @@ class ProfileController extends AppController {
 								  'birthdate'=>$birthdate,
 								  'n_status'=>0,
 								  'register_completed'=>0,
+								  'paid_member'=>-1,
 								  'activation_code' => date("Ymdhis").rand(100, 999),
 								  'ref_code' => $ref_code
 								  );

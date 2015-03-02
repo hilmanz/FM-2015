@@ -1,3 +1,11 @@
+<?php
+function isNotFree($user_plan){
+    if($plan!='free'){
+        return true;
+    }
+}
+$paid_teams = array('t1','t3','t8','t6','t11','t14','t43');
+?>
 <div id="fillDetailsPage">
 	
     <div id="thecontent">
@@ -31,14 +39,24 @@
                             		$selected = "selected";
                             	}
                             ?>
-                            <a class="teamBox <?=$selected?>" no="<?=$team['uid']?>" href="#/selectTeam/<?=$team['uid']?>" title="<?=$team['name']?>">
-                    
+                            <?php if($plan=='free' && in_array($team['uid'],$paid_teams)):?>
+                            <a class="teamBox-disabled" title="<?=$team['name']?>">
                                 <img style="height:46px" src="http://widgets-images.s3.amazonaws.com/football/team/badges_65/<?=str_replace('t','',$team['uid'])?>.png"/>
                                 <div class="team-name"><?=$team['name']?></div>
                             </a><!-- end .teamBox -->
+                            <?php else:?>
+                            <a class="teamBox <?=$selected?>" no="<?=$team['uid']?>" href="#/selectTeam/<?=$team['uid']?>" title="<?=$team['name']?>">
+                                <img style="height:46px" src="http://widgets-images.s3.amazonaws.com/football/team/badges_65/<?=str_replace('t','',$team['uid'])?>.png"/>
+                                <div class="team-name"><?=$team['name']?></div>
+                            </a><!-- end .teamBox -->
+                            <?php endif;?>
                             <?php endforeach;?>
                         </div><!-- end .row -->
-                       
+                        <?php if($plan=='free'):?>
+                        <div class="row">
+                            * Tim Papan Atas hanya bisa dipilih oleh Pro League Member
+                        </div>
+                        <?php endif;?>
                         <div class="row">
                             <input type="hidden" name="fb_id" value="<?=$USER_DATA['fb_id']?>"/>
                             <input type="hidden" name="team_id" value="<?=$previous_team_id?>"/>

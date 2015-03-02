@@ -1,3 +1,4 @@
+
 <div id="fillDetailsPage">
 	
     <div id="thecontent">
@@ -24,6 +25,7 @@
                                 $teamList = json_decode($team_list,true);
                                 for($i=0;$i < sizeof($teamList);$i++):
                             ?>
+                            
                             <a class="teamBox" href="#selectTeam/<?=$o[$i]['uid']?>" title="<?=$teamList[$i]['name']?>">
                                 <img src="images/team/logo1.png" />
                             </a><!-- end .teamBox -->

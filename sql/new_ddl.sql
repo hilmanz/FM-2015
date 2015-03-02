@@ -635,3 +635,8 @@ ADD COLUMN `po_number` VARCHAR(45) NULL AFTER `transaction_dt`;
 
 ALTER TABLE `fantasy`.`membership_transactions` 
 ADD COLUMN `payment_method` VARCHAR(45) NULL DEFAULT NULL AFTER `amount`;
+ALTER TABLE `fantasy`.`membership_transactions`     ADD COLUMN `transaction_id` VARCHAR(70) NULL AFTER `fb_id`;
+ALTER TABLE `fantasy`.`membership_transactions` ADD UNIQUE `transaction_id` (`transaction_id`);
+
+
+ALTER TABLE `fantasy`.`users`     ADD COLUMN `paid_plan` VARCHAR(10) NULL AFTER `ref_code`;

@@ -43,7 +43,7 @@ pool.getConnection(function(err,conn){
 			});
 		},
 		function(schedules,callback){
-			processSchedule(schedules,function(err){
+			processSchedule(conn,schedules,function(err){
 				callback(err);
 			});
 		},
@@ -64,7 +64,7 @@ pool.getConnection(function(err,conn){
 	function(err){
 		conn.release();
 		pool.end(function(err){
-			console.log('done');
+			console.log('all done');
 		});
 	});
 });
@@ -499,17 +499,17 @@ function getAllEventsWhichWillHappenToday(conn, cb){
 //the player data events will in effect immediately, 
 //while the master data only executed on matchday
 //after the updater_worker process ended, and before the rank_and_points.js executed.
-function processSchedule(schedules,cb){
+function processSchedule(conn,schedules,cb){
 	console.log(schedules);
 	async.eachSeries(schedules,function(schedule,next){
 		if(schedule.event_type==1){
 			//if event_type 1
-			processPlayerEvent(schedule,function(err){
+			processPlayerEvent(conn,schedule,function(err){
 				next();
 			});
 		}else{
 			//if event type 2
-			processMasterEvent(schedule,function(err){
+			processMasterEvent(conn,schedule,function(err){
 				next();
 			});
 		}
@@ -518,14 +518,14 @@ function processSchedule(schedules,cb){
 	});
 }
 
-function processPlayerEvent(schedule,cb){
+function processPlayerEvent(conn,schedule,cb){
 	console.log('process player event');
 	//check the target recipients
 	switch(schedule.target_type){
 		case 1:
 			//if selected individual teams, then queue those selected individual team to event_immediate table
 			//and then queue the email notifications
-			distributeEventToIndividualTeam(schedule,function(err){
+			distributeEventToIndividualTeam(conn,schedule,function(err){
 				flagSchedule(schedule,1,function(err,rs){
 					cb(err);
 				});
@@ -535,7 +535,7 @@ function processPlayerEvent(schedule,cb){
 		case 2:
 			//if all teams, then simply queue all teams and insert into event_immediate table.
 			//and then queue the email notifications
-			distributeEventToAllTeams(schedule,function(err){
+			distributeEventToAllTeams(conn,schedule,function(err){
 				flagSchedule(schedule,1,function(err,rs){
 					cb(err);
 				});
@@ -544,8 +544,8 @@ function processPlayerEvent(schedule,cb){
 		case 3:
 			//if by tier, then query the n-tier teams, then put those n-tier tam to event_immediate table
 			//and then queue the email notifications
-			distributeEventByTier(schedule,function(err){
-				flagSchedule(schedule,1,function(err,rs){
+			distributeEventByTier(conn,schedule,function(err){
+				flagSchedule(conn,schedule,1,function(err,rs){
 					cb(err);
 				});
 			});
@@ -554,8 +554,8 @@ function processPlayerEvent(schedule,cb){
 			//if by original player, then we query all teams that has that player in their team,
 			//then insert them into event_immediate table. 
 			//and then queue the email notifications
-			distributeEventByOriginalPlayer(schedule,function(err){
-				flagSchedule(schedule,1,function(err,rs){
+			distributeEventByOriginalPlayer(conn,schedule,function(err){
+				flagSchedule(conn,schedule,1,function(err,rs){
 					cb(err);
 				});
 			});
@@ -564,14 +564,14 @@ function processPlayerEvent(schedule,cb){
 			//if by original team, we query all team that play as the original team,
 			//then insert them into event_immediate table, and then queue the email.
 			if(schedule.prequisite_event_id==0){
-				distributeEventByOriginalTeam(schedule,function(err){
-					flagSchedule(schedule,1,function(err,rs){
+				distributeEventByOriginalTeam(conn,schedule,function(err){
+					flagSchedule(conn,schedule,1,function(err,rs){
 						cb(err);
 					});
 				});	
 			}else{
-				distributeEventByOriginalTeamPrequisite(schedule,function(err){
-					flagSchedule(schedule,1,function(err,rs){
+				distributeEventByOriginalTeamPrequisite(conn,schedule,function(err){
+					flagSchedule(conn,schedule,1,function(err,rs){
 						cb(err);
 					});
 				});	
@@ -584,24 +584,26 @@ function processPlayerEvent(schedule,cb){
 		break;
 	}
 }
-function flagSchedule(schedule,flag,cb){
-	pool.getConnection(function(err,conn){
+function flagSchedule(conn,schedule,flag,cb){
+	
 		conn.query("UPDATE ffgame.master_events SET n_status=? WHERE id=?",
 					[flag,schedule.id],
 					function(err,rs){
+						
 						cb(err,rs);	
 					});
-	});
+	
 }
-function distributeEventToIndividualTeam(schedule,cb){
+function distributeEventToIndividualTeam(conn,schedule,cb){
 	console.log('distributeEventToIndividualTeam');
 	var targets = JSON.parse(schedule.target_value);
-	pool.getConnection(function(err,conn){
+	
 		//queue those selected individual teams to event_immediate table
 		distributeEachTeam(conn,schedule,targets,function(err){
+
 			cb(err);
 		});
-	});
+	
 }
 function distributeEachTeam(conn,schedule,targets,cb){
 	async.eachSeries(targets,function(target,next){
@@ -691,9 +693,9 @@ function distributeEachTeam(conn,schedule,targets,cb){
 		cb(err);	
 	});
 }
-function distributeEventToAllTeams(schedule,cb){
+function distributeEventToAllTeams(conn,schedule,cb){
 	console.log('distributeEventToAllTeams');
-	pool.getConnection(function(err,conn){
+	
 		var has_data = true;
 		var since_id = 0;
 		async.whilst(function(){
@@ -718,14 +720,17 @@ function distributeEventToAllTeams(schedule,cb){
 				}
 			});
 		},function(err){
-			cb(err);
+			
+				cb(err);
+			
+			
 		});
-	});
+
 }
-function distributeEventByOriginalTeam(schedule,cb){
+function distributeEventByOriginalTeam(conn,schedule,cb){
 	console.log('distirbuteEventByOriginalTeam');
 	var the_targets = JSON.parse(schedule.target_value);
-	pool.getConnection(function(err,conn){
+	
 		var has_data = true;
 		var since_id = 0;
 		async.whilst(function(){
@@ -755,14 +760,17 @@ function distributeEventByOriginalTeam(schedule,cb){
 				}
 			});
 		},function(err){
-			cb(err);
+			
+			
+				cb(err);
+			
 		});
-	});
+	
 }
 function distributeEventByOriginalTeamPrequisite(schedule,cb){
 	console.log('distributeEventByOriginalTeamPrequisite');
 	var the_targets = JSON.parse(schedule.target_value);
-	pool.getConnection(function(err,conn){
+	
 		var has_data = true;
 		var since_id = 0;
 		async.whilst(function(){
@@ -813,14 +821,16 @@ function distributeEventByOriginalTeamPrequisite(schedule,cb){
 				}
 			});
 		},function(err){
-			cb(err);
+			
+				cb(err);
+			
 		});
-	});
+	
 }
-function distributeEventByOriginalPlayer(schedule,cb){
+function distributeEventByOriginalPlayer(conn,schedule,cb){
 	console.log('distirbuteEventByOriginalPlayer');
 	var players = JSON.parse(schedule.target_value);
-	pool.getConnection(function(err,conn){
+	
 		var has_data = true;
 		var since_id = 0;
 		async.whilst(function(){
@@ -850,9 +860,11 @@ function distributeEventByOriginalPlayer(schedule,cb){
 				}
 			});
 		},function(err){
-			cb(err);
+			
+				cb(err);
+			
 		});
-	});
+	
 }
 function distributeEventByTier(schedule,cb){
 	console.log('distributeEventByTier');
@@ -862,7 +874,7 @@ function distributeEventByTier(schedule,cb){
 
 	var start_rank = 0;
 	var end_rank = 0;
-	pool.getConnection(function(err,conn){
+	
 		async.waterfall([
 				function(callback){
 					conn.query("SELECT MAX(rank) AS max_rank FROM "+dbschema+".points;",
@@ -943,14 +955,16 @@ function distributeEventByTier(schedule,cb){
 				}
 			],
 			function(err){
-				cb(err);
+				
+					cb(err);
+				
 		});
-	});
+	
 	
 	
 }
 
-function processMasterEvent(schedule,cb){
+function processMasterEvent(conn,schedule,cb){
 	console.log('process master event');
 	//check the target recipients
 	switch(schedule.target_type){
@@ -958,8 +972,8 @@ function processMasterEvent(schedule,cb){
 			//if individual teams, then queue all teams which its original team is matched the selected teams,
 			//and scheduled it for the next match_day (can we distribute the point immediately ? )
 			//and then queue the email notifications
-			distributeMasterEventToTeam(schedule,function(err){
-				flagSchedule(schedule,1,function(err,rs){
+			distributeMasterEventToTeam(conn,schedule,function(err){
+				flagSchedule(conn,schedule,1,function(err,rs){
 					cb(err);
 				});
 			});
@@ -975,8 +989,8 @@ function processMasterEvent(schedule,cb){
 			//		});
 			//	});
 			//}else{
-				distributeMasterEventToPlayer(schedule,function(err){
-					flagSchedule(schedule,1,function(err,rs){
+				distributeMasterEventToPlayer(conn,schedule,function(err){
+					flagSchedule(conn,schedule,1,function(err,rs){
 						cb(err);
 					});
 				});
@@ -989,10 +1003,10 @@ function processMasterEvent(schedule,cb){
 		break;
 	}
 }
-function distributeMasterEventToPlayer(schedule,cb){
+function distributeMasterEventToPlayer(conn,schedule,cb){
 	console.log('distributeMasterEventToPlayer');
 	var targets = JSON.parse(schedule.target_value);
-	distributeMasterEvents(targets,schedule,function(err){
+	distributeMasterEvents(conn,targets,schedule,function(err){
 		
 		//sendNotificationEmails(schedule,function(err){
 			console.log('finished');
@@ -1000,25 +1014,28 @@ function distributeMasterEventToPlayer(schedule,cb){
 		//});
 	});
 }
-function distributeMasterEventToTeam(schedule,cb){
+function distributeMasterEventToTeam(conn,schedule,cb){
 	console.log('distributeMasterEventToTeam');
 	var targets = JSON.parse(schedule.target_value);
 	var players = [];
 	//for each team, we take the list of its players
 	async.eachSeries(targets,function(target,next){
-		pool.getConnection(function(err,conn){
+		
 			conn.query("SELECT uid FROM ffgame.master_player WHERE team_id=? LIMIT 100;",
 					[target],function(err,rs){
 						for(var i in rs){
 							players.push(rs[i].uid);
 						}
-						next();
+						
+						
+							next();
+						
 					});
-		});
+		
 		
 	},function(err){
 		console.log(players);
-		distributeMasterEvents(players,schedule,function(err){
+		distributeMasterEvents(conn,players,schedule,function(err){
 			//sendNotificationEmails(schedule,function(err){
 				cb(err);
 			//});
@@ -1028,8 +1045,8 @@ function distributeMasterEventToTeam(schedule,cb){
 	});
 	
 }
-function distributeMasterEvents(targets,schedule,cb){
-	pool.getConnection(function(err,conn){
+function distributeMasterEvents(conn,targets,schedule,cb){
+	
 		async.eachSeries(targets,function(target,next){
 			async.waterfall([
 				function(callback){
@@ -1065,9 +1082,12 @@ function distributeMasterEvents(targets,schedule,cb){
 				next();
 			});
 		},function(err){
-			console.log('done');
+			
+				cb(err);
+			
+			
 		});
-	});
+	
 }
 function processAllUsersForMaster(conn,target,schedule,matchday,done){
 	var has_data = true;
@@ -1514,7 +1534,12 @@ function next_match(conn,game_team_id,done){
 				conn.query("SELECT team_id FROM ffgame.game_teams WHERE id = ? LIMIT 1",
 							[game_team_id],function(err,rs){
 								console.log('next_match',S(this.sql).collapseWhitespace().s);
-								callback(err,rs[0].team_id);
+								if(rs.length>0){
+									callback(err,rs[0].team_id);	
+								}else{
+									callback(err,0);	
+								}
+								
 							});
 			},
 			function(team_id,callback){

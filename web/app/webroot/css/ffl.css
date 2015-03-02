@@ -1011,7 +1011,7 @@ input[type=text]{
 	margin:10px 0 0 0;
 	font-size:14px;
 }
-.teamBox{
+.teamBox,.teamBox-disabled{
 	background:url(../images/tr.png) repeat;
 	border-radius:5px;
 	padding:20px;
@@ -2830,4 +2830,45 @@ input[type=text], input[type="password"]{
 .playerhighlight td{
 	background-color: #fdcb02;
 	
+}
+.plan{
+	text-align:left;
+}
+.plan .price{
+	color:#fdcb02;
+	font-weight:bold;
+	font-size:20px;
+}
+.plan ul {
+list-style: circle;
+padding: 18px;
+}
+.plan .box {
+min-height: 480px;
+padding: 0;
+}
+#pilih-liga.plan {
+width: 290px;
+float: left;
+margin: 10px;
+}
+td.l-rank.subtotal {
+text-align: right;
+}
+.metode{
+	margin-bottom:10px;
+}
+.row.metode-pembayaran {
+float: right;
+width: 300px;
+}
+.row.metode-pembayaran input[type=submit] {
+width:100%;
+}
+.metode-pembayaran label {
+display: block;
+float: left;
+width: 100%;
+font-weight: bold;
+text-transform: uppercase;
 }

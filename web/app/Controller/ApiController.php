@@ -3731,6 +3731,10 @@ class ApiController extends AppController {
 		    		$this->MerchandiseOrder->id = $data_redis['order_id'];
 
 		    		$this->MerchandiseOrder->save(array('n_status' => 1));
+		    	}else if($additionaldata == 'fm-subscribe')
+		    	{
+					CakeLog::write('doku','NOTIFY - '.date("Y-m-d H:i:s").' - Processing fm-subscribe : '.json_encode($data));
+					$this->pro_subscribe($data,$doku);
 		    	}
 		    	else
 		    	{
@@ -3814,7 +3818,25 @@ class ApiController extends AppController {
 		$this->render('default');
 
 	}
+	private function pro_subscribe($trx,$doku){
+		//get transaction_id
+		if($trx['RESULTMSG']=='SUCCESS'){
+			$this->loadModel('MembershipTransactions');
+			$trans = $this->MembershipTransactions->findByPo_number($doku['Doku']['po_number']);
+			$this->MembershipTransactions->id = $trans['MembershipTransactions']['id'];
+			$this->MembershipTransactions->save(array(
+				'n_status'=>1
+			));
 
+			$this->MembershipTransactions->query("INSERT INTO member_billings
+												(fb_id,log_dt,expire)
+												VALUES('{$trans['MembershipTransactions']['fb_id']}',
+														NOW(), NOW() + INTERVAL 1 MONTH)");
+			$this->User->query("UPDATE users SET paid_member=1,paid_member_status=1 
+											WHERE fb_id='{$trans['MembershipTransactions']['fb_id']}'");	
+		}
+		
+	}
 	//param POST fb_id, order_id, payment_method
 	public function doku_ongkir_payment()
 	{
