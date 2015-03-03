@@ -85,14 +85,13 @@ app.get('/simulator/update', [], function(req,res){
 	});
 	
 });
+
 app.get('/playerstats/:game_id',[],function(req,res){
-	client.get('player_stats'+req.params.game_id,function(err,resp){
-		var data = JSON.parse(resp);
-		report_player.process_team_stats(data,function(err,rs){
-			res.send(200,{status:1,data:rs});
-		});
+	getPlayerStats(req.params.game_id, function(err,rs){
+		res.send(200,{status:1,data:rs});
 	});
 });
+
 app.get('/matchstats/:game_id',[],function(req,res){
 	client.get('teamstats_'+req.params.game_id,function(err,resp){
 		var data = JSON.parse(resp);
@@ -328,6 +327,32 @@ function resetData(done){
 		});
 	});
 }
+
+function getPlayerStats(game_id, done){
+	pool.getConnection(function(err,conn){
+		async.waterfall([
+			function(cb){
+				conn.query("SELECT * FROM ffgame.game_matchstats_modifier LIMIT 100000;",
+							[],function(err,rs){
+								cb(err,rs);
+							});
+			},
+			function(stats_modifier, cb){
+				client.get('player_stats'+game_id,function(err,resp){
+					var data = JSON.parse(resp);
+					report_player.process_team_stats(data,stats_modifier,function(err,rs){
+						cb(err, rs);
+					});
+				});
+			}
+		],
+		function(err,rs){
+			conn.release();
+			done(err,rs);
+		});
+	});
+}
+
 function getFixtures(league,done){
 	var dbname = '';
 	if(league=='ita'){

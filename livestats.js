@@ -676,7 +676,7 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 		},
 		function(cb){
 			//save the player accumulative stats
-			conn.query("SELECT a.player_id,a.team_id,a.stats_name,SUM(a.stats_value) AS total\
+			conn.query("SELECT a.player_id,a.team_id,a.stats_name,b.position,SUM(a.stats_value) AS total\
 						FROM optadb.player_stats a\
 						INNER JOIN optadb.master_player b\
 						ON a.player_id = b.uid \
