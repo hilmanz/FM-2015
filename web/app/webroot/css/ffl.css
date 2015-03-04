@@ -1879,16 +1879,18 @@ h3.tabtitle{
 	position:relative;
 	width:265px !important;
 }
-.thumbPlayers,.thumbPlayersSmall{
-	display:block;
-	width:100px; height:100px;
-	border:solid 1px #fff;
-	overflow:hidden;
-	position:relative;
+.thumbPlayers, .thumbPlayersSmall {
+display: block;
+width: 50px;
+height: 50px;
+border: solid 1px #fff;
+overflow: hidden;
+position: relative;
 }
 .thumbPlayers img{
 	position:absolute;
 	top:-20px;
+	width:50px;
 }
 .opta-widget-container .profile .team-logo img{
 	border:solid 1px #fff;

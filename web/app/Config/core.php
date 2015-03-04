@@ -421,9 +421,9 @@ Configure::write('FM_SESSION_ID',2014);
 
 
 Configure::write("SUBSCRIPTION_PLAN",array(
-	'free'=>array('name'=>'Play for Free','price'=>0,'admin_fee'=>0),
-	'pro1'=>array('name'=>'Pro League 25k','price'=>25000,'admin_fee'=>5000),
-	'pro2'=>array('name'=>'Pro League 50k','price'=>50000,'admin_fee'=>5000)
+	'free'=>array('name'=>'Play for Free','price'=>0,'admin_fee'=>0,'initial_budget'=>0),
+	'pro1'=>array('name'=>'Pro League 25k','price'=>25000,'admin_fee'=>5000,'initial_budget'=>15000000),
+	'pro2'=>array('name'=>'Pro League 50k','price'=>50000,'admin_fee'=>5000,'initial_budget'=>50000000)
 ));
 
 Configure::write('SUPERSOCCER_WEB', 'http://supersoccer.code18.us/');

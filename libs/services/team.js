@@ -51,6 +51,7 @@ exports.create = function(req,res){
 		fb_id: req.body.fb_id,
 		team_id: req.body.team_id,
 		players: JSON.parse(req.body.players),
+		plan:req.body.plan
 	},
 	function(err,result){
 		if(err){

@@ -1,77 +1,120 @@
-<div id="fillDetailsPage">
-      <div class="rowd">
-     	 <?php echo $this->element('infobar'); ?>
-      </div>
-      <div class="rowd">
-    <div id="thecontent">
-        <?=$this->Session->flash();?>
-        <div id="content">
-        	<div class="content">
-            	<div class="row-2">
-                  <h1 class="red">Upgrade Member</h1>
-                  <p>Upgrade keanggotaan loe untuk kesempatan mendapatkan hadiah yang lebih menarik.
+<div id="loginContainer">
+    <div class="container">
+      <h3>MEMBERSHIP PLAN</h3>
+      <h4 class="yellow"></h4>
+    </div>
+    <div  id="pilih-liga" class="widgets tr plan">
+      <div class="box">
+         <h2>FREE MEMBER</h2>
+         <p class="price">Rp. 0</p>
+         <p>loe bisa main FM secara gratis, namun dengan fasilitas terbatas : </p>
+         <ul>
+          <li>
+              Tidak dapat memilih tim papan atas sebagai starter team.
+          </li>
+          <li>
+             hanya mendapatkan 10juta SS$ untuk modal awal setelah memilih team
+          </li>
+          <li>
+              harus mengatur formasi sendiri di tiap minggunya.
+          </li>
 
-                  Biaya keanggotaan adalah Rp.10,000 / bulan per liga.</p>
-                  <br />
-                  <table class="theTable footable" border="0" cellpadding="0" cellspacing="0" width="100%">
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>Nama Liga</th>
-                            <th width="20%">Tanggal Daftar</th>
-                            <th class="alignright">Biaya Perbulan</th>
-                            <th class="alignright">Lama Bermain</th>
-                            <th class="alignright">Jumlah</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                      <?php 
-                        $total_bill = 0; 
-                        $j=1; 
-                        for ($i=0;$i<count($data_view['league']);$i++): 
-                      ?>
-                        <tr class="odd">
-                          <td><?=$j?></td>
-                            <td><?=$data_view['league'][$i]?></td>
-                            <td width="20%"><?=$data_view['register_date'][$i]?></td>
-                            <td class="alignright"><?=number_format($data_view['charge'][$i])?></td>
-                            <td class="alignright"><?=number_format($data_view['period'][$i])?> Bulan</td>
-                            <td class="alignright">
-                              IDR. <?=number_format($data_view['period'][$i]*$data_view['charge'][$i])?>
-                            </td>
-                        </tr>
-                      <?php
-                        $total_bill += $data_view['period'][$i]*$data_view['charge'][$i];
-                        $j++; 
-                        endfor; 
-                      ?>
-                        <tr class="odd">
-                          <td colspan="5" style="text-align:right;">Total:</td>
-                          <td>IDR. <?=number_format($total_bill)?></td>
-                        </tr>
-                    </tbody>
-                </table>
-                  <p>
-                      <?php if(!isset($rs['data'])): ?>
-                        Tidak bisa terhubung dengan eCash Bank Mandiri
-                        <a class="button" href="<?=$this->Html->url('/upgrade/member')?>">Refresh</a>
-                      <?php elseif($rs['data'] == '#'): ?>
-                        Tidak bisa terhubung dengan eCash Bank Mandiri
-                        <a class="button" href="<?=$this->Html->url('/upgrade/member')?>">Refresh</a>
-                      <?php else: ?>
-                        <a class="button" href="<?=$rs['data']?>">Upgrade member</a>
-                      <?php endif; ?>
-                  </p>
-    			</div><!-- end .row-2 -->
-			</div><!-- end .content -->
-        </div><!-- end #content -->
-	<div id="sidebar" class="tr">
-	    
-	    <div class="widget">
-	        <div class="cash-left">
-	        </div>
-	    </div><!-- end .widget -->
-       
-	</div><!-- end #sidebar -->
-    </div><!-- end #thecontent -->
-</div><!-- end #fillDetailsPage -->
+         </ul>
+      </div>
+      <div>
+        <?php if($plan=='free'):?>
+         <a href="<?=$this->Html->url('/upgrade/plan/free')?>" class="button">
+           PILIH
+         </a>
+       <?php endif;?>
+      </div>  
+    </div>
+    <div  id="pilih-liga"  class="widgets tr plan">
+      <div class="box">
+         <h2>PRO LEAGUE 25</h2>
+         <p class="price">Rp. 25,000 / Bulan</p>
+         <p>Sebagai pro member, lo mendapatkan fasilitas berikut :  </p>
+         <ul>
+          <li>
+            Dapat memilih tim papan atas sebagai starter team.
+          </li>
+          <li>
+             daftar cedera secara eksklusif setiap minggu.
+          </li>
+          <li>
+             atur formasi secara otomatis(boot)
+          </li>
+          <li>
+             tidak perlu membuka katalog hadiah level 1 (free)
+          </li>
+          <li>
+              mendapatkan 3 saran pemain terbaik setiap minggu
+          </li>
+          <li>
+             mendapatkan tambahan 15juta SS$
+          </li>
+         </ul>
+      </div>  
+     
+      <div>
+         <?php if($plan=='free'):?>
+           <a href="<?=$this->Html->url('/upgrade/plan/pro1')?>" class="button">
+            PILIH
+           </a>
+         <?php endif;?>
+      </div>  
+    </div>
+    <div  id="pilih-liga"  class="widgets tr plan">
+      <div class="box">
+         <h2>PRO LEAGUE 50</h2>
+         <p class="price">Rp. 50,000 / Bulan</p>
+         <p>Sebagai pro member, lo mendapatkan fasilitas berikut :  </p>
+         <ul>
+          <li>
+            Dapat memilih tim papan atas sebagai starter team.
+          </li>
+          <li>
+              tidak perlu membuka katalog hadiah (free)
+          </li>
+          <li>
+              mendapatkan tambahan 50juta SS$
+          </li>
+          <li>
+              tidak usah membayar ongkir di setiap redeem hadiah
+          </li>
+          <li>
+              mendapatkan tambahan 10% point booster (random) di tiap minggunya
+          </li>
+          <li>
+             mendapatkan daftar cedera secara eksklusif
+          </li>
+          <li>
+              bisa atur formasi secara otomatis(boot)
+          </li>
+          <li>
+              langsung mendapatkan koin sebesar 7000.
+          </li>
+          <li>
+             mendapatkan 5 saran pemain terbaik
+          </li>
+           <li>
+             tidak perlu membuka trivia apps (free)
+          </li>
+           <li>
+             mendapatkan 5 saran pemain terbaik
+          </li>
+           <li>
+             mendapatkan 2x bursa transfer dalam 1 bulan
+          </li>
+         </ul>
+      </div>  
+     
+      <div>
+        <?php if($plan=='free' || $plan=='pro1'):?>
+         <a href="<?=$this->Html->url('/upgrade/plan/pro2')?>" class="button">
+          PILIH
+         </a>
+        <?php endif;?>
+      </div>  
+    </div>
+</div>

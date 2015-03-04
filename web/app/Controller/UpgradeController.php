@@ -668,7 +668,7 @@ class UpgradeController extends AppController {
 					$this->set('order_doku',$data);
 					return $data;
 				}catch(Exception $e){
-					CakeLog::write('doku_pro',date("Y-m-d H:i:s").' - [request] failed doku entry '.json_encode($rs_doku));
+					CakeLog::write('doku_pro',date("Y-m-d H:i:s").' - [request] failed doku entry '.json_encode(@$rs_doku).' '.$e->getMessage());
 				}
 			}else{
 				//transaction exist, so we use the old po

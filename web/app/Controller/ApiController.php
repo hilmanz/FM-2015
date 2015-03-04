@@ -3834,6 +3834,46 @@ class ApiController extends AppController {
 														NOW(), NOW() + INTERVAL 1 MONTH)");
 			$this->User->query("UPDATE users SET paid_member=1,paid_member_status=1 
 											WHERE fb_id='{$trans['MembershipTransactions']['fb_id']}'");	
+
+			$user = $this->User->findByFb_id($trans['MembershipTransactions']['fb_id']);
+			CakeLog::write('doku','NOTIFY - '.date("Y-m-d H:i:s").' - Processing fm-subscribe : '.json_encode($user['User']['paid_plan']));
+			if($user['User']['paid_plan']=='pro2'){
+				
+				try{
+					$this->MembershipTransactions->query("
+										INSERT IGNORE INTO game_transactions
+										(fb_id,transaction_dt,transaction_name,amount,details)
+										VALUES('{$trans['MembershipTransactions']['fb_id']}',NOW(),'PRO_BONUS',7000,'PRO_BONUS')");
+					
+					$this->MembershipTransactions->query("INSERT INTO game_team_cash
+															(fb_id,cash)
+															SELECT fb_id,SUM(amount) AS cash 
+															FROM game_transactions
+															WHERE fb_id = '{$trans['MembershipTransactions']['fb_id']}'
+															GROUP BY fb_id
+															ON DUPLICATE KEY UPDATE
+															cash = VALUES(cash);");
+					
+				}catch(Exception $err){
+					CakeLog::write('doku','NOTIFY - '.date("Y-m-d H:i:s").' - Processing fm-subscribe : '.
+												"INSERT IGNORE INTO game_transactions
+											(fb_id,transaction_dt,transaction_name,amount,details)
+											VALUES('{$trans['MembershipTransactions']['fb_id']}',NOW(),'PRO_BONUS',7000,'PRO_BONUS')");
+
+					CakeLog::write('doku','NOTIFY - '.date("Y-m-d H:i:s").' - Processing fm-subscribe : '.
+												"INSERT INTO game_team_cash
+															(fb_id,cash)
+															SELECT fb_id,SUM(amount) AS cash 
+															FROM game_transactions
+															WHERE fb_id = '{$trans['MembershipTransactions']['fb_id']}'
+															GROUP BY fb_id
+															ON DUPLICATE KEY UPDATE
+															cash = VALUES(cash);");
+				}
+				
+				
+				
+			}
 		}
 		
 	}
@@ -7605,7 +7645,8 @@ class ApiController extends AppController {
 			
 			$data = array(
 				'team_id'=>Sanitize::paranoid($team_id),
-				'fb_id'=>Sanitize::paranoid($userData['fb_id'])
+				'fb_id'=>Sanitize::paranoid($userData['fb_id']),
+				'plan'=>$user['User']['paid_plan']
 			);
 			
 			$players_selected = $this->Game->getMasterTeam($team_id);

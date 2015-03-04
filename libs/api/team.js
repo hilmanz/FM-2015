@@ -13,6 +13,7 @@ var async = require('async');
 var mysql = require('mysql');
 var S = require('string');
 var initial_money = require(path.resolve('./libs/game_config')).initial_money;
+var additional_budget = require(path.resolve('./libs/game_config')).additional_budget;
 var team_stars	= require(path.resolve('./libs/game_config')).team_stars;
 var pool = {};
 function prepareDb(callback){
@@ -223,12 +224,12 @@ function create(data,callback){
 					}
 				},
 				function(game_team_id,callback){
-
+					console.log('data',data);
 					if(game_team_id!=null){
 						conn.query(
 							"INSERT IGNORE INTO "+config.database.database+".game_team_purse(game_team_id,budget)\
 							 VALUES(?,?)"
-						,[game_team_id,initial_money],
+						,[game_team_id,initial_money + additional_budget[data.plan]],
 						function(err,rs){
 							console.log('CREATE_TEAM',S(this.sql).collapseWhitespace().s);
 							callback(err,game_team_id);

@@ -258,7 +258,8 @@ class ProfileController extends AppController {
 		$userData = $this->getUserData();
 		
 		$paid_plan = $this->userDetail['User']['paid_plan'];
-
+		$pro_setting = Configure::read('SUBSCRIPTION_PLAN');
+		
 		CakeLog::write('create_team',' ['.$_SESSION['league'].'] - register_team');
 		if(@$userData['register_completed']!=1 || $userData['team']==null){
 			$team = $this->Session->read('TeamRegister');
@@ -282,7 +283,9 @@ class ProfileController extends AppController {
 				$teams = $this->Game->getTeams();
 				$this->set('team_list',$teams);
 				$this->set('plan',$paid_plan);
-				$this->set('INITIAL_BUDGET',Configure::read('INITIAL_BUDGET'));
+				$this->set('INITIAL_BUDGET',
+							intval(Configure::read('INITIAL_BUDGET')) + 
+							$pro_setting[$paid_plan]['initial_budget']);
 			}
 		}else{
 			$this->redirect("/?error=501");
@@ -375,7 +378,8 @@ class ProfileController extends AppController {
 			$players = explode(',',$this->request->data['players']);
 			$data = array(
 				'team_id'=>Sanitize::paranoid($team['team_id']),
-				'fb_id'=>Sanitize::paranoid($userData['fb_id'])
+				'fb_id'=>Sanitize::paranoid($userData['fb_id']),
+				'plan'=>$this->userDetail['User']['paid_plan']
 			);
 			
 			$players_selected = $this->Game->getMasterTeam($team['team_id']);
@@ -464,10 +468,14 @@ class ProfileController extends AppController {
 			$userData = $this->getUserData();
 			$selected_team = $this->Session->read('TeamRegister');
 			
+			$paid_plan = $this->userDetail['User']['paid_plan'];
+			$pro_setting = Configure::read('SUBSCRIPTION_PLAN');
 			if(is_array($this->Session->read('TeamRegister'))){
 				
 				$userData = $this->getUserData();
-				$this->set('INITIAL_BUDGET',Configure::read('INITIAL_BUDGET'));
+				$this->set('INITIAL_BUDGET',
+							intval(Configure::read('INITIAL_BUDGET')) + 
+							$pro_setting[$paid_plan]['initial_budget']);
 				$teams = $this->Game->getTeams();
 				//get players of selected team.
 				$players_selected = $this->Game->getMasterTeam($selected_team['team_id']);
@@ -578,7 +586,7 @@ class ProfileController extends AppController {
 
 		if(@$this->userData['register_completed']!=1){
 			$this->loadModel('User');
-		
+			
 			$this->set('INITIAL_BUDGET',Configure::read('INITIAL_BUDGET'));
 			$user_fb = $this->Session->read('Userlogin.info');
 			$this->set('user',$user_fb);

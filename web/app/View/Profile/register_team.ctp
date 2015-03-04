@@ -4,7 +4,10 @@ function isNotFree($user_plan){
         return true;
     }
 }
-$paid_teams = array('t1','t3','t8','t6','t11','t14','t43');
+
+
+$paid_teams = array('t1','t3','t8','t6','t11','t14','t43',
+                    't128','t121','t120','t127','t459','t129');
 ?>
 <div id="fillDetailsPage">
 	

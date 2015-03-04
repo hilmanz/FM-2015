@@ -119,6 +119,11 @@ exports.formations = {
 
 //initial amount of money the user will have.
 exports.initial_money = 10000000;
+exports.additional_budget = {
+	free:0,
+	pro1:15000000,
+	pro2:50000000
+};
 exports.sponsorship_chance = 0.4;
 exports.end_of_match_bonus = {
 	all_lineup_played: 20,
