@@ -102,6 +102,8 @@ class UpgradeController extends AppController {
 	{
 
 		$userData = $this->userData;
+		
+		$this->set('plan',$this->userDetail['User']['paid_plan']);
 		$rs_user = $this->User->findByFb_id($userData['fb_id']);
 		$transaction_id = intval($rs_user['User']['id']).'-'.date("YmdHis").'-'.rand(0,999);
 		$description = 'Purchase Order #'.$transaction_id;

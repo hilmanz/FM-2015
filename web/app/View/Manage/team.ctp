@@ -179,7 +179,7 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
                 </a>
             </div>
             <?php endfor;?>
-        	
+        	<?=$this->element('pro_news')?>
             
         </div><!-- end .box4 -->
         <div class="box3 tr fl drop" id="formationBox">

@@ -56,6 +56,7 @@ class PagesController extends AppController {
 		$user = $this->userDetail;
 		$this->set('user',$user['User']);
 	}
+	
 	public function display() {
 		$path = func_get_args();
 

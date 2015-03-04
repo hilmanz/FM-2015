@@ -1,4 +1,3 @@
-
 <div id="loginContainer">
     <div class="container">
       <h3>MEMBERSHIP PLAN</h3>
@@ -23,11 +22,11 @@
          </ul>
       </div>
       <div>
-        <?php if($plan=='free'):?>
+       
          <a href="<?=$this->Html->url('/upgrade/plan/free')?>" class="button">
            PILIH
          </a>
-       <?php endif;?>
+      
       </div>  
     </div>
     <div  id="pilih-liga"  class="widgets tr plan">
@@ -58,11 +57,9 @@
       </div>  
      
       <div>
-         <?php if($plan=='free'):?>
-           <a href="<?=$this->Html->url('/upgrade/plan/pro1')?>" class="button">
-            PILIH
-           </a>
-         <?php endif;?>
+         <a href="<?=$this->Html->url('/upgrade/plan/pro1')?>" class="button">
+          PILIH
+         </a>
       </div>  
     </div>
     <div  id="pilih-liga"  class="widgets tr plan">
@@ -102,20 +99,15 @@
              tidak perlu membuka trivia apps (free)
           </li>
            <li>
-             mendapatkan 5 saran pemain terbaik
-          </li>
-           <li>
              mendapatkan 2x bursa transfer dalam 1 bulan
           </li>
          </ul>
       </div>  
      
       <div>
-        <?php if($plan=='free' || $plan=='pro1'):?>
          <a href="<?=$this->Html->url('/upgrade/plan/pro2')?>" class="button">
           PILIH
          </a>
-        <?php endif;?>
       </div>  
     </div>
 </div>

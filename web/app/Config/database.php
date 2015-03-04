@@ -85,6 +85,16 @@ class DATABASE_CONFIG {
 		'prefix' => '',
 		'encoding' => 'utf8',
 	);
+	public $wordpress = array(
+		'datasource' => 'Database/Mysql',
+		'persistent' => false,
+		'host' => 'localhost',
+		'login' => 'root',
+		'password' => 'root',
+		'database' => 'supersoccer_stg',
+		'prefix' => '',
+		'encoding' => 'utf8',
+	);
 	public $test = array(
 		'datasource' => 'Database/Mysql',
 		'persistent' => false,
