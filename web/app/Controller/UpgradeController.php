@@ -694,6 +694,9 @@ class UpgradeController extends AppController {
 				
 	}
 	public function payment_pending(){
-				
+		
+		$paymentcode = $this->request->query['trx'];
+		
+		$this->set('paymentcode',decrypt_param($paymentcode));
 	}
 }
