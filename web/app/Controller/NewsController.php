@@ -72,8 +72,8 @@ class NewsController extends AppController {
 		//user data
 		$user = $this->userDetail;
 		$this->set('user',$user['User']);
-		
-		if($user['User']['paid_member']!=1 && $this->request->params['action']!='error'){
+
+		if($user['User']['paid_member_status']!=1 && $this->request->params['action']!='error'){
 			$this->redirect('/news/error');
 			die();	
 		}

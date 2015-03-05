@@ -117,50 +117,12 @@ class UpgradeController extends AppController {
 		}
 		else if($rs_user['User']['paid_member'] == 1 && $rs_user['User']['paid_member_status'] == 0)
 		{
-			$can_upgrade = false;
+			$can_upgrade = true;
 		}
 
 		if($can_upgrade)
 		{
-			$data_view = array();
-			if($this->checkTotalTeam() > 1)
-			{
-				$amount = $amount + $this->epl_charge($userData['fb_id']);
-				$amount = $amount + $this->ita_charge($userData['fb_id']);
-				$data_view['league'] = array('English Premier League', 'Serie A Italy');
-
-				$period_epl = $this->checkRegisterGameUser($userData['fb_id'], 'epl');
-				$period_ita = $this->checkRegisterGameUser($userData['fb_id'], 'ita');
-
-				$data_view['register_date'] = array(
-										$period_epl[0][0]['tanggal'],
-										$period_ita[0][0]['tanggal']
-									);
-
-				$data_view['period'] = array($period_epl[0][0]['period'],
-											$period_ita[0][0]['period']);
-
-				$data_view['charge'] = array($this->charge,$this->charge);
-			}
-			else
-			{
-				$amount = $amount + $this->epl_charge($userData['fb_id']);
-				if($amount == 0)
-				{
-					$amount = $amount + $this->ita_charge($userData['fb_id']);
-				}
-
-			}
-
-			$rs = $this->Game->getEcashUrl(array(
-				'transaction_id'=>$transaction_id,
-				'description'=>$description,
-				'amount'=>$amount,
-				'clientIpAddress'=>$this->request->clientIp(),
-				'source'=>'FMUPGRADE'
-			));
-			$this->set('data_view', $data_view);
-			$this->set('rs', $rs);
+			$this->plan();
 		}
 		else
 		{

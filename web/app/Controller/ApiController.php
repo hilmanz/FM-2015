@@ -3820,6 +3820,7 @@ class ApiController extends AppController {
 	}
 	private function pro_subscribe($trx,$doku){
 		//get transaction_id
+		$url_mobile_notif = Configure::read('URL_MOBILE_NOTIF').'fm_payment_notification';
 		if($trx['RESULTMSG']=='SUCCESS'){
 			$this->loadModel('MembershipTransactions');
 			$trans = $this->MembershipTransactions->findByPo_number($doku['Doku']['po_number']);
@@ -3831,14 +3832,17 @@ class ApiController extends AppController {
 			$this->MembershipTransactions->query("INSERT INTO member_billings
 												(fb_id,log_dt,expire)
 												VALUES('{$trans['MembershipTransactions']['fb_id']}',
-														NOW(), NOW() + INTERVAL 1 MONTH)");
+														NOW(), NOW() + INTERVAL 1 MONTH) 
+												ON DUPLICATE KEY UPDATE log_dt = NOW(), 
+												expire=NOW() + INTERVAL 1 MONTH");
 			$this->User->query("UPDATE users SET paid_member=1,paid_member_status=1 
 											WHERE fb_id='{$trans['MembershipTransactions']['fb_id']}'");	
 
 			$user = $this->User->findByFb_id($trans['MembershipTransactions']['fb_id']);
 			CakeLog::write('doku','NOTIFY - '.date("Y-m-d H:i:s").' - Processing fm-subscribe : '.json_encode($user['User']['paid_plan']));
+
+			$fb_id = $trans['MembershipTransactions']['fb_id'];
 			if($user['User']['paid_plan']=='pro2'){
-				
 				try{
 					$this->MembershipTransactions->query("
 										INSERT IGNORE INTO game_transactions
@@ -3853,6 +3857,11 @@ class ApiController extends AppController {
 															GROUP BY fb_id
 															ON DUPLICATE KEY UPDATE
 															cash = VALUES(cash);");
+
+					$user_data = array('fb_id' => $fb_id, 'trx_type' => 'PRO_LEAGUE_2');
+
+					$result_mobile = curlPost($url_mobile_notif, $user_data);
+					$result_mobile = json_decode($result_mobile, TRUE);
 					
 				}catch(Exception $err){
 					CakeLog::write('doku','NOTIFY - '.date("Y-m-d H:i:s").' - Processing fm-subscribe : '.
@@ -3873,7 +3882,14 @@ class ApiController extends AppController {
 				
 				
 				
+			}else if($user['User']['paid_plan']=='pro1'){
+				$user_data = array('fb_id' => $fb_id, 'trx_type' => 'PRO_LEAGUE');
+
+				$result_mobile = curlPost($url_mobile_notif, $user_data);
+				$result_mobile = json_decode($result_mobile, TRUE);
 			}
+
+			Cakelog::write('debug', 'api.pro_subscribe result_mobile'.$result_mobile);
 		}
 		
 	}
