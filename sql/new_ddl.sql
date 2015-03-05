@@ -640,3 +640,6 @@ ALTER TABLE `fantasy`.`membership_transactions` ADD UNIQUE `transaction_id` (`tr
 
 
 ALTER TABLE `fantasy`.`users`     ADD COLUMN `paid_plan` VARCHAR(10) NULL AFTER `ref_code`;
+
+ALTER TABLE `fantasy`.`member_billings` 
+ADD UNIQUE INDEX `UNIQUE_FB_ID` (`fb_id` ASC);
