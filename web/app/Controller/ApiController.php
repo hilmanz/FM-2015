@@ -3834,7 +3834,8 @@ class ApiController extends AppController {
 												VALUES('{$trans['MembershipTransactions']['fb_id']}',
 														NOW(), NOW() + INTERVAL 1 MONTH) 
 												ON DUPLICATE KEY UPDATE log_dt = NOW(), 
-												expire=NOW() + INTERVAL 1 MONTH");
+												expire=NOW() + INTERVAL 1 MONTH,
+												is_sevendays_notif=0,is_threedays_notif=0");
 			$this->User->query("UPDATE users SET paid_member=1,paid_member_status=1 
 											WHERE fb_id='{$trans['MembershipTransactions']['fb_id']}'");	
 
@@ -3889,7 +3890,7 @@ class ApiController extends AppController {
 				$result_mobile = json_decode($result_mobile, TRUE);
 			}
 
-			Cakelog::write('debug', 'api.pro_subscribe result_mobile'.$result_mobile);
+			Cakelog::write('debug', 'api.pro_subscribe result_mobile'.json_encode($result_mobile));
 		}
 		
 	}
