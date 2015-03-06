@@ -5,7 +5,7 @@
     </div>
     <div  id="pilih-liga" class="widgets tr plan">
       <div class="box">
-         <h2>FREE MEMBER</h2>
+        <img src="<?=$this->Html->url('/images/free.jpg')?>"/>
          <p class="price">Rp. 0</p>
          <p>loe bisa main FM secara gratis, namun dengan fasilitas terbatas : </p>
          <ul>
@@ -31,7 +31,7 @@
     </div>
     <div  id="pilih-liga"  class="widgets tr plan">
       <div class="box">
-         <h2>PRO LEAGUE 25</h2>
+         <img src="<?=$this->Html->url('/images/pro1.jpg')?>"/>
          <p class="price">Rp. 25,000 / Bulan</p>
          <p>Sebagai pro member, lo mendapatkan fasilitas berikut :  </p>
          <ul>
@@ -67,7 +67,7 @@
     </div>
     <div  id="pilih-liga"  class="widgets tr plan">
       <div class="box">
-         <h2>PRO LEAGUE 50</h2>
+         <img src="<?=$this->Html->url('/images/pro2.jpg')?>"/>
          <p class="price">Rp. 50,000 / Bulan</p>
          <p>Sebagai pro member, lo mendapatkan fasilitas berikut :  </p>
          <ul>
