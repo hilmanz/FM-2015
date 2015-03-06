@@ -36,22 +36,25 @@
          <p>Sebagai pro member, lo mendapatkan fasilitas berikut :  </p>
          <ul>
           <li>
+            Berkesempatan mendapatkan hadiah puluhan juta rupiah setiap minggunya.
+          </li>
+          <li>
             Dapat memilih tim papan atas sebagai starter team.
           </li>
           <li>
-             daftar cedera secara eksklusif setiap minggu.
+             Daftar cedera secara eksklusif setiap minggu.
           </li>
           <li>
-             atur formasi secara otomatis(boot)
+             Atur formasi secara otomatis(bot)
           </li>
           <li>
-             tidak perlu membuka katalog hadiah level 1 (free)
+             Tidak perlu membuka katalog hadiah level 1 (free)
           </li>
           <li>
-              mendapatkan 3 saran pemain terbaik setiap minggu
+              Mendapatkan 3 saran pemain terbaik setiap minggu
           </li>
           <li>
-             mendapatkan tambahan 15juta SS$
+             Mendapatkan tambahan 15juta SS$
           </li>
          </ul>
       </div>  
@@ -69,37 +72,40 @@
          <p>Sebagai pro member, lo mendapatkan fasilitas berikut :  </p>
          <ul>
           <li>
+            Berkesempatan mendapatkan hadiah puluhan juta rupiah setiap minggunya.
+          </li>
+          <li>
             Dapat memilih tim papan atas sebagai starter team.
           </li>
           <li>
-              tidak perlu membuka katalog hadiah (free)
+              Tidak perlu membuka katalog hadiah (free)
           </li>
           <li>
-              mendapatkan tambahan 50juta SS$
+              Mendapatkan tambahan 50juta SS$
           </li>
           <li>
-              tidak usah membayar ongkir di setiap redeem hadiah
+              Tidak usah membayar ongkir di setiap redeem hadiah
           </li>
           <li>
-              mendapatkan tambahan 10% point booster (random) di tiap minggunya
+              Mendapatkan tambahan 10% point booster (random) di tiap minggunya
           </li>
           <li>
-             mendapatkan daftar cedera secara eksklusif
+             Mendapatkan daftar cedera secara eksklusif
           </li>
           <li>
-              bisa atur formasi secara otomatis(boot)
+              Bisa atur formasi secara otomatis(bot)
           </li>
           <li>
-              langsung mendapatkan koin sebesar 7000.
+              Langsung mendapatkan koin sebesar 7000.
           </li>
           <li>
-             mendapatkan 5 saran pemain terbaik
+             Mendapatkan 5 saran pemain terbaik
           </li>
            <li>
-             tidak perlu membuka trivia apps (free)
+             Tidak perlu membuka trivia apps (free)
           </li>
            <li>
-             mendapatkan 2x bursa transfer dalam 1 bulan
+             Mendapatkan 2x bursa transfer dalam 1 bulan
           </li>
          </ul>
       </div>  
