@@ -3819,6 +3819,7 @@ class ApiController extends AppController {
 
 	}
 	private function pro_subscribe($trx,$doku){
+		$this->loadModel('Game');
 		//get transaction_id
 		$url_mobile_notif = Configure::read('URL_MOBILE_NOTIF').'fm_payment_notification';
 		if($trx['RESULTMSG']=='SUCCESS'){
@@ -3843,6 +3844,9 @@ class ApiController extends AppController {
 			CakeLog::write('doku','NOTIFY - '.date("Y-m-d H:i:s").' - Processing fm-subscribe : '.json_encode($user['User']['paid_plan']));
 
 			$fb_id = $trans['MembershipTransactions']['fb_id'];
+			$team = $this->Game->getTeam($fb_id);
+			$next_match = $this->Game->getNextMatch($team['id']);
+
 			if($user['User']['paid_plan']=='pro2'){
 				try{
 					$this->MembershipTransactions->query("
@@ -3858,6 +3862,17 @@ class ApiController extends AppController {
 															GROUP BY fb_id
 															ON DUPLICATE KEY UPDATE
 															cash = VALUES(cash);");
+
+					//give ss$50000000
+					$this->Game->addTeamExpenditures(
+												intval($team['id']),
+												'PRO_LEAGUE_2',
+												1,
+												50000000,
+												$next_match['match']['game_id'],
+												$next_match['match']['matchday'],
+												1,
+												1);
 
 					$user_data = array('fb_id' => $fb_id, 'trx_type' => 'PRO_LEAGUE_2');
 
@@ -3884,6 +3899,18 @@ class ApiController extends AppController {
 				
 				
 			}else if($user['User']['paid_plan']=='pro1'){
+
+				//give ss$15000000
+				$this->Game->addTeamExpenditures(
+												intval($team['id']),
+												'PRO_LEAGUE',
+												1,
+												15000000,
+												$next_match['match']['game_id'],
+												$next_match['match']['matchday'],
+												1,
+												1);
+
 				$user_data = array('fb_id' => $fb_id, 'trx_type' => 'PRO_LEAGUE');
 
 				$result_mobile = curlPost($url_mobile_notif, $user_data);
