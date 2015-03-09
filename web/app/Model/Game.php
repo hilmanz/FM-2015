@@ -309,6 +309,45 @@ class Game extends AppModel {
 		return $this->query($sql,false);
 
 	}
+
+	public function addTeamExpendituresByLeague(
+		$game_team_id,
+		$item_name,
+		$item_type,
+		$amount,
+		$game_id,
+		$match_day,
+		$item_total=1,
+		$base_price=1,
+		$league='epl'){
+
+		$database = 'ffgame';
+		if($league == 'ita'){
+			$database = 'ffgame_ita';
+		}
+		$sql = "INSERT IGNORE INTO ".$database.".game_team_expenditures
+				(game_team_id,
+				item_name,
+				item_type,
+				amount,
+				game_id,
+				match_day,
+				item_total,
+				base_price)
+				VALUES
+				(
+				{$game_team_id},
+				'{$item_name}',
+				{$item_type},
+				{$amount},
+				'{$game_id}',
+				{$match_day},
+				{$item_total},
+				{$base_price}
+				);";
+		return $this->query($sql,false);
+
+	}
 	
 	public function getPerkByType($perks,$perk_type,$reward_type=null){
 		$result = array();

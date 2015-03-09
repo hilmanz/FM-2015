@@ -3844,8 +3844,11 @@ class ApiController extends AppController {
 			CakeLog::write('doku','NOTIFY - '.date("Y-m-d H:i:s").' - Processing fm-subscribe : '.json_encode($user['User']['paid_plan']));
 
 			$fb_id = $trans['MembershipTransactions']['fb_id'];
-			$team = $this->Game->getTeam($fb_id);
-			$next_match = $this->Game->getNextMatch($team['id']);
+
+			$game_team_id_epl = $this->get_game_team_id($fb_id, 'epl');
+			$game_team_id_ita = $this->get_game_team_id($fb_id, 'ita');
+
+			Cakelog::write('debug', 'api. pro_subscribe game_team_id '.$game_team_id_epl.' '.$game_team_id_ita);
 
 			if($user['User']['paid_plan']=='pro2'){
 				try{
@@ -3864,15 +3867,31 @@ class ApiController extends AppController {
 															cash = VALUES(cash);");
 
 					//give ss$50000000
-					$this->Game->addTeamExpenditures(
-												intval($team['id']),
+					if($game_team_id_epl != NULL){
+						$this->Game->addTeamExpendituresByLeague(
+												intval($game_team_id_epl),
 												'PRO_LEAGUE_2',
 												1,
 												50000000,
-												$next_match['match']['game_id'],
-												$next_match['match']['matchday'],
+												'',
+												0,
 												1,
-												1);
+												1,
+												'epl');
+					}
+
+					if($game_team_id_ita != NULL){
+						$this->Game->addTeamExpendituresByLeague(
+												intval($game_team_id_ita),
+												'PRO_LEAGUE_2',
+												1,
+												50000000,
+												'',
+												0,
+												1,
+												1,
+												'ita');
+					}
 
 					$user_data = array('fb_id' => $fb_id, 'trx_type' => 'PRO_LEAGUE_2');
 
@@ -3901,15 +3920,31 @@ class ApiController extends AppController {
 			}else if($user['User']['paid_plan']=='pro1'){
 
 				//give ss$15000000
-				$this->Game->addTeamExpenditures(
-												intval($team['id']),
-												'PRO_LEAGUE',
-												1,
-												15000000,
-												$next_match['match']['game_id'],
-												$next_match['match']['matchday'],
-												1,
-												1);
+				if($game_team_id_epl != NULL){
+					$this->Game->addTeamExpendituresByLeague(
+											intval($game_team_id_epl),
+											'PRO_LEAGUE',
+											1,
+											15000000,
+											'',
+											0,
+											1,
+											1,
+											'epl');
+				}
+
+				if($game_team_id_ita != NULL){
+					$this->Game->addTeamExpendituresByLeague(
+											intval($game_team_id_ita),
+											'PRO_LEAGUE',
+											1,
+											15000000,
+											'',
+											0,
+											1,
+											1,
+											'ita');
+				}
 
 				$user_data = array('fb_id' => $fb_id, 'trx_type' => 'PRO_LEAGUE');
 
@@ -3920,6 +3955,23 @@ class ApiController extends AppController {
 			Cakelog::write('debug', 'api.pro_subscribe result_mobile'.json_encode($result_mobile));
 		}
 		
+	}
+
+
+	private function  get_game_team_id($fb_id, $league='epl')
+	{
+		$this->loadModel('Game');
+		$game_team_id = $this->Game->query("SELECT b.id FROM ffgame.game_users a 
+											INNER JOIN ffgame.game_teams b 
+											ON a.id = b.user_id WHERE a.fb_id=".$fb_id);
+		if($league == 'ita')
+		{
+			$game_team_id = $this->Game->query("SELECT b.id FROM ffgame_ita.game_users a 
+											INNER JOIN ffgame_ita.game_teams b 
+											ON a.id = b.user_id WHERE a.fb_id=".$fb_id);
+		}
+
+		return @$game_team_id[0]['b']['id'];
 	}
 	//param POST fb_id, order_id, payment_method
 	public function doku_ongkir_payment()
