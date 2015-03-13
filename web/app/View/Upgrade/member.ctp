@@ -1,4 +1,3 @@
-
 <div id="loginContainer">
     <div class="container">
       <h3>MEMBERSHIP PLAN</h3>
@@ -6,7 +5,7 @@
     </div>
     <div  id="pilih-liga" class="widgets tr plan">
       <div class="box">
-         <h2>FREE MEMBER</h2>
+        <img src="<?=$this->Html->url('/images/free.jpg')?>"/>
          <p class="price">Rp. 0</p>
          <p>loe bisa main FM secara gratis, namun dengan fasilitas terbatas : </p>
          <ul>
@@ -23,99 +22,95 @@
          </ul>
       </div>
       <div>
-        <?php if($plan=='free'):?>
+       
          <a href="<?=$this->Html->url('/upgrade/plan/free')?>" class="button">
            PILIH
          </a>
-       <?php endif;?>
+      
       </div>  
     </div>
     <div  id="pilih-liga"  class="widgets tr plan">
       <div class="box">
-         <h2>PRO LEAGUE 25</h2>
+         <img src="<?=$this->Html->url('/images/pro1.jpg')?>"/>
          <p class="price">Rp. 25,000 / Bulan</p>
          <p>Sebagai pro member, lo mendapatkan fasilitas berikut :  </p>
          <ul>
           <li>
+            Berkesempatan mendapatkan hadiah puluhan juta rupiah setiap minggunya.
+          </li>
+          <li>
             Dapat memilih tim papan atas sebagai starter team.
           </li>
           <li>
-             daftar cedera secara eksklusif setiap minggu.
+             Daftar cedera secara eksklusif setiap minggu.
           </li>
           <li>
-             atur formasi secara otomatis(boot)
+             Atur formasi secara otomatis(bot)
           </li>
           <li>
-             tidak perlu membuka katalog hadiah level 1 (free)
+             Tidak perlu membuka katalog hadiah level 1 (free)
           </li>
           <li>
-              mendapatkan 3 saran pemain terbaik setiap minggu
+              Mendapatkan 3 saran pemain terbaik setiap minggu
           </li>
           <li>
-             mendapatkan tambahan 15juta SS$
+             Mendapatkan tambahan 15juta SS$
           </li>
          </ul>
       </div>  
      
       <div>
-         <?php if($plan=='free'):?>
-           <a href="<?=$this->Html->url('/upgrade/plan/pro1')?>" class="button">
-            PILIH
-           </a>
-         <?php endif;?>
+         <a href="<?=$this->Html->url('/upgrade/plan/pro1')?>" class="button">
+          PILIH
+         </a>
       </div>  
     </div>
     <div  id="pilih-liga"  class="widgets tr plan">
       <div class="box">
-         <h2>PRO LEAGUE 50</h2>
+         <img src="<?=$this->Html->url('/images/pro2.jpg')?>"/>
          <p class="price">Rp. 50,000 / Bulan</p>
          <p>Sebagai pro member, lo mendapatkan fasilitas berikut :  </p>
          <ul>
           <li>
+            Berkesempatan mendapatkan hadiah puluhan juta rupiah setiap minggunya.
+          </li>
+          <li>
             Dapat memilih tim papan atas sebagai starter team.
           </li>
           <li>
-              tidak perlu membuka katalog hadiah (free)
+              Tidak perlu membuka katalog hadiah (free)
           </li>
           <li>
-              mendapatkan tambahan 50juta SS$
+              Mendapatkan tambahan 50juta SS$
           </li>
           <li>
-              tidak usah membayar ongkir di setiap redeem hadiah
+              Mendapatkan tambahan 10% point booster (random) di tiap minggunya
           </li>
           <li>
-              mendapatkan tambahan 10% point booster (random) di tiap minggunya
+             Mendapatkan daftar cedera secara eksklusif
           </li>
           <li>
-             mendapatkan daftar cedera secara eksklusif
+              Bisa atur formasi secara otomatis(bot)
           </li>
           <li>
-              bisa atur formasi secara otomatis(boot)
+              Langsung mendapatkan koin sebesar 7000.
           </li>
           <li>
-              langsung mendapatkan koin sebesar 7000.
-          </li>
-          <li>
-             mendapatkan 5 saran pemain terbaik
+             Mendapatkan 5 saran pemain terbaik
           </li>
            <li>
-             tidak perlu membuka trivia apps (free)
+             Tidak perlu membuka trivia apps (free)
           </li>
            <li>
-             mendapatkan 5 saran pemain terbaik
-          </li>
-           <li>
-             mendapatkan 2x bursa transfer dalam 1 bulan
+             Mendapatkan 2x bursa transfer dalam 1 bulan
           </li>
          </ul>
       </div>  
      
       <div>
-        <?php if($plan=='free' || $plan=='pro1'):?>
          <a href="<?=$this->Html->url('/upgrade/plan/pro2')?>" class="button">
           PILIH
          </a>
-        <?php endif;?>
       </div>  
     </div>
 </div>

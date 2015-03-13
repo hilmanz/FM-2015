@@ -455,6 +455,8 @@ class ManageController extends AppController {
 
 		$club = $this->club;
 		$userData = $this->userData;
+		$userDetail = $this->userDetail['User'];
+		$this->set('userDetail', $userDetail);
 		
 		$next_match = $this->nextMatch;
 

@@ -84,9 +84,6 @@
               Mendapatkan tambahan 50juta SS$
           </li>
           <li>
-              Tidak usah membayar ongkir di setiap redeem hadiah
-          </li>
-          <li>
               Mendapatkan tambahan 10% point booster (random) di tiap minggunya
           </li>
           <li>

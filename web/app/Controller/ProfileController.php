@@ -633,7 +633,7 @@ class ProfileController extends AppController {
 								  'survey_has_play'=>$this->request->data['firstime'],
 								  'faveclub'=>Sanitize::clean($this->request->data['faveclub']),
 								  'birthdate'=>$birthdate,
-								  'n_status'=>0,
+								  'n_status'=>1,
 								  'register_completed'=>0,
 								  'paid_member'=>-1,
 								  'activation_code' => date("Ymdhis").rand(100, 999),

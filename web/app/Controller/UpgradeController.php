@@ -78,7 +78,7 @@ class UpgradeController extends AppController {
 	private function subscribe_free(){
 		$userData = $this->userData;
 		$this->User->query("UPDATE users SET paid_member=0,paid_member_status=0,paid_plan='free' 
-										WHERE fb_id='{$userData['fb_id']}'");
+										WHERE fb_id='{$userData['fb_id']}' AND paid_member='-1'");
 		$this->redirect('/profile/register_team');
 	}
 	private function subscribe($plan){

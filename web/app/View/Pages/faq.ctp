@@ -17,69 +17,71 @@
                         <h2 class="yellow">FAQ</h2>
                     </div>
 					<div class="row-3">
-						<h3 class="yellow">Apa itu Super Soccer Football Manager?</h3>
-						<p>Super Soccer Football Manager adalah sebuah permainan yang menggabungkan konsep permainan simulasi manajemen sepak bola dan permainan fantasy football. Permainan ini dilakukan secara online melalui situs www.supersoccer.co.id atau aplikasi mobile yang dapat di download secara terpisah.</p>
+						<h3 class="yellow">Apa itu FM SuperSoccer?</h3>
+						<p>FM merupakan kependekan dari Football Manager SuperSoccer. FM SuperSoccer adalah simulasi game apakah lo layak menangani sebuah klub sepak bola.</p>
 					</div><!-- end .row-3 -->
 					<div class="row-3">
-						<h3 class="yellow">Bagaimana cara bermainnya?</h3>
-						<p>Untuk mendaftar dan turut bermain, kunjungi fm.supersoccer.co.id. Permainan diawali dengan pemilihan tim, dimana user akan diminta untuk menentukan line-up terbaik yang akan diturunkannya di setiap minggu. User dapat menjual pemain yang ada di tim pilihannya dan menggantikannya dengan pemain lain dengan cara belanja pemain di bursa transfer. User akan memperoleh poin berdasarkan performa pemain yang dipilih di pertandingan yang sesungguhnya.</p>
+						<h3 class="yellow">Bagaimana cara memainkan FM SuperSoccer?</h3>
+						<p>Langkah awal adalah lo daftar lewat facebook atau email. Setelah itu lo memilih tim andalan Premier League atau Serie A. Atur komposisi skuat dari pemilihan tim inti, cadangan sampai bursa transfer. Setiap pekan semua pemain yang turun di lapangan akan mendapat poin. Jumlah kesemuanya dalam klub lo akan menentukan posisi lo diantara Manager FM lainnya.</p>
 					</div><!-- end .row-3 -->
 					<div class="row-3">
-						<h3 class="yellow">Bagaimana cara menilai performa pemain?</h3>
-						<p>Penentuan perolehan poin pemain dilakukan berdasarkan data statistik resmi pertandingan BPL yang dicatat oleh Opta, mitra resmi BPL untuk data dan statistik.</p>
+						<h3 class="yellow">Bagaimana perhitungan poin?</h3>
+						<p>Baik kiper dan outfield players memiliki kategori poin masing-masing persamaan keduanya apabila main dari awal mendapat 2 poin sementara ketika masuk sebagai pemain pengganti hanya 1.  Semisal Thibaut Courtois bisa melakukan penyelamatan maka 15 poin berhak atas namanya. Kemudian Wayne Rooney cetak gol maka 50 poin jadi miliknya. Lengkapnya ada di bagan berikut. Nantinya total semua poin bisa menjadi COINS setelah dikali 1,5.
+						</p>
 					</div><!-- end .row-3 -->
 					<div class="row-3">
-						<h3 class="yellow">Bagaimana cara mendaftar?</h3>
-						<p>Anda harus mendaftar menggunakan Facebook account dengan mengklik tombol mendaftar di halaman utama fm.supersoccer.co.id</p>
+						<h3 class="yellow">Apa itu COINS?</h3>
+						<p>COINS merupakan alat transaksi untuk redeem hadiah di Online Katalog. COINS merupakan hasil total poin kemudian dikali 1. Contoh misal total poin klub mendapat 2000 maka COINS yang lo dapatkan adalah 2000. Jumlah tersebut bisa lo gunakan untuk belanja barang-barang langka dan menarik di Online Katalog.
+						</p>
 					</div><!-- end .row-3 -->
 					<div class="row-3">
-						<h3 class="yellow">Kapan saja saya bisa mendaftar?</h3>
-						<p>Anda bisa mendaftar kapan saja, namun Anda tidak akan dapat menentukan line-up jika pertandingan matchday di minggu itu sedang berlangsung (Sabtu 17:00 - Senin/Selasa 09:00). Jika Anda mendaftar di saat transfer window (jendela transfer) sedang ditutup, Anda akan diberikan 1 hari untuk melakukan jual beli pemain sampai nanti jendela transfer dibuka lagi. untuk keterangan lebih lanjut baca Jendela Transfer.</p>
+						<h3 class="yellow">Apa itu Online Katalog?</h3>
+						<p>Adalah tempat untuk membelanjakan COINS yang lo miliki. Ada 3 level semakin tinggi maka semakin menarik dan langka barang yang ada. 24 untuk level pertama, kemudian 129 level kedua, dan 239 ribu rupiah tingkat terakhir. Kepengen punya baju retro klub idaman ada di katalog level dua dan tiga, sementara udah ga sabar mau main ps4 sudah siap diambil di level ketiga.
+						</p>
 					</div><!-- end .row-3 -->
 					<div class="row-3">
-						<h3 class="yellow">Kenapa saya harus memberikan email dan nomor HP?</h3>
-						<p>Untuk menikmati layanan penuh permainan Super Soccer Football Manager, kami memerlukan alamat email aktif Anda sehingga memungkinkan terjadinya interaksi game yang dapat menentukan perolehan poin. Contoh interaksi yang mungkin terjadi adalah email dari manajer lain yang menawar untuk membeli salah satu pemain Anda, email dari staff keuangan yang menemukan cara untuk mengurangi pembayaran pajak, dll.</p>
+						<h3 class="yellow">Berapa modal awal ketika baru pertama kali main?</h3>
+						<p>10 juta dollar SuperSoccer otomatis jadi dana pertama untuk menjalankan klub selama satu musim. Disini lo harus bisa mengatur pengeluaran jika tak ingin bangkrut. Gaji pemain sampai bursa transfer menjadi tanggung jawab lo sebagai Manager.</p>
 					</div><!-- end .row-3 -->
 					<div class="row-3">
-						<h3 class="yellow">Bagaimana saya mendapatkan poin?</h3>
-						<p>Perolehan poin mingguan ditentukan oleh perolehan pemain yang dipilih masuk kedalam line-up setiap minggunya, dimana mereka akan menerima poin sesuai performa mereka di pertandingan sesungguhnya. Poin yang diperoleh pemain diitung berdasarkan data statistik resmi pertandingan BPL yang dicatat oleh Opta, mitra resmi BPL untuk data dan statistik.</p>
+						<h3 class="yellow">Apa itu fitur Private League?</h3>
+						<p>Di sini lo bakal buktikan siapa yang terbaik diantara komunitas atau teman-teman satu tongkrongan lo. Tinggal kirim undangan buat mereka yang ingin lo tantang dan semuanya akan bergabung dengan liga khusus bikinan lo. Sebelumnya pastikan baik lo dan teman yang diundang belum tergabung dengan private league lain.
+						</p>
 					</div><!-- end .row-3 -->
 					<div class="row-3">
-						<h3 class="yellow">Bagaimana saya menjual pemain?</h3>
-						<p>Di bagian 'KLUB SAYA', klik tombol 'PEMAIN". pilih pemain yang ingin Anda jual, dan klik tombol jual yang terletak di bawah profil nya.</p>
+						<h3 class="yellow">Cara dapet Sponsor gimana?</h3>
+						<p>Sponsor akan datang kalau tim besutan lo bisa konsisten mengumpulkan poin. Terkadang ada pemberitahuan tambahan lewat twitter @my_supersoccer bagaimana mendapatkan dana tambahan lewat dukungan sponsor.
+						</p>
 					</div><!-- end .row-3 -->
 					<div class="row-3">
-						<h3 class="yellow">Bagaimana saya memilih Line Up pemain?</h3>
-						<p>Di halaman 'MENGELOLA TIM', pilih pemain yang ingin Anda pasang, klik dan tarik jersey yang bernama pemain pilihan dan letakkan jersey itu di posisi yang di kehendaki. Lakukan hal itu sampai ke 11 starter dan 5 pemain cadangan terpasang. Anda hanya bisa menempatkan pemain sesuai posisi utamanya (gelandang, striker, bek, kiper)</p>
+						<h3 class="yellow">Kalau SuperSoccer Pro League apa lagi tuh?</h3>
+						<p>Ini adalah fitur baru dari FM SuperSoccer. Banyak keuntungan yang bisa lo dapatkan hanya dengan mengeluarkan 25 atau 50 ribu rupiah untuk tiap bulan per satu liga.
+						</p>
 					</div><!-- end .row-3 -->
 					<div class="row-3">
-						<h3 class="yellow">Bagaimana pemasukan tim dihitung?</h3>
-						<p></p>
+						<h3 class="yellow">Keuntungannya apa saja?</h3>
+						<p>Untuk kategori 25 lo bakal diberikan fasilitas diantaranya adalah menggunakan tim papan atas sebagai klub awal, daftar cedera eksklusif setiap minggu, formasi otomatis tersimpan setiap pekan, unlock katalog store level 1, 3 saran pemain terbaik setiap minggu, dan tambahan dana sebesar 15 juta dollar SuperSoccer.
+Sementara pilihan kedua atau 50 lebih banyak lagi benefit buat lo. Tambahan 7000 Coins masuk ke dalam akun begitu selesai daftar, Katalog store langsung terbuka tak hanya level 1, Tak perlu membayar ongkir setiap redeem hadiah, 10% poin booster secara random setiap minggu, Trivia otomatis terbuka, dan bursa transfer dua kali dalam sebulan. Selain itu juga lo masih bisa menikmati benefit di kategori 25 seperti otomatis menyimpan formasi, menggunakan tim papan atas, serta daftar cedera secara khusus. Ditambah dana 50 juta dollar SuperSoccer dan 5 saran pemain terbaik.</p>
 					</div><!-- end .row-3 -->
 					<div class="row-3">
-						<h3 class="yellow">Bagaimana saya bisa menambah pemasukan tim saya?</h3>
-						<p>Anda akan mendapat bonus pemasukan jika tim yang Anda kelola juga meraih kemenangan di pertandingan sebenarnya. Selain itu, sebentar lagi Anda akan bisa mengambil banyak inisiatif seperti merekrut staff komersil seperti marketing director, PR manager, dll dimana mereka akan menjadwalkan kegiatan pemasaran untuk menghasilkan dana tambahan.</p>
-					</div><!-- end .row-3 -->
-
-
-					<div class="row-3">
-						<h3 class="yellow">Bagaimana jika mendaftar dengan email Yahoo?</h3>
-						<p>Kalau elo daftar dengan email Yahoo, pastikan login terlebih dahulu di Yahoo sebelum daftar. Untuk mengecek apakah Email Yahoo elo tidak di suspend.</p>
-					</div><!-- end .row-3 -->
-
-
-
-					<div class="row-3">
-						<h3 class="yellow">Bagaimana caranya jika saat daftar tidak mendapat activation Code?</h3>
-						<p>Cek terlebih dahulu di spam email lo jika di Inbox tidak ada.</p>
-						<p>Jika masih belum ada juga, silahkan kirim email ke noreplysupersoccer@gmail.com nanti akan dikirimkan activation code ke email lo secara manual.</p>
+						<h3 class="yellow">Jadi sekarang main FM harus bayar dong?</h3>
+						<p>Ga usah panik, gratis tetap ada tapi lo ga bisa nikmatin fasilitas layaknya Pro 25 atau 50. Begitu selesai registrasi lo cuma bisa menggunakan tim-tim kasta bawah. Hanya 10 juta dollar sebagai modal awal dan harus menyimpan formasi sebelum klub-klub bermain di Premier League dan Serie A.
+						</p>
 					</div><!-- end .row-3 -->
 
 
 					<div class="row-3">
-						<h3 class="yellow">Apakah saat baru daftar langsung bisa melakukan transfer pemain?</h3>
-						<p> Kalau elo daftar dengan email yang pernah terverifikasi saat FM Super Soccer musim lalu atau saat Brazil Edition maka elo gak bisa mendapat bonus transfer pemain saat baru daftar.</p>
-						<p> Jika elo menggunakan email yang baru digunakan kali ini saja, maka lo dapet bonus free transfer selama 24 jam.</p>
+						<h3 class="yellow">Tiap minggu, mau ikut gratis atau Pro League harus buka PC / Laptop dong buat ngatur?</h3>
+						<p>Jangan khawatir sekarang SuperSoccer sudah hadir di Playstore dan Appstore. Tinggal download aja apps-nya dan lo bisa ngatur tim lo hanya dari genggaman tangan saja. Tentunya selain main FM lo bisa lihat statistik tim-tim kesukaan lo dan berita-berita dari web.<br />
+						<a href="https://play.google.com/store/apps/details?id=air.com.arm_enterprises.supersoccer.england2014" target="_blank">
+							Download Disini
+						</a>
+						<br />
+						Untuk Pengguna iOS 
+						<a href="https://itunes.apple.com/TR/app/id902290991" target="_blank">
+							Download Disini
+						</a>
+					</p>
 					</div><!-- end .row-3 -->
 
 				</div><!-- end #tabs-faq -->

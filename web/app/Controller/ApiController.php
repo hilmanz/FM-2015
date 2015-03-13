@@ -3893,7 +3893,11 @@ class ApiController extends AppController {
 												'ita');
 					}
 
-					$user_data = array('fb_id' => $fb_id, 'trx_type' => 'PRO_LEAGUE_2');
+					$user_data = array(
+										'fb_id' => $fb_id, 
+										'trx_type' => 'PRO_LEAGUE_2',
+										'user_id' => $user['User']['id']
+									);
 
 					$result_mobile = curlPost($url_mobile_notif, $user_data);
 					$result_mobile = json_decode($result_mobile, TRUE);
@@ -3946,13 +3950,17 @@ class ApiController extends AppController {
 											'ita');
 				}
 
-				$user_data = array('fb_id' => $fb_id, 'trx_type' => 'PRO_LEAGUE');
+				$user_data = array(
+									'fb_id' => $fb_id,
+									'trx_type' => 'PRO_LEAGUE',
+									'user_id' => $user['User']['id']
+									);
 
 				$result_mobile = curlPost($url_mobile_notif, $user_data);
 				$result_mobile = json_decode($result_mobile, TRUE);
 			}
 
-			Cakelog::write('debug', 'api.pro_subscribe result_mobile'.json_encode($result_mobile));
+			Cakelog::write('debug', 'api.pro_subscribe result_mobile'.json_encode($result_mobile).' fb_id '.$fb_id);
 		}
 		
 	}
@@ -6631,7 +6639,10 @@ class ApiController extends AppController {
 								'email'	=> $rs_user['User']['email'],
 								'n_status' => $rs_user['User']['n_status'],
 								'register_completed' => $rs_user['User']['register_completed'],
-								'need_password' => $need_password
+								'need_password' => $need_password,
+								'paid_member' => $rs_user['User']['paid_member'],
+								'paid_member_status' => $rs_user['User']['paid_member_status'],
+								'paid_plan' => $rs_user['User']['paid_plan']
 							);
 
 				$this->set('response',array('status'=>1, 
@@ -6663,7 +6674,18 @@ class ApiController extends AppController {
 
 		if(count($rs_user) > 0)
 		{
-			$this->set('response',array('status'=>1));
+			$profile = array(
+							'fb_id' => $rs_user['User']['fb_id'],
+							'name'	=> $rs_user['User']['name'],
+							'email'	=> $rs_user['User']['email'],
+							'n_status' => $rs_user['User']['n_status'],
+							'register_completed' => $rs_user['User']['register_completed'],
+							'paid_member' => $rs_user['User']['paid_member'],
+							'paid_member_status' => $rs_user['User']['paid_member_status'],
+							'paid_plan' => $rs_user['User']['paid_plan']
+						);
+			$this->set('response',array('status'=>1,
+										'data' => array('profile' => $profile)));
 			$this->ActivityLog->writeLog($rs_user['User']['id'],'LOGIN');
 			Cakelog::write('debug', 'api.login_supersoccer_facebook '.json_encode($rs_user));
 		}

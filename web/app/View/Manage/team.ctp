@@ -155,7 +155,29 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
       </div>
     <div id="thecontent">
         <div class="box4 fl" id="bannerBox">
-           
+            <?php if($userDetail['paid_member']==1 
+                &&$userDetail['paid_member_status']==1&& 
+                $userDetail['paid_plan']=='pro1'): ?>
+                <div class="banner250x250" style="height:70px;">
+                    <a href="#">
+                        <img src="<?=$this->Html->url('/images/pro 25.jpg')?>">
+                    </a>
+                </div>
+            <?php elseif($userDetail['paid_member']==1 
+                &&$userDetail['paid_member_status']==1&& 
+                $userDetail['paid_plan']=='pro2'): ?>
+                <div class="banner250x250" style="height:70px;">
+                    <a href="#">
+                        <img src="<?=$this->Html->url('/images/pro 50.jpg')?>">
+                    </a>
+                </div>
+            <?php else: ?>
+                <div class="banner250x250" style="height:70px;">
+                    <a href="<?=$this->Html->url('/upgrade/plan')?>">
+                        <img src="<?=$this->Html->url('/images/free member.jpg')?>">
+                    </a>
+                </div>
+            <?php endif; ?>
         	<!--<div class="banner250x250">
 			<?=$this->element('sponsor_banner',array('slot'=>'TEAM_SMALL','game_team_id'=>$game_team_id));?>
             </div>-->
