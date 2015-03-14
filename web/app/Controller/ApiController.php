@@ -3803,6 +3803,7 @@ class ApiController extends AppController {
 		    }
 		    else
 		    {
+		    	$message = "STOP";
 		    	CakeLog::write('doku','api.doku_notify - '.date("Y-m-d H:i:s").' - ERROR - MISSING TRANSACTION : '.json_encode($data));
 		    	throw new Exception("Error Processing Request");
 		    }
