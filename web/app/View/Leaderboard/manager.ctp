@@ -3,7 +3,7 @@ $monthly = isset($monthly) ? "selected='selected'":"";
 $weekly = isset($weekly) ? "selected='selected'":"";
 $overall = isset($overall) ? "selected='selected'":"";
 $manager = isset($manager) ? "selected='selected'":"";
-
+$pro_weekly = isset($pro_weekly) ? "selected='selected'":"";
 ?>
 <div id="leaderboardPage">
       <div class="rowd">
@@ -70,10 +70,11 @@ $manager = isset($manager) ? "selected='selected'":"";
         <form action="<?=$this->Html->url('/leaderboard')?>" 
           method="get" enctype="application/x-www-form-urlencoded">
           <select name="period" class="styled">
-              <option value="weekly" <?=@$weekly?>>Mingguan</option>
-              <option value="monthly" <?=@$monthly?>>Bulanan</option>
-              <option value="overall" <?=@$overall?>>Keseluruhan</option>
-              <option value="manager" <?=@$manager?>>Manager Standings</option>
+              <option value="weekly" <?=$weekly?>>Mingguan</option>
+              <option value="monthly" <?=$monthly?>>Bulanan</option>
+              <option value="overall" <?=$overall?>>Keseluruhan</option>
+              <option value="pro_weekly" <?=$pro_weekly?>>PROLeague - Mingguan</option>
+               <option value="manager" <?=@$manager?>>Manager Standings</option>
           </select>
         </form>
       </div>
@@ -143,12 +144,14 @@ $("select[name='period']").change(function(){
     case 'manager':
       document.location="<?=$this->Html->url('/leaderboard/manager')?>";
     break;
+    case 'pro_weekly':
+      document.location="<?=$this->Html->url('/leaderboard/pro_weekly')?>";
+    break;
     default:
       document.location="<?=$this->Html->url('/leaderboard')?>";
     break;
   }
 });
-
 </script>
 
 <script type="text/template" id="manager_list">

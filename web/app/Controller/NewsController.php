@@ -81,11 +81,14 @@ class NewsController extends AppController {
 	}
 	public function getInjuryNews(){
 		$this->loadModel('WpPosts');
-		return $this->WpPosts->getInjuryNews();
+		$userData = $this->userDetail;
+		return $this->WpPosts->getInjuryNews($_SESSION['league'],$userData['User']['paid_plan']);
 	}
 	public function getTopPlayerNews(){
 		$this->loadModel('WpPosts');
-		return $this->WpPosts->getTopPlayerNews();	
+		$userData = $this->userDetail;
+		//print "<!-- pro : ".json_encode($userData)."-->";
+		return $this->WpPosts->getTopPlayerNews($_SESSION['league'],$userData['User']['paid_plan']);	
 	}
 
 	public function error(){

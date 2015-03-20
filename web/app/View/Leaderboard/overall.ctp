@@ -70,6 +70,7 @@ $manager = isset($manager) ? "selected='selected'":"";
               <option value="weekly" <?=$weekly?>>Mingguan</option>
               <option value="monthly" <?=$monthly?>>Bulanan</option>
               <option value="overall" <?=$overall?>>Keseluruhan</option>
+              <option value="pro_weekly" <?=$pro_weekly?>>PROLeague - Mingguan</option>
                <option value="manager" <?=@$manager?>>Manager Standings</option>
           </select>
         </form>
@@ -143,6 +144,9 @@ $("select[name='period']").change(function(){
     break;
     case 'manager':
       document.location="<?=$this->Html->url('/leaderboard/manager')?>";
+    break;
+    case 'pro_weekly':
+      document.location="<?=$this->Html->url('/leaderboard/pro_weekly')?>";
     break;
     default:
       document.location="<?=$this->Html->url('/leaderboard')?>";

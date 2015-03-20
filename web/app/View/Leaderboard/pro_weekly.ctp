@@ -2,26 +2,8 @@
 $monthly = isset($monthly) ? "selected='selected'":"";
 $weekly = isset($weekly) ? "selected='selected'":"";
 $overall = isset($overall) ? "selected='selected'":"";
+$pro_weekly = isset($overall) ? "selected='selected'":"";
 $manager = isset($manager) ? "selected='selected'":"";
-$pro_weekly = isset($manager) ? "selected='selected'":"";
-$months = array('','Januari','Februari','Maret','April','Mei',
-                    'Juni','Juli','Agustus','September','Oktober',
-                    'November','Desember');
-
-$previous_month = ($current_month==1) ? 12 : $current_month - 1;
-$previous_year = ($current_month==1) ? $current_year - 1 : $current_year;
-
-$next_month = ($current_month==12) ? 1 : $current_month + 1;
-$next_year = ($current_month==12) ? $current_year + 1 : $current_year;
-
-function isMonthAvailable($available,$m,$y){
- 
-  foreach($available as $a){
-    if($a['monthly_points']['bln'] == $m && $a['monthly_points']['thn'] == $y){
-      return true;
-    }
-  }
-}
 ?>
 <div id="leaderboardPage">
       <div class="rowd">
@@ -73,17 +55,17 @@ function isMonthAvailable($available,$m,$y){
     <div class="headbar tr">
         <div class="leaderboard-head fl">
          
-        	<h1>Papan Peringkat – Bulan <?=$months[$current_month]?> <?=$current_year?></h1>
-            <p>Daftar urutan manajer berdasarkan poin tertinggi tiap bulan.<br />Diperbaharui secara mingguan. </p>
+        	<h1>Papan Peringkat PRO LEAGUE– Minggu ke <?=$matchday?></h1>
+            <p>Daftar urutan manajer berdasarkan poin tertinggi.<br />Diperbaharui secara mingguan. </p>
         </div>
         <div class="leaderboard-rank fr">
             <span>Peringkat Anda:</span>
-            <h3><?=number_format(@$rank)?></h3>
+            <h3><?=number_format($rank)?></h3>
             <span>Tier <?=$tier?></span>
         </div>
     </div><!-- end .headbar -->
-    <div class="headbar tr"> 
-        
+    <div class="headbar tr">
+     
       <div class="fl">
         <form action="<?=$this->Html->url('/leaderboard')?>" 
           method="get" enctype="application/x-www-form-urlencoded">
@@ -96,19 +78,17 @@ function isMonthAvailable($available,$m,$y){
           </select>
         </form>
       </div>
-       <?php if(isMonthAvailable($available_months,$previous_month,$previous_year)):?>
+      
+        <?php if($matchday>1):?>
         <div class="fr">
-          <a href="<?=$this->Html->url('/leaderboard/monthly?m='.
-                                        ($previous_month).'&y='.$previous_year)?>" 
-            class="button"><?=$months[$previous_month]?> <?=$previous_year?></a>
+          <a href="<?=$this->Html->url('/leaderboard/?week='.($matchday-1))?>" 
+            class="button">Minggu Lalu</a>
         </div>
         <?php endif;?>
-
-        <?php if(isMonthAvailable($available_months,$next_month,$next_year)):?>
+        <?php if(($next_match['match']['matchday']-1) > $matchday):?>
         <div class="fr">
-          <a href="<?=$this->Html->url('/leaderboard/monthly?m='.
-                                        ($next_month).'&y='.$next_year)?>" 
-            class="button"><?=$months[$next_month]?> <?=$next_year?></a>
+          <a href="<?=$this->Html->url('/leaderboard/?week='.($matchday+1))?>" 
+            class="button">Minggu Berikutnya</a>
         </div>
         <?php endif;?>
     </div>
@@ -126,8 +106,8 @@ function isMonthAvailable($available,$m,$y){
                 </thead>
                 <tbody>
                   <?php
-                  $params = $this->Paginator->params('Monthly_point');
-                  
+                  $params = $this->Paginator->params();
+                
                     foreach($team as $n=>$t):
                       $no = $n+1 + (($params['page']-1) * $params['limit']);
 
@@ -135,7 +115,7 @@ function isMonthAvailable($available,$m,$y){
                   <tr class="odd">
                     <td class="l-rank"><?=number_format($no)?></td>
                     <td class="l-club"><?=h($t['Team']['team_name'])?></td>
-                    <td class="l-manager"><?=h($t['Manager']['name'])?></td>
+                    <td class="l-manager"><a href="#" title="<?=$t['manager_id']?>"><?=h($t['Manager']['name'])?></a></td>
                     <td class="l-points alignright"><?=number_format($t['Point']['points'])?></td>
                   </tr>
                   <?php
@@ -155,7 +135,7 @@ function isMonthAvailable($available,$m,$y){
             </div><!-- end .widget -->
         </div><!-- end .content -->
         <div class="rows">
-           <?php for($i=0;$i<sizeof($long_banner2);$i++):?>
+            <?php for($i=0;$i<sizeof($long_banner2);$i++):?>
                   <div class="col2">
                       <div class="mediumBanner">
                         <a href="javascript:banner_click(<?=$long_banner2[$i]['Banners']['id']?>,'<?=$long_banner2[$i]['Banners']['url']?>');">
@@ -168,6 +148,7 @@ function isMonthAvailable($available,$m,$y){
         </div><!-- end .rows -->
     </div><!-- end #thecontent -->
 </div><!-- end #leaderboardPage -->
+
 <script>
 $("select[name='period']").change(function(){
   
