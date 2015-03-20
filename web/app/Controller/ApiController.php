@@ -282,6 +282,7 @@ class ApiController extends AppController {
 		$this->set('response',array('status'=>1,'data'=>$response));
 		$this->render('default');
 	}
+
 	public function save_formation(){
 		$this->loadModel('Team');
 		$this->loadModel('User');
@@ -294,7 +295,7 @@ class ApiController extends AppController {
 
 
 		//can updte formation
-		$can_update_formation = true;
+		$can_update_formation = false;
 
 
 		
@@ -312,7 +313,7 @@ class ApiController extends AppController {
 
 
 		
-		if(time() > $this->closeTime['ts'] && Configure::read('debug') == 0){
+		if(time() < $this->closeTime['ts'] && Configure::read('debug') == 0){
 		    
 		    $can_update_formation = false;
 		    if(time() > $this->openTime){
@@ -3731,7 +3732,7 @@ class ApiController extends AppController {
 		    		$this->MerchandiseOrder->id = $data_redis['order_id'];
 
 		    		$this->MerchandiseOrder->save(array('n_status' => 1));
-		    	}else if($additionaldata == 'fm-subscribe')
+		    	}else if($additionaldata == 'fm-subscribe' || $additionaldata == 'app-fm-subscribe')
 		    	{
 					CakeLog::write('doku','NOTIFY - '.date("Y-m-d H:i:s").' - Processing fm-subscribe : '.json_encode($data));
 					$this->pro_subscribe($data,$doku);
@@ -3791,6 +3792,11 @@ class ApiController extends AppController {
 		    		$this->MerchandiseOrder->id = $data_redis['order_id'];
 
 		    		$this->MerchandiseOrder->save(array('n_status' => 1));
+		    	}
+		    	else if($additionaldata == 'fm-subscribe' || $additionaldata == 'app-fm-subscribe')
+		    	{
+					CakeLog::write('doku','NOTIFY - '.date("Y-m-d H:i:s").' - Processing fm-subscribe : '.json_encode($data));
+					$this->pro_subscribe($data,$doku);
 		    	}
 		    	else
 		    	{
@@ -4247,12 +4253,22 @@ class ApiController extends AppController {
 		$this->loadModel('MembershipTransactions');
 		$transaction_name = 'Purchase Order #'.$data['doku_data']['po_number'];
 		$transaction_type = 'UNLOCK '.$data['trx_type'];
+
+		$payment_channel = $data['doku_param']['PAYMENTCHANNEL'];
+		$payment_method	= "va";
+		if($payment_channel == '01')
+		{
+			$payment_method == "cc";
+		}
+
 		$insert_data = array(
 								'fb_id' => $data['fb_id'],
 								'transaction_dt' => date("Y-m-d H:i:s"),
+								'po_number' => $data['doku_data']['po_number'],
 								'transaction_name' => $transaction_name,
 								'transaction_type' =>$transaction_type,
 								'amount' => $data['amount'],
+								'payment_method' => $payment_method,
 								'details' => serialize($data)
 							);
 		$fb_id = $data['fb_id'];
@@ -6692,12 +6708,34 @@ class ApiController extends AppController {
 		else
 		{
 			$this->set('response',array('status'=>0));
-			Cakelog::write('debug', 'api.login_supersoccer_facebook error '.json_encode($rs_user));
+			Cakelog::write('debug', 'api.login_supersoccer_facebook 
+									user_id '.$user_id.'
+									error '.json_encode($rs_user));
 		}
 		$this->render('default');
 	}
 
-
+	public function pro_league_status()
+	{
+		$fb_id = $this->request->query('fb_id');
+		$rs_user = $this->User->findByFb_id($fb_id);
+		
+		if(count($rs_user) > 0)
+		{
+			$this->set('response',array('status'=>1,
+									'data' => array(
+										'paid_member' => $rs_user['User']['paid_member'],
+										'paid_member_status' => $rs_user['User']['paid_member_status'],
+										'paid_plan' => $rs_user['User']['paid_plan']
+										)
+								));
+		}
+		else
+		{
+			$this->set('response',array('status'=>0));
+		}
+		$this->render('default');
+	}
 	/*
 	* API for login user from register_supersoccer
 	* POST :  /api/register_supersoccer/
@@ -6746,6 +6784,8 @@ class ApiController extends AppController {
 					  'n_status'=>0,
 					  'register_completed'=>0,
 					  'activation_code' => date("Ymdhis").rand(100, 999),
+					  'paid_member' => '-1',
+					  'paid_member_status' => '0',
 					  'ref_code' => $data['ref_code']
 					  );
 
@@ -7865,7 +7905,7 @@ class ApiController extends AppController {
 		}
 
 		$this->set('response',$results);
-		$this->render('default');	
+		$this->render('default');
 	}
 
 	public function check_point_calculation()
