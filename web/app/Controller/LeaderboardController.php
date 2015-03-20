@@ -448,4 +448,81 @@ class LeaderboardController extends AppController {
 		$rs = $this->Game->query($sql);
 		return $rs;
 	}
+
+	public function pro_weekly($week=1){
+		$this->loadModel("Point");
+	    $this->loadModel('User');
+	    $this->loadModel('Weekly_point');
+	    $this->loadModel('Weekly_rank');
+	    $this->loadModel('Weekly_ranks_pro');
+	  
+	    $next_match = $this->Game->getNextMatch($this->userData['team']['team_id']);
+	    $this->set('next_match',$next_match);
+		//define week.
+		if(!isset($this->request->query['week'])){
+		    if($next_match['match']['matchday']<=1){
+		    	$matchday = 1;
+		    }else{
+		    	$matchday = $next_match['match']['matchday']-1;
+		    }
+		}else{
+			$matchday = intval($this->request->query['week']);
+		}
+		
+		$this->Weekly_point->virtualFields['TotalPoints'] = 'SUM(Weekly_point.points + Weekly_point.extra_points)';
+		
+		$this->paginate = array(
+								'conditions'=>array('matchday'=>$matchday,'league'=>$_SESSION['league']),
+								'limit'=>100,
+								'order'=> array('rank'=>'asc')
+							);
+
+
+	 
+	    $rs = $this->paginate('Weekly_ranks_pro');
+	    
+	    $game_id = '';
+	 
+	  	if(sizeof($rs)>0){
+	  		foreach($rs as $n=>$r){
+		    	$poin = $this->Weekly_point->find('first',array(
+		    									'conditions'=>array(
+		    										'Weekly_point.team_id'=>$r['Weekly_ranks_pro']['team_id'],
+		    										'matchday'=>$matchday,
+		    										'Weekly_point.league'=>$_SESSION['league']
+		    									)
+		    								));
+		    	$rs[$n]['Weekly_point'] = $poin['Weekly_point'];
+		    	$rs[$n]['Weekly_point']['points'] = $poin['Weekly_point']['TotalPoints'];
+		    	$rs[$n]['Point'] = $rs[$n]['Weekly_point'];
+		    	$rs[$n]['Team'] = $poin['Team'];
+		    	//get manager's name
+		    	$manager = $this->User->findById($poin['Team']['user_id']);
+		    	$game_team = $this->Game->query("SELECT b.id as id FROM ".$_SESSION['ffgamedb'].".game_users a
+							INNER JOIN ".$_SESSION['ffgamedb'].".game_teams b
+							ON a.id = b.user_id WHERE fb_id = '{$manager['User']['fb_id']}' LIMIT 1;");
+
+		    	$rs[$n]['Manager'] = @$manager['User'];
+		    	
+		    	$rs[$n]['manager_id'] = $game_team[0]['b']['id'] + intval(Configure::read('RANK_RANDOM_NUM'));
+
+		    }
+	  	}
+	   
+	    
+	    //assign team ranking list to template
+	    $this->set('team',$rs);
+	    
+
+	    $myRank = $this->Weekly_ranks_pro->find('first',
+	    									array('conditions'=>
+											array('team_id'=>$this->userDetail['Team']['id'],
+												'matchday'=>$matchday)));
+	    
+	    $this->set('matchday',$matchday);
+	    $this->set('rank',$myRank['Weekly_ranks_pro']['rank']);
+	    $this->set('pro_weekly',true);
+	    $this->set('tier',$this->getTier($myRank['Weekly_ranks_pro']['rank']));
+
+	}
 }

@@ -2,6 +2,8 @@
 $monthly = isset($monthly) ? "selected='selected'":"";
 $weekly = isset($weekly) ? "selected='selected'":"";
 $overall = isset($overall) ? "selected='selected'":"";
+$manager = isset($manager) ? "selected='selected'":"";
+$pro_weekly = isset($pro_weekly) ? "selected='selected'":"";
 ?>
 <div id="leaderboardPage">
       <div class="rowd">
@@ -71,6 +73,8 @@ $overall = isset($overall) ? "selected='selected'":"";
               <option value="weekly" <?=$weekly?>>Mingguan</option>
               <option value="monthly" <?=$monthly?>>Bulanan</option>
               <option value="overall" <?=$overall?>>Keseluruhan</option>
+              <option value="pro_weekly" <?=$pro_weekly?>>PROLeague - Mingguan</option>
+               <option value="manager" <?=@$manager?>>Manager Standings</option>
           </select>
         </form>
       </div>
@@ -157,6 +161,9 @@ $("select[name='period']").change(function(){
     break;
     case 'manager':
       document.location="<?=$this->Html->url('/leaderboard/manager')?>";
+    break;
+    case 'pro_weekly':
+      document.location="<?=$this->Html->url('/leaderboard/pro_weekly')?>";
     break;
     default:
       document.location="<?=$this->Html->url('/leaderboard')?>";

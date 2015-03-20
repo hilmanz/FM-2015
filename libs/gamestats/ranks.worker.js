@@ -56,7 +56,7 @@ exports.update = function(conn,since_id,until_id,update_rank,game_id,done){
 			},
 			function(matchday,cb){
 					console.log('Distribute overall,weekly,and monthly POINTS');
-					conn.query("SELECT a.id AS team_id,b.fb_id\
+					conn.query("SELECT a.id AS team_id,b.paid_plan,b.fb_id,d.team_id as original_team_id,d.id as game_team_id\
 					FROM "+frontend_schema+".teams a \
 					INNER JOIN "+frontend_schema+".users b\
 					ON a.user_id = b.id \
@@ -69,7 +69,7 @@ exports.update = function(conn,since_id,until_id,update_rank,game_id,done){
 					[league,since_id,until_id,limit],
 					function(err,rs){
 						console.log('update_rank',S(this.sql).collapseWhitespace().s);
-						if(rs.length>0){
+						if(typeof rs !== 'undefined' && rs.length>0){
 							populate(conn,rs,matchday,function(err){
 								console.log('DONE POPULATING');
 								cb(err,matchday);
@@ -86,7 +86,7 @@ exports.update = function(conn,since_id,until_id,update_rank,game_id,done){
 				
 				if(update_rank){
 					console.log('update_rank','NOW WE RECALCULATE THE RANKS');
-					recalculate_ranks(conn,function(err){
+					recalculate_ranks(conn,matchday,function(err){
 						update_rank_history(conn,function(e){
 							cb(err,matchday);
 						});
@@ -125,7 +125,7 @@ function update_rank_history(conn,done){
 					done(err);
 				});
 }
-function recalculate_ranks(conn,done){
+function recalculate_ranks(conn,matchday,done){
 	console.log('recalculate ranks');
 	async.waterfall([
 		function(callback){
@@ -136,12 +136,14 @@ function recalculate_ranks(conn,done){
 		},
 		function(callback){
 			conn.query("SELECT matchday FROM "+frontend_schema+".weekly_points \
-                            GROUP BY matchday ORDER BY matchday \
-                            LIMIT 1000;",[],function(err,matchdays){
+                            GROUP BY matchday ORDER BY matchday DESC \
+                            LIMIT 1;",[],function(err,matchdays){
                             	callback(err,matchdays);
                             });
 		},
 		function(matchdays,callback){
+			//now we only need to recalculate 1 matchday
+			/*
 			async.eachSeries(matchdays,function(matchday,next){
 				conn.query("CALL "+frontend_schema+".recalculate_weekly_rank(?,?);",
 							[league,matchday.matchday],function(err,rs){
@@ -150,10 +152,27 @@ function recalculate_ranks(conn,done){
 							});
 			},
 			function(err){
-				callback(err);
+				callback(err,matchdays);
 			});
+			*/
+		conn.query("CALL "+frontend_schema+".recalculate_weekly_rank(?,?);",
+							[league,matchday],function(err,rs){
+								console.log('recalculating matchday #',matchday,' ranks');
+								callback(err);
+							});
 		},
 		function(callback){
+			console.log('PRO WEEKLY RANK RECALCULATE');
+			
+				conn.query("CALL "+frontend_schema+".recalculate_weekly_rank_pro(?,?);",
+							[league,matchday],function(err,rs){
+								console.log('recalculating matchday #',matchday,' pro weekly  ranks');
+								callback(err);	
+							});
+			
+		},
+		function(callback){
+
 			conn.query("SELECT YEAR(matchdate) AS thn,MONTH(matchdate) AS bln\
                             FROM "+frontend_schema+".weekly_points GROUP BY thn,bln;",[],
                             function(err,monthset){
@@ -176,7 +195,7 @@ function recalculate_ranks(conn,done){
 				callback(err);
 
 			});
-		}
+		},
 	],
 
 	function(err,rs){
@@ -188,12 +207,35 @@ function populate(conn,teams,matchday,done){
 	
 	async.eachSeries(teams,function(team,next){
 		//console.log(team.fb_id);
-		getUserTeamPoints(conn,team.fb_id,matchday,function(err,stats){
-			console.log('update_rank','RESULT',team,stats);
-			updatePoints(conn,team,stats,function(err){
-				next();	
+		if(typeof team.paid_plan !== 'undefined' && team.paid_plan == 'pro2'){
+			async.waterfall([
+				function(cb){
+					console.log('PRO BONUS','this is PRO50 user',team.game_team_id);
+					proleagueRandomBonusPoints(conn,team.game_team_id,team.original_team_id,matchday,function(err){
+						cb(err);
+					});
+				},
+				function(cb){
+					getUserTeamPoints(conn,team.fb_id,matchday,function(err,stats){
+						console.log('update_rank','RESULT',team,stats);
+						updatePoints(conn,team,stats,function(err){
+							cb(err);	
+						});
+					});
+				}
+			],
+			function(err,rs){
+				next();
 			});
-		});
+		}else{
+			getUserTeamPoints(conn,team.fb_id,matchday,function(err,stats){
+				console.log('update_rank','RESULT',team,stats);
+				updatePoints(conn,team,stats,function(err){
+					next();	
+				});
+			});
+		}
+		
 		
 	},function(err){
 		done(null);	
@@ -212,6 +254,61 @@ function populate(conn,teams,matchday,done){
 		});
 	});*/
 	
+}
+function proleagueRandomBonusPoints(conn,game_team_id,original_team_id,matchday,done){
+	var point_type = ['defending','passing_and_attacking','goalkeeper','mistakes_and_errors'];
+	async.waterfall([
+		function(cb){
+			var bonus_type = Math.floor(Math.random()*(point_type.length-1));
+			console.log('PRO BONUS',game_team_id,point_type[bonus_type]);
+			conn.query("SELECT SUM(points) AS total FROM \
+						"+config.database.statsdb+".game_team_player_weekly \
+						WHERE game_team_id=? \
+						AND game_id IN (\
+						SELECT game_id FROM "+config.database.database+".game_fixtures WHERE matchday=?\
+						) AND stats_category=?;",[game_team_id,matchday,point_type[bonus_type]],
+			function(err,rs){
+				console.log('PRO BONUS',game_team_id,S(this.sql).collapseWhitespace().s);
+				var bonus_point = 0;
+				if(typeof rs !== 'undefined' && rs.length > 0){
+					bonus_point = 0.1 * parseFloat(rs[0].total);
+				}
+				console.log('PRO BONUS',game_team_id,'bonus : ',bonus_point);
+				cb(err,bonus_point,bonus_type);
+				
+			});
+		},
+		function(bonus_point,bonus_type,cb){
+			conn.query("SELECT game_id FROM "+config.database.database+".game_fixtures \
+						WHERE (home_id=? OR away_id=?) AND matchday = ? LIMIT 1",
+						[original_team_id,original_team_id,matchday],function(err,rs){
+				console.log('PRO BONUS',game_team_id,S(this.sql).collapseWhitespace().s);
+				
+				cb(err,rs[0].game_id,bonus_point,bonus_type);
+			});
+		},
+		function(game_id,bonus_point,bonus_type,cb){
+			var bonus_point = Math.abs(bonus_point); //the point must be positive.
+			conn.query("INSERT IGNORE INTO "+config.database.statsdb+".game_team_extra_points\
+						(game_id,matchday,game_team_id,modifier_name,extra_points)\
+						VALUES\
+						(?,?,?,?,?)\
+						ON DUPLICATE KEY UPDATE\
+						extra_points = VALUES(extra_points)",[
+							game_id,
+							matchday,
+							game_team_id,
+							'bonus pro50 - '+bonus_type,
+							bonus_point
+						],function(err,rs){
+							console.log('PRO BONUS',game_team_id,S(this.sql).collapseWhitespace().s);
+							cb(err,rs);
+						});
+		}
+	],
+	function(err,rs){
+		done(err);
+	});
 }
 function updatePoints(conn,team,stats,done){
 	console.log('update_rank','updatePoints',team,stats);

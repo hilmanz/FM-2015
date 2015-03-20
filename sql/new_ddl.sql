@@ -643,3 +643,14 @@ ALTER TABLE `fantasy`.`users`     ADD COLUMN `paid_plan` VARCHAR(10) NULL AFTER 
 
 ALTER TABLE `fantasy`.`member_billings` 
 ADD UNIQUE INDEX `UNIQUE_FB_ID` (`fb_id` ASC);
+
+
+CREATE TABLE fantasy.weekly_ranks_pro (
+  `id` BIGINT(21) NOT NULL AUTO_INCREMENT,
+  `team_id` BIGINT(21) DEFAULT NULL,
+  `matchday` INT(5) DEFAULT NULL,
+  `rank` INT(11) DEFAULT '0' COMMENT 'the last rank before the income is calculated.',
+  `league` VARCHAR(5) DEFAULT 'epl',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_team_game` (`team_id`,`matchday`,`league`)
+) ENGINE=INNODB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
