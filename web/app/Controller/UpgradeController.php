@@ -405,6 +405,7 @@ class UpgradeController extends AppController {
 										'po_number' => $transaction_id,
 										'transaction_type' => 'SUBSCRIPTION',
 										'amount' => $total_price,
+										'payment_method' => $payment_method,
 										'details' => $detail,
 										'league' => $_SESSION['league'],
 										'n_status'=>0

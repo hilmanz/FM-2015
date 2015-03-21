@@ -215,7 +215,6 @@ class PaymentController extends AppController {
 	}
 
 	//doku fm payment like trivia, unlock catalog 123, ongkir payment
-
 	public function doku()
 	{
 		$this->loadModel('Doku');
@@ -334,6 +333,170 @@ class PaymentController extends AppController {
 			$this->set('doku_param', $doku_param);
 			$this->set('doku_api', $doku_api);
 			$this->set('basket', 'UNLOCK '.$trx_type);
+		}
+		else
+		{
+			$this->redirect($url_scheme.'fmpayment?status=0&message=Terjadi Kesalahan !');
+		}
+	}
+
+	public function proleague()
+	{
+		$this->loadModel('Doku');
+		$charge = Configure::read('MOBILE_CHARGE');
+		$url_scheme = Configure::read('URL_SCHEME');
+
+		if($this->request->query('fb_id') == NULL 
+			|| $this->request->query('trx_type') == NULL
+			|| $this->request->query('payment_method') == NULL)
+		{
+			$this->redirect($url_scheme.'fmpayment?status=0&message=Terjadi Kesalahan !');
+		}
+
+		$fb_id = trim($this->request->query('fb_id'));
+		$trx_type = strtoupper($this->request->query('trx_type'));
+		$payment_method = trim($this->request->query('payment_method'));
+		
+		if(array_key_exists($trx_type, $charge))
+		{
+			$amount = $charge[$trx_type];
+
+			//add admin fee
+			$admin_fee = '5000';
+			$amount += $admin_fee;
+			$this->set('admin_fee', $admin_fee);
+
+
+			$rs_user = $this->User->findByFb_id($fb_id);
+
+			$payment_channel = '01';
+			if($payment_method == "va")
+			{
+				$payment_channel = '05';
+			}
+
+			//todo
+			//if rs_user empty handle this
+			$transaction_id = intval($rs_user['User']['id']).'-'.rand(0,999);
+			$transaction_id_merchant = str_replace('-', '', $transaction_id);
+
+			$doku_api = Configure::read('DOKU_API');
+			$doku_mid = Configure::read('DOKU_MALLID');
+			$doku_sharedkey = Configure::read('DOKU_SHAREDKEY');
+			$hash_words = sha1(number_format($amount,2,'.','').
+							  $doku_mid.
+							  $doku_sharedkey.
+							  $transaction_id_merchant);
+			$trx_session_id = sha1(time());
+			$additionaldata = 'app-fm-subscribe';
+			$basket = 'UNLOCK '.$trx_type.','.$amount.','.$amount.','.$amount.';';
+
+			$doku_param = array('MALLID'=>$doku_mid,
+								'CHAINMERCHANT'=>'NA',
+								'AMOUNT'=>number_format($amount,2,'.',''),
+								'PURCHASEAMOUNT'=>number_format($amount,2,'.',''),
+								'TRANSIDMERCHANT'=>$transaction_id_merchant,
+								'WORDS'=>$hash_words,
+								'REQUESTDATETIME'=>date("YmdHis"),
+								'CURRENCY'=>'360',
+								'PURCHASECURRENCY'=>'360',
+								'SESSIONID'=>$trx_session_id,
+								'NAME'=>$rs_user['User']['name'],
+								'EMAIL'=>$rs_user['User']['email'],
+								'ADDITIONALDATA'=>$additionaldata,
+								'PAYMENTCHANNEL'=>$payment_channel,
+								'BASKET'=>$basket,
+							);
+
+			$doku_data = array(
+							'catalog_order_id'=>NULL,
+							'po_number'=>$transaction_id,
+							'transidmerchant'=>$transaction_id_merchant,
+							'totalamount'=>number_format($amount,2,'.',''),
+							'words'=>$hash_words,
+							'statustype'=>'',
+							'response_code'=>'',
+							'approvalcode'=>'',
+							'trxstatus'=>'Requested',
+							'payment_channel'=>$payment_channel,
+							'paymentcode'=>'',
+							'session_id'=>$trx_session_id,
+							'bank_issuer'=>'',
+							'creditcard'=>'',
+							'payment_date_time'=>date("Y-m-d H:i:s"),
+							'verifyid'=>'',
+							'verifyscore'=>'',
+							'verifystatus'=>'',
+							'additionaldata'=>$additionaldata
+					);
+
+			$dataSource = $this->MembershipTransactions->getDataSource();
+			$dataSource->begin();
+			
+			//save to Doku table
+			$this->Doku->create();
+			$rs_doku = $this->Doku->save($doku_data);
+
+			$transaction_name = 'Purchase Order #'.$transaction_id;
+			$save_data = array(
+								'fb_id' => $fb_id,
+								'transaction_dt' => date("Y-m-d H:i:s"),
+								'transaction_name' => $transaction_name,
+								'po_number' => $transaction_id,
+								'transaction_type' => 'SUBSCRIPTION',
+								'amount' => $amount,
+								'payment_method' => $payment_method,
+								'details' => json_encode($doku_param),
+								'league' => $_SESSION['league'],
+								'n_status'=>0
+							);
+
+			
+			$this->MembershipTransactions->save($save_data);
+			
+			/*
+			$this->MembershipTransactions->query("INSERT INTO member_billings
+										(fb_id,log_dt,expire)
+										VALUES('{$userData['fb_id']}',
+												NOW(), NOW() + INTERVAL 1 MONTH)");
+			*/
+			/*$this->User->query("UPDATE users SET paid_member=1,paid_member_status=1
+								WHERE fb_id='{$userData['fb_id']}'");
+								*/
+			$plan = 'pro1';
+			if($trx_type == 'PRO_LEAGUE_2'){
+				$plan = 'pro2';
+			}
+
+			$this->User->query("UPDATE users SET paid_plan='{$plan}'
+								WHERE fb_id='{$fb_id}'");
+
+			$dataSource->commit();
+
+			$this->set('basket', $trx_type.' SUBSCRIPTION');
+			//overide trx_type
+			$trx_type = 'SUBSCRIPTION';
+
+			$data_redis = array('doku_data' => $doku_data,
+								'doku_param' => $doku_param,
+								'fb_id' => $fb_id,
+								'trx_type' => $trx_type,
+								'amount' => $amount
+								);
+
+
+			$this->redisClient->set($transaction_id_merchant, serialize($data_redis));
+
+			$this->redisClient->expire($transaction_id_merchant, 24*60*60);//expires in 1 day
+			if($payment_channel == '05')
+			{
+				$this->redisClient->expire($transaction_id_merchant, 6*60*60);//expires in 6 hours
+			}
+			
+			Cakelog::write('debug', 'payment.doku data_redis '.json_encode($data_redis));
+
+			$this->set('doku_param', $doku_param);
+			$this->set('doku_api', $doku_api);
 		}
 		else
 		{
