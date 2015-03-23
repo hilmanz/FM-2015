@@ -80,6 +80,7 @@ class WpPosts extends AppModel {
 				$rs = $this->query($sql,false);
 			}
 		}
+		print "<!--plan : ".$plan."-->";
 		return $rs[0]['a'];
 	}
 	public function readNews($post_id){

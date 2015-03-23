@@ -20,7 +20,8 @@ var pool  = mysql.createPool({
 
 var limit = 10;
 
-
+var total_applied = 0;
+var total_ready = 0;
 var league = 'epl';
 if(typeof argv.league !== 'undefined'){
 	switch(argv.league){
@@ -85,7 +86,7 @@ function process_pro_team(conn,current_matchday,done){
 					WHERE paid_member = 1 AND paid_member_status=1 \
 					AND c.id > "+last_id+" ORDER BY c.id ASC LIMIT 10;",
 					[],function(err,rs){
-						console.log(S(this.sql).collapseWhitespace().s);
+						console.log('get paid member : '+last_id,S(this.sql).collapseWhitespace().s);
 
 	        	if(rs.length==0){
 	        		has_data = false;
@@ -101,6 +102,8 @@ function process_pro_team(conn,current_matchday,done){
 	    },
 	    function (err) {
 	        // 5 seconds have passed
+	        console.log('total_applied',total_applied);
+	        console.log('total_ready',total_ready);
 	        done(err);
 	    }
 	);
@@ -137,21 +140,26 @@ function setTeamFormation(conn,team,current_matchday,done){
 			console.log('pass here');
 			console.log(last_matchday)
 			//console.log(current_matchday,last_matchday,'--->');
+			console.log('team#',team.id,'last_match:',last_matchday,' - current match : ',current_matchday);
 			if(current_matchday > last_matchday){
-				console.log('team#',team.id,'last_match:',last_matchday,' - current match : ',current_matchday);
-			
-
-				conn.query("INSERT INTO "+config.database.database+".game_team_lineups\
+				console.log('team#',team.id,'apply formation');	
+				total_applied++;
+				
+				conn.query("INSERT IGNORE INTO "+config.database.database+".game_team_lineups\
 							(game_team_id,player_id,position_no,matchday)\
 							SELECT a.game_team_id,a.player_id,position_no,"+current_matchday+" AS matchday \
 							FROM "+config.database.database+".game_team_lineups a\
 							INNER JOIN ffgame.game_team_players b\
 							ON a.game_team_id = b.game_team_id AND a.player_id = b.player_id\
-							WHERE a.game_team_id=? AND  matchday="+last_matchday+";",[team.id],function(err,rs){
+							WHERE a.game_team_id=? AND  matchday="+last_matchday+"\
+							ON DUPLICATE KEY UPDATE matchday = VALUES(matchday);",[team.id],function(err,rs){
 								console.log(S(this.sql).collapseWhitespace().s);
 								cb(err,rs);
 							});
+				
 			}else{
+				total_ready++;
+				console.log('team#',team.id,'formation ok');	
 				cb(null,null);
 			}
 		}

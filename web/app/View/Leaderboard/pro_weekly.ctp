@@ -81,13 +81,13 @@ $manager = isset($manager) ? "selected='selected'":"";
       
         <?php if($matchday>1):?>
         <div class="fr">
-          <a href="<?=$this->Html->url('/leaderboard/?week='.($matchday-1))?>" 
+          <a href="<?=$this->Html->url('/leaderboard/pro_weekly?week='.($matchday-1))?>" 
             class="button">Minggu Lalu</a>
         </div>
         <?php endif;?>
         <?php if(($next_match['match']['matchday']-1) > $matchday):?>
         <div class="fr">
-          <a href="<?=$this->Html->url('/leaderboard/?week='.($matchday+1))?>" 
+          <a href="<?=$this->Html->url('/leaderboard/pro_weekly?week='.($matchday+1))?>" 
             class="button">Minggu Berikutnya</a>
         </div>
         <?php endif;?>
