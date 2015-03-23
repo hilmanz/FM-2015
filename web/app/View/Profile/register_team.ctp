@@ -153,3 +153,5 @@ $(document).ready(function(){
 	});
 }); 
 </script>
+<!-- Conversion: Supersoccer_activity_create_team_page -->
+<img src="http://avn.innity.com/conversion/?cb=46236&conversion=708&value=[VALUE]" width="1" height="1" border="0"/>
