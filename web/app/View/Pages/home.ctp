@@ -125,5 +125,3 @@
 </div><!-- end #sidebar -->
 
 
-<!-- Conversion: Supersoccer_acitvity_landingpage_form -->
-<img src="http://avn.innity.com/conversion/?cb=85229&conversion=672&value=[VALUE]" width="1" height="1" border="0">

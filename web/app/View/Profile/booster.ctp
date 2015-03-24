@@ -55,6 +55,39 @@
                     </tbody>
             </table>
 			</div><!-- end .content -->
+            <div class="content">
+                <div class="row-2">
+                    <h1 class="red">PEROLEHAN BONUS</h1>
+                    <p>Perolehan Random Booster Pro League : </p>
+                </div><!-- end .row-2 -->
+                <table class="theTable footable" width="100%" border="0" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th data-class="expand">No.</th>
+                            <th>Booster Name</th>
+                            <th data-hide="phone,tablet">Week</th>
+                            <th data-hide="phone,tablet">Bonus Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if(count($pro_booster) != 0): ?>
+                            <?php $i=1; foreach ($pro_booster as $value): ?>
+                               
+                                <tr class="odd">
+                                    <td class="l-rank"><?=$i?></td>
+                                    <td class="l-club"><?=strtoupper(str_replace("_"," ",$value['pro_booster']['booster_type']))?></td>
+                                    <td class="l-club"><?=$value['pro_booster']['matchday']?></td>
+                                    <td class="l-manager"><?=$value['pro_booster']['bonus_points']?></td>
+                                </tr>
+                            <?php $i++; endforeach; ?>
+                        <?php else: ?>
+                            <tr class="odd">
+                                <td colspan="4">Tidak tersedia</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+            </table>
+            </div><!-- end .content -->
         </div><!-- end #content -->
 	<div id="sidebar" class="tr">
 	    <div class="widget">

@@ -654,3 +654,24 @@ CREATE TABLE fantasy.weekly_ranks_pro (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_team_game` (`team_id`,`matchday`,`league`)
 ) ENGINE=INNODB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE ffgame.pro_booster (
+  `id` BIGINT(21) NOT NULL AUTO_INCREMENT,
+  `game_team_id` BIGINT(21) DEFAULT NULL,
+  `matchday` INT(11) DEFAULT NULL,
+  `booster_type` VARCHAR(32) DEFAULT NULL,
+  `bonus_points` INT(6) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQUE_TEAM` (`game_team_id`,`matchday`)
+) ENGINE=INNODB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+CREATE TABLE ffgame_ita.pro_booster (
+  `id` BIGINT(21) NOT NULL AUTO_INCREMENT,
+  `game_team_id` BIGINT(21) DEFAULT NULL,
+  `matchday` INT(11) DEFAULT NULL,
+  `booster_type` VARCHAR(32) DEFAULT NULL,
+  `bonus_points` INT(6) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQUE_TEAM` (`game_team_id`,`matchday`)
+) ENGINE=INNODB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;

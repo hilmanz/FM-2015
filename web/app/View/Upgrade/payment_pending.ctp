@@ -14,7 +14,8 @@
         <div class="rowd">
             <div class="detil-transaksi">
                 <p>
-                    Silahkan lakukan pembayaran via ATM ke Bank Permata.
+                    PENTING : Silahkan lakukan pembayaran via ATM ke Bank Permata menggunakan RTGS.
+                    Pembayaran menggunakan LLG (lalu lintas giro) tidak dapat digunakan.
                 </p>
                 <h3>Tata Cara Pembayaran via ATM</h3>
                     <ul>

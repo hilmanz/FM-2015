@@ -53,14 +53,18 @@ class UpgradeController extends AppController {
 		}
 		else
 		{
-			//$this->pay_with_ecash($po_number);
-			$this->render('ecash');
+			$this->pay_with_ecash();
+			//$this->render('ecash');
 		}
 	}
 	
 	public function index()
 	{
 		$this->redirect('/profile');
+	}
+
+	private function pay_with_ecash(){
+		
 	}
 	public function plan($choice=''){
 		

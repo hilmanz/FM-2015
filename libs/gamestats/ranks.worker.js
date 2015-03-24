@@ -298,7 +298,24 @@ function proleagueRandomBonusPoints(conn,game_team_id,original_team_id,matchday,
 							game_id,
 							matchday,
 							game_team_id,
-							'bonus pro50 - '+bonus_type,
+							'bonus pro50',
+							bonus_point
+						],function(err,rs){
+							console.log('PRO BONUS',game_team_id,S(this.sql).collapseWhitespace().s);
+							cb(err,game_id,bonus_point,bonus_type);
+						});
+		},
+		function(game_id,bonus_point,bonus_type,cb){
+			conn.query("INSERT IGNORE INTO "+config.database.database+".pro_booster\
+						(game_team_id,matchday,booster_type,bonus_points)\
+						VALUES\
+						(?,?,?,?)\
+						ON DUPLICATE KEY UPDATE\
+						bonus_points = VALUES(bonus_points),\
+						booster_type=VALUES(booster_type)",[
+							game_team_id,
+							matchday,
+							point_type[bonus_type],
 							bonus_point
 						],function(err,rs){
 							console.log('PRO BONUS',game_team_id,S(this.sql).collapseWhitespace().s);

@@ -51,7 +51,7 @@
               method="POST" enctype="application/x-www-form-urlencoded">
               <label>Metode Pembayaran</label>
               <div class="metode">
-                <input type="radio" name="payment_method" value="ecash" disabled='disabled'/> Ecash Mandiri (Rupiah)<br />
+                <input type="radio" name="payment_method" value="ecash"/> Ecash Mandiri (Rupiah)<br />
                 <input type="radio" name="payment_method" value="bank_transfer"/> Transfer Bank<br />
                 <input type="radio" name="payment_method" value="kartu_kredit"/> Kartu Kredit(Visa/Master)
               </div>
