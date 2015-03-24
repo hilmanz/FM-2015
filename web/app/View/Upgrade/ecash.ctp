@@ -1,19 +1,39 @@
-<div id="fillDetailsPage">
-      <div class="rowd">
-     	 <?php echo $this->element('infobar'); ?>
-      </div>
-      <div class="rowd">
-    <div id="thecontent">
-        <?=$this->Session->flash();?>
-        <div id="content">
-        	<div class="content">
-            	<div class="row-2">
-                  <h1 class="red">Mohon maaf, sementara tidak dapat menggunakan metode ini</h1>
+<?php
+if(isset($item)){
+$pic = Configure::read('avatar_web_url').
+        "merchandise/thumbs/0_".
+        $item['pic']; 
+}
 
-                       
-    			     </div><!-- end .row-2 -->
-     
-			   </div><!-- end .content -->
-        </div><!-- end #content -->
+?>
+<div id="catalogPage">
+      <div class="rowd">
+       <?php echo $this->element('infobar'); ?>
+      </div>
+  
+    <div id="thecontent">
+        <div class="content pad20">
+          <div class="titlePage">
+        <h1 class="yellow">PRO LEAGUE SUBSCRIPTION</h1>
+        <h4>Proses Pembayaran</h4>
+            </div>
+            <div class="rowd">
+        <div class="col-contents">
+          <div class="tr widgets">
+            <h1>Kode Transaksi : <?=$transaction_id?></h1>
+            <h3>Loe akan diteruskan ke halaman pembayaran, silahkan klik tombol dibawah untuk melakukan pembayaran
+            </h3>
+          </div>
+          
+          <div class="tr widgets">
+            <p>
+              <a class="button2" href="<?=$ecash_url?>">
+                Bayar Menggunakan E-Cash Mandiri
+              </a>
+            </p>
+          </div><!-- end .widget -->
+        </div><!-- end .col-contents -->
+            </div><!-- end .row-3 -->
+        </div><!-- end .content -->
     </div><!-- end #thecontent -->
-</div><!-- end #fillDetailsPage -->
+</div><!-- end #catalogPage -->

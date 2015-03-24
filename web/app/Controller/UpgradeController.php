@@ -32,7 +32,8 @@ class UpgradeController extends AppController {
 			&&$this->request->params['action']!='pay'
 			&&$this->request->params['action']!='payment_success'
 			&&$this->request->params['action']!='payment_error'
-			&&$this->request->params['action']!='payment_pending'){
+			&&$this->request->params['action']!='payment_pending'
+			&&$this->request->params['action']!='member_success'){
 			$this->redirect('/login/expired');
 		}
 
@@ -72,9 +73,6 @@ class UpgradeController extends AppController {
 		$this->redirect('/profile');
 	}
 
-	private function pay_with_ecash(){
-		
-	}
 	public function plan($choice=''){
 		
 		if($choice!=''){
