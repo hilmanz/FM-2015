@@ -1,4 +1,5 @@
 <?php
+require_once APP . 'Vendor' . DS. 'lib/Predis/Autoloader.php';
 App::uses('AppController', 'Controller');
 App::uses('Sanitize', 'Utility');
 
@@ -13,6 +14,7 @@ class UpgradeController extends AppController {
 
 	public $name = 'Upgrade';
 	public $charge = 10000;
+	protected $redisClient;
 
 	public function beforeFilter()
 	{
@@ -33,6 +35,13 @@ class UpgradeController extends AppController {
 			&&$this->request->params['action']!='payment_pending'){
 			$this->redirect('/login/expired');
 		}
+
+		Predis\Autoloader::register();
+		$this->redisClient = new Predis\Client(array(
+											    'host'     => Configure::read('REDIS.Host'),
+											    'port'     => Configure::read('REDIS.Port'),
+											    'database' => Configure::read('REDIS.Database')
+											));
 	}
 
 	public function hasTeam(){
@@ -53,7 +62,7 @@ class UpgradeController extends AppController {
 		}
 		else
 		{
-			//$this->pay_with_ecash($po_number);
+			$this->pay_with_ecash();
 			$this->render('ecash');
 		}
 	}
@@ -150,63 +159,132 @@ class UpgradeController extends AppController {
 					$amount = 0;
 					$dataSource = $this->MembershipTransactions->getDataSource();
 					$dataSource->begin();
-					if($this->checkTotalTeam() > 1)
-					{
-						$amount_epl = $amount + $this->epl_charge($userData['fb_id']);
-						$amount_ita = $amount + $this->ita_charge($userData['fb_id']);
 
-						$save_data[] = array(
-										'fb_id' => $userData['fb_id'],
-										'transaction_dt' => date("Y-m-d H:i:s"),
-										'transaction_name' => $transaction_name,
-										'transaction_type' => 'UPGRADE MEMBER',
-										'amount' => $amount_epl,
-										'details' => $detail,
-										'league' => 'epl'
-									);
+					$redis_content = unserialize($this->redisClient->get($data[3]));
+					$trxinfo = $redis_content['trxinfo'];
+					$rs_user = $this->User->findByFb_id($redis_content['fb_id']);
+					$url_mobile_notif = Configure::read('URL_MOBILE_NOTIF').'fm_payment_notification';
+					$save_data= array(
+									'fb_id' => $redis_content['fb_id'],
+									'transaction_dt' => date("Y-m-d H:i:s"),
+									'po_number' => $data[3],
+									'transaction_name' => $transaction_name,
+									'transaction_type' => 'SUBSCRIPTION',
+									'amount' => $trxinfo['price'],
+									'details' => $detail,
+									'payment_method' => 'ecash',
+									'league' => '',
+									'n_status' => 1
+								);
 
-						$save_data[] = array(
-										'fb_id' => $userData['fb_id'],
-										'transaction_dt' => date("Y-m-d H:i:s"),
-										'transaction_name' => $transaction_name,
-										'transaction_type' => 'UPGRADE MEMBER',
-										'amount' => $amount_ita,
-										'details' => $detail,
-										'league' => 'ita'
-									);
-						$this->MembershipTransactions->saveMany($save_data);
-					}
-					else
-					{
-						$amount = $amount + $this->epl_charge($userData['fb_id']);
-						$league = 'epl';
-
-						if($amount == 0)
-						{
-							$amount = $amount + $this->ita_charge($userData['fb_id']);
-							$league = 'ita';
-						}
-						$save_data = array(
-										'fb_id' => $userData['fb_id'],
-										'transaction_dt' => date("Y-m-d H:i:s"),
-										'transaction_name' => $transaction_name,
-										'transaction_type' => 'UPGRADE MEMBER',
-										'amount' => $amount,
-										'details' => $detail,
-										'league' => $league
-									);
-						$this->MembershipTransactions->create();
-						$this->MembershipTransactions->save($save_data);
-					}
+					$this->MembershipTransactions->save($save_data);
+					
 
 					$this->MembershipTransactions->query("INSERT INTO member_billings
 												(fb_id,log_dt,expire)
 												VALUES('{$userData['fb_id']}',
-														NOW(), NOW() + INTERVAL 1 MONTH)");
+														NOW(), NOW() + INTERVAL 1 MONTH) ON DUPLICATE KEY 
+													UPDATE log_dt = NOW(), 
+													expire=NOW() + INTERVAL 1 MONTH,
+													is_sevendays_notif=0,is_threedays_notif=0");
 
-					$this->User->query("UPDATE users SET paid_member=1,paid_member_status=1 
-										WHERE fb_id='{$userData['fb_id']}'");
+					$this->User->query("UPDATE users SET paid_member=1, paid_member_status=1,
+										paid_plan='{$trxinfo['plan']}' 
+										WHERE fb_id='{$redis_content['fb_id']}'");
 
+					$game_team_id_epl = $this->get_game_team_id($redis_content['fb_id'], 'epl');
+					$game_team_id_ita = $this->get_game_team_id($redis_content['fb_id'], 'ita');
+
+					if($trxinfo['plan']=='pro2'){
+						$this->MembershipTransactions->query("
+											INSERT IGNORE INTO game_transactions
+											(fb_id,transaction_dt,transaction_name,amount,details)
+											VALUES('{$redis_content['fb_id']}',NOW(),'PRO_BONUS',7000,'PRO_BONUS')");
+						
+						$this->MembershipTransactions->query("INSERT INTO game_team_cash
+																(fb_id,cash)
+																SELECT fb_id,SUM(amount) AS cash 
+																FROM game_transactions
+																WHERE fb_id = '{$redis_content['fb_id']}'
+																GROUP BY fb_id
+																ON DUPLICATE KEY UPDATE
+																cash = VALUES(cash);");
+
+						//give ss$50000000
+						if($game_team_id_epl != NULL){
+							$this->Game->addTeamExpendituresByLeague(
+													intval($game_team_id_epl),
+													'PRO_LEAGUE_2',
+													1,
+													50000000,
+													'',
+													0,
+													1,
+													1,
+													'epl');
+						}
+
+						if($game_team_id_ita != NULL){
+							$this->Game->addTeamExpendituresByLeague(
+													intval($game_team_id_ita),
+													'PRO_LEAGUE_2',
+													1,
+													50000000,
+													'',
+													0,
+													1,
+													1,
+													'ita');
+						}
+
+						$user_data = array(
+											'fb_id' => $redis_content['fb_id'], 
+											'trx_type' => 'PRO_LEAGUE_2',
+											'user_id' => $rs_user['User']['id']
+										);
+
+						$result_mobile = curlPost($url_mobile_notif, $user_data);
+						$result_mobile = json_decode($result_mobile, TRUE);
+					}else if($trxinfo['plan']=='pro1'){
+
+						//give ss$15000000
+						if($game_team_id_epl != NULL){
+							$this->Game->addTeamExpendituresByLeague(
+													intval($game_team_id_epl),
+													'PRO_LEAGUE',
+													1,
+													15000000,
+													'',
+													0,
+													1,
+													1,
+													'epl');
+						}
+
+						if($game_team_id_ita != NULL){
+							$this->Game->addTeamExpendituresByLeague(
+													intval($game_team_id_ita),
+													'PRO_LEAGUE',
+													1,
+													15000000,
+													'',
+													0,
+													1,
+													1,
+													'ita');
+						}
+
+						$user_data = array(
+											'fb_id' => $redis_content['fb_id'],
+											'trx_type' => 'PRO_LEAGUE',
+											'user_id' => $rs_user['User']['id']
+											);
+
+						$result_mobile = curlPost($url_mobile_notif, $user_data);
+						$result_mobile = json_decode($result_mobile, TRUE);
+					}
+
+					$this->redisClient->del($data[3]);
 					$dataSource->commit();
 				}catch(Exception $e){
 					$dataSource->rollback();
@@ -226,6 +304,22 @@ class UpgradeController extends AppController {
 			Cakelog::write('error', 'Upgrade.member_success '.$id.'Not Found');
 			$this->render('error');
 		}
+	}
+
+	private function  get_game_team_id($fb_id, $league='epl')
+	{
+		$this->loadModel('Game');
+		$game_team_id = $this->Game->query("SELECT b.id FROM ffgame.game_users a 
+											INNER JOIN ffgame.game_teams b 
+											ON a.id = b.user_id WHERE a.fb_id=".$fb_id);
+		if($league == 'ita')
+		{
+			$game_team_id = $this->Game->query("SELECT b.id FROM ffgame_ita.game_users a 
+											INNER JOIN ffgame_ita.game_teams b 
+											ON a.id = b.user_id WHERE a.fb_id=".$fb_id);
+		}
+
+		return @$game_team_id[0]['b']['id'];
 	}
 
 
@@ -481,6 +575,34 @@ class UpgradeController extends AppController {
 		
 
 	}
+
+	private function pay_with_ecash(){
+		$userData = $this->userData;
+
+		$transaction_id = $this->request->data['po_number'];
+		$trxinfo = unserialize(decrypt_param($this->request->data['trxinfo']));
+
+		$data_redis = array(
+								'fb_id' => $userData['fb_id'],
+								'trxinfo' => $trxinfo,
+								'transaction_id' => $transaction_id
+							);
+
+		$this->redisClient->set($transaction_id, serialize($data_redis));
+		$this->redisClient->expire($transaction_id, 24*60*60);//expires in 1 day
+
+		$rs = $this->Game->getEcashUrl(array(
+			'transaction_id'=>$transaction_id,
+			'amount'=>$trxinfo['price'],
+			'clientIpAddress'=>$this->request->clientIp(),
+			'description'=>$trxinfo['name'],
+			'source'=>'FMUPGRADE'
+		));
+
+		$this->set('transaction_id',$transaction_id);
+		$this->set('ecash_url',$rs['data']);
+	}
+
 	public function payment_success(){
 		
 	}
