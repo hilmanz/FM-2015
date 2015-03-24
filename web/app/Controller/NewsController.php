@@ -87,7 +87,7 @@ class NewsController extends AppController {
 	public function getTopPlayerNews(){
 		$this->loadModel('WpPosts');
 		$userData = $this->userDetail;
-		//print "<!-- pro : ".json_encode($userData)."-->";
+		
 		return $this->WpPosts->getTopPlayerNews($_SESSION['league'],$userData['User']['paid_plan']);	
 	}
 

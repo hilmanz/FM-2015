@@ -415,6 +415,18 @@ class Game extends AppModel {
 
 		return $rs;
 	}
+	public function getProBooster($game_team_id,$league='epl'){
+		if($league=='ita'){
+			$db = 'ffgame_ita';
+		}else{
+			$db = 'ffgame';
+		}
+		
+		$rs = $this->query("SELECT * FROM {$db}.pro_booster 
+							WHERE game_team_id={$game_team_id}  LIMIT 100;");
+
+		return $rs;	
+	}
 
 	public function livestats($game_id){
 		$response = $this->api_call_raw('/livestats/'.$game_id);

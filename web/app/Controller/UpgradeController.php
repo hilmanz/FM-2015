@@ -71,6 +71,10 @@ class UpgradeController extends AppController {
 	{
 		$this->redirect('/profile');
 	}
+
+	private function pay_with_ecash(){
+		
+	}
 	public function plan($choice=''){
 		
 		if($choice!=''){

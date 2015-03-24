@@ -966,3 +966,4 @@ $(document).ready(function(){
         <span class="player-name"></span>
     </div><!-- end .jersey-player -->
 </script>
+<!-- Conversion: Supersoccer_activity_game_page --><img src="http://avn.innity.com/conversion/?cb=77480&conversion=710&value=[VALUE]" width="1" height="1" border="0">

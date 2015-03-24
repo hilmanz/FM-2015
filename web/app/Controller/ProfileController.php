@@ -127,6 +127,11 @@ class ProfileController extends AppController {
 
 		$booster = $this->Game->getPoinBooster($userData['team']['id']);
 		$this->set('booster', $booster);
+		
+
+		$pro_booster = $this->Game->getProBooster($userData['team']['id'],$_SESSION['league']);
+		$this->set('pro_booster', $pro_booster);
+
 	}
 
 	public function create_password()
