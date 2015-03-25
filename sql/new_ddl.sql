@@ -675,3 +675,6 @@ CREATE TABLE ffgame_ita.pro_booster (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQUE_TEAM` (`game_team_id`,`matchday`)
 ) ENGINE=INNODB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+
+ALTER TABLE `ffgame`.`master_transfer_window`     ADD COLUMN `is_pro` TINYINT(3) DEFAULT '0' NULL AFTER `window_name`;

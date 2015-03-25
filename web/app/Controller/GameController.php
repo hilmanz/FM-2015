@@ -177,7 +177,7 @@ class GameController extends AppController {
 		$this->loadModel('Team');
 		$this->loadModel('User');
 		$userData = $this->getUserData();
-		$player_id = Sanitize::clean($this->request->data['player_id']);
+		$player_id = Sanitize::clean(@$this->request->data['player_id']);
 
 		$window = $this->Game->transfer_window();
 
@@ -196,7 +196,9 @@ class GameController extends AppController {
 		}else{
 			$can_transfer = true;
 		}
-		
+		if(@$window['is_pro'] && $this->userDetail['User']['paid_member'] <= 0){
+			$can_transfer = false;
+		}
 		
 		if($can_transfer){
 			$window_id = $window['id'];
@@ -246,7 +248,9 @@ class GameController extends AppController {
 		}else{
 			$can_transfer = true;
 		}
-
+		if(@$window['is_pro'] && $this->userDetail['User']['paid_member'] <= 0){
+			$can_transfer = false;
+		}
 		if($can_transfer){
 			$rs = $this->Game->buy_player($window_id,$userData['team']['id'],$player_id);
 		

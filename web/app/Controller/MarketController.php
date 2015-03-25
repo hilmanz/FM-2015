@@ -178,7 +178,9 @@ class MarketController extends AppController {
 			$can_transfer = true;
 			
 		}
-		
+		if($window['is_pro'] && $userDetail['User']['paid_member'] <= 0){
+			$can_transfer = false;
+		}
 		//still can't transfer ?
 		//we check if the user has transfer window perk in active.
 		if(!$can_transfer){
