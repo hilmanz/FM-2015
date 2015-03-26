@@ -715,7 +715,7 @@ class ProfileController extends AppController {
 										$this->redirect("/profile/send_activation");
 									}
 								}else{
-									$this->redirect("/profile/register_team");
+									$this->redirect('/profile/success_page');
 								}
 
 								//$this->redirect("/profile/register_team");

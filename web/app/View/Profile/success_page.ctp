@@ -1,5 +1,5 @@
 <div id="loginContainer">
-	<h1 class="yellow">Selamat Akun Lo Sudah Berhasil Di Aktifkan.</h1>
+	<h1 class="yellow">Selamat Lo Sudah Berhasil Mendaftar.</h1>
 	<a class="backtohome button" href="<?=$this->Html->url('/pages/liga')?>">Klik disini untuk melanjutkan</a>
 </div><!-- end #logoutpage -->
 <!-- Conversion: Supersoccer_success_form -->
