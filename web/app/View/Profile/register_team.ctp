@@ -107,6 +107,10 @@ $paid_teams = array('t1','t3','t8','t6','t11','t14','t43',
         </div><!-- END .popupContent -->
     </div><!-- END .popupContainer -->
 </div><!-- END .popup --> 
+
+<!-- Conversion: Supersoccer_activity_create_team_page --><img src="http://avn.innity.com/conversion/?cb=46236&conversion=708&value=[VALUE]" width="1" height="1" border="0">
+
+
 <a class="fancy" href="#popup-messages"></a>
 <?php 
     if(!is_array($team_list)) $team_list = array();
