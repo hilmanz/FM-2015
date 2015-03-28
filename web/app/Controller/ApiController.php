@@ -3480,6 +3480,8 @@ class ApiController extends AppController {
 						  $doku_sharedkey.
 						  str_replace('-', '', $transaction_id));
 		$trx_session_id = sha1(time());
+		$first_name = Sanitize::clean($this->request->data['first_name']);
+		$last_name = Sanitize::clean($this->request->data['last_name']);
 		$data = array('MALLID'=>$doku_mid,
 						'CHAINMERCHANT'=>'NA',
 						'AMOUNT'=>number_format($total_price,2,'.',''),
@@ -3490,7 +3492,7 @@ class ApiController extends AppController {
 						'CURRENCY'=>'360',
 						'PURCHASECURRENCY'=>'360',
 						'SESSIONID'=>$trx_session_id,
-						'NAME'=>$this->request->data['first_name'].' '.$this->request->data['last_name'],
+						'NAME'=>$first_name.' '.$last_name,
 						'EMAIL'=>$this->request->data['email'],
 						'ADDITIONALDATA'=>encrypt_param($transaction_id),
 						'PAYMENTCHANNEL'=>$payment_channel,
@@ -4075,7 +4077,8 @@ class ApiController extends AppController {
 				$hash_words = $rs_doku['Doku']['words'];
 			}
 			
-			
+			$first_name = Sanitize::clean($rs_order['MerchandiseOrder']['first_name']);
+			$last_name = Sanitize::clean($rs_order['MerchandiseOrder']['last_name']);
 			$data_param = array('MALLID'=>$doku_mid,
 							'CHAINMERCHANT'=>'NA',
 							'AMOUNT'=>number_format($total_amount,2,'.',''),
@@ -4086,7 +4089,7 @@ class ApiController extends AppController {
 							'CURRENCY'=>'360',
 							'PURCHASECURRENCY'=>'360',
 							'SESSIONID'=>$trx_session_id,
-							'NAME'=>$rs_order['MerchandiseOrder']['first_name'].' '.$rs_order['MerchandiseOrder']['last_name'],
+							'NAME'=>$first_name.' '.$last_name,
 							'EMAIL'=>$rs_order['MerchandiseOrder']['email'],
 							'ADDITIONALDATA'=>'ongkir-payment',
 							'PAYMENTCHANNEL'=>$payment_channel,

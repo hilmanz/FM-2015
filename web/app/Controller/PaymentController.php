@@ -414,7 +414,7 @@ class PaymentController extends AppController {
 								'CURRENCY'=>'360',
 								'PURCHASECURRENCY'=>'360',
 								'SESSIONID'=>$trx_session_id,
-								'NAME'=>$rs_user['User']['name'],
+								'NAME'=>Sanitize::clean($rs_user['User']['name']),
 								'EMAIL'=>$rs_user['User']['email'],
 								'ADDITIONALDATA'=>$additionaldata,
 								'PAYMENTCHANNEL'=>$payment_channel,

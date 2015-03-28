@@ -465,7 +465,7 @@ class UpgradeController extends AppController {
 						'CURRENCY'=>'360',
 						'PURCHASECURRENCY'=>'360',
 						'SESSIONID'=>$trx_session_id,
-						'NAME'=>$first_name.' '.$last_name,
+						'NAME'=>Sanitize::clean($first_name).' '.Sanitize::clean($last_name),
 						'EMAIL'=>$this->userDetail['User']['email'],
 						'ADDITIONALDATA'=>$additionaldata,
 						'PAYMENTCHANNEL'=>$payment_channel,
