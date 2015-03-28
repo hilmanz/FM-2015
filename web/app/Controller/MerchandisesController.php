@@ -286,7 +286,7 @@ class MerchandisesController extends AppController {
 
 			//add suffix -1 to define that its the payment for shipping for these po number.
 			$transaction_id =  $po_number.'-1';
-			$transaction_id_merchant = str_replace('-', '', $transaction_id);
+			$transaction_id_merchant = date("YmdHis").rand(0,99);
 			$total_ongkir = $rs_order['MerchandiseOrder']['total_ongkir'];
 			$admin_fee = $rs_order['MerchandiseOrder']['total_admin_fee'];
 			$total_amount =  $total_ongkir + $admin_fee;

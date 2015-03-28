@@ -343,15 +343,28 @@ class PaymentController extends AppController {
 	public function proleague()
 	{
 		$this->loadModel('Doku');
-		$charge = Configure::read('MOBILE_CHARGE');
-		$url_scheme = Configure::read('URL_SCHEME');
+		
 
 		if($this->request->query('fb_id') == NULL 
-			|| $this->request->query('trx_type') == NULL
-			|| $this->request->query('payment_method') == NULL)
+			|| $this->request->query('trx_type') == NULL)
 		{
 			$this->redirect($url_scheme.'fmpayment?status=0&message=Terjadi Kesalahan !');
 		}
+
+		if($this->request->query('payment_method') != NULL)
+		{
+			$this->pay_with_doku();
+		}
+		else
+		{
+			$this->pay_with_ecash();
+		}
+	}
+
+	private function pay_with_doku()
+	{
+		$charge = Configure::read('MOBILE_CHARGE');
+		$url_scheme = Configure::read('URL_SCHEME');
 
 		$fb_id = trim($this->request->query('fb_id'));
 		$trx_type = strtoupper($this->request->query('trx_type'));
@@ -454,15 +467,6 @@ class PaymentController extends AppController {
 			
 			$this->MembershipTransactions->save($save_data);
 			
-			/*
-			$this->MembershipTransactions->query("INSERT INTO member_billings
-										(fb_id,log_dt,expire)
-										VALUES('{$userData['fb_id']}',
-												NOW(), NOW() + INTERVAL 1 MONTH)");
-			*/
-			/*$this->User->query("UPDATE users SET paid_member=1,paid_member_status=1
-								WHERE fb_id='{$userData['fb_id']}'");
-								*/
 			$plan = 'pro1';
 			if($trx_type == 'PRO_LEAGUE_2'){
 				$plan = 'pro2';
@@ -502,6 +506,234 @@ class PaymentController extends AppController {
 		{
 			$this->redirect($url_scheme.'fmpayment?status=0&message=Terjadi Kesalahan !');
 		}
+	}
+
+	private function pay_with_ecash()
+	{
+		$url_scheme = Configure::read('URL_SCHEME');
+
+		$fb_id = trim($this->request->query('fb_id'));
+		$trx_type = strtoupper($this->request->query('trx_type'));
+		$settings = Configure::read('SUBSCRIPTION_PLAN');
+
+		$plan = 'pro2';
+		if($trx_type == 'PRO_LEAGUE')
+		{
+			$plan = 'pro1';
+		}
+
+		$rs_user = $this->User->findByFb_id($fb_id);
+
+		$transaction_id = $rs_user['User']['id'].rand(0,9999);
+		$trxinfo = $settings[$plan];
+		$trxinfo['plan'] = $plan;
+
+		$data_redis = array(
+								'fb_id' => $fb_id,
+								'trxinfo' => $trxinfo,
+								'transaction_id' => $transaction_id
+							);
+
+		$this->redisClient->set($transaction_id, serialize($data_redis));
+		$this->redisClient->expire($transaction_id, 24*60*60);//expires in 1 day
+
+		$amount = $trxinfo['price'] + $trxinfo['admin_fee'];
+
+		$rs = $this->Game->getEcashUrl(array(
+			'transaction_id'=>$transaction_id,
+			'amount'=>$amount,
+			'clientIpAddress'=>$this->request->clientIp(),
+			'description'=>$trxinfo['name'],
+			'source'=>'APPFMUPGRADE'
+		));
+
+		$this->set('transaction_id',$transaction_id);
+		$this->set('ecash_url',$rs['data']);
+		$this->render('ecash');
+	}
+
+	public function app_proleague()
+	{
+		$url_scheme = Configure::read('URL_SCHEME');
+		$id = $this->request->query['id'];
+
+		$rs = $this->Game->EcashValidate($id);
+
+		if(isset($rs['data']) && $rs['data'] != '')
+		{
+			$data = explode(',', $rs['data']);
+			if(isset($data[4]) && trim($data[4]) == "SUCCESS")
+			{
+				$userData = $this->userData;
+				$transaction_name = 'Purchase Order #'.$data[3];
+				$detail = json_encode($rs['data']);
+
+				try{
+					$amount = 0;
+					$dataSource = $this->MembershipTransactions->getDataSource();
+					$dataSource->begin();
+
+					$redis_content = unserialize($this->redisClient->get($data[3]));
+					$trxinfo = $redis_content['trxinfo'];
+					$rs_user = $this->User->findByFb_id($redis_content['fb_id']);
+					$url_mobile_notif = Configure::read('URL_MOBILE_NOTIF').'fm_payment_notification';
+					$save_data= array(
+									'fb_id' => $redis_content['fb_id'],
+									'transaction_dt' => date("Y-m-d H:i:s"),
+									'po_number' => $data[3],
+									'transaction_name' => $transaction_name,
+									'transaction_type' => 'SUBSCRIPTION',
+									'amount' => $trxinfo['price'],
+									'details' => $detail,
+									'payment_method' => 'ecash',
+									'league' => '',
+									'n_status' => 1
+								);
+
+					$this->MembershipTransactions->save($save_data);
+					
+
+					$this->MembershipTransactions->query("INSERT INTO member_billings
+												(fb_id,log_dt,expire)
+												VALUES('{$userData['fb_id']}',
+														NOW(), NOW() + INTERVAL 1 MONTH) ON DUPLICATE KEY 
+													UPDATE log_dt = NOW(), 
+													expire=NOW() + INTERVAL 1 MONTH,
+													is_sevendays_notif=0,is_threedays_notif=0");
+
+					$this->User->query("UPDATE users SET paid_member=1, paid_member_status=1,
+										paid_plan='{$trxinfo['plan']}' 
+										WHERE fb_id='{$redis_content['fb_id']}'");
+
+					$game_team_id_epl = $this->get_game_team_id($redis_content['fb_id'], 'epl');
+					$game_team_id_ita = $this->get_game_team_id($redis_content['fb_id'], 'ita');
+
+					if($trxinfo['plan']=='pro2'){
+						$this->MembershipTransactions->query("
+											INSERT IGNORE INTO game_transactions
+											(fb_id,transaction_dt,transaction_name,amount,details)
+											VALUES('{$redis_content['fb_id']}',NOW(),'PRO_BONUS',7000,'PRO_BONUS')");
+						
+						$this->MembershipTransactions->query("INSERT INTO game_team_cash
+																(fb_id,cash)
+																SELECT fb_id,SUM(amount) AS cash 
+																FROM game_transactions
+																WHERE fb_id = '{$redis_content['fb_id']}'
+																GROUP BY fb_id
+																ON DUPLICATE KEY UPDATE
+																cash = VALUES(cash);");
+
+						//give ss$50000000
+						if($game_team_id_epl != NULL){
+							$this->Game->addTeamExpendituresByLeague(
+													intval($game_team_id_epl),
+													'PRO_LEAGUE_2',
+													1,
+													50000000,
+													'',
+													0,
+													1,
+													1,
+													'epl');
+						}
+
+						if($game_team_id_ita != NULL){
+							$this->Game->addTeamExpendituresByLeague(
+													intval($game_team_id_ita),
+													'PRO_LEAGUE_2',
+													1,
+													50000000,
+													'',
+													0,
+													1,
+													1,
+													'ita');
+						}
+
+						$user_data = array(
+											'fb_id' => $redis_content['fb_id'], 
+											'trx_type' => 'PRO_LEAGUE_2',
+											'user_id' => $rs_user['User']['id']
+										);
+
+						$result_mobile = curlPost($url_mobile_notif, $user_data);
+						$result_mobile = json_decode($result_mobile, TRUE);
+					}else if($trxinfo['plan']=='pro1'){
+
+						//give ss$15000000
+						if($game_team_id_epl != NULL){
+							$this->Game->addTeamExpendituresByLeague(
+													intval($game_team_id_epl),
+													'PRO_LEAGUE',
+													1,
+													15000000,
+													'',
+													0,
+													1,
+													1,
+													'epl');
+						}
+
+						if($game_team_id_ita != NULL){
+							$this->Game->addTeamExpendituresByLeague(
+													intval($game_team_id_ita),
+													'PRO_LEAGUE',
+													1,
+													15000000,
+													'',
+													0,
+													1,
+													1,
+													'ita');
+						}
+
+						$user_data = array(
+											'fb_id' => $redis_content['fb_id'],
+											'trx_type' => 'PRO_LEAGUE',
+											'user_id' => $rs_user['User']['id']
+											);
+
+						$result_mobile = curlPost($url_mobile_notif, $user_data);
+						$result_mobile = json_decode($result_mobile, TRUE);
+					}
+
+					$this->redisClient->del($data[3]);
+					$dataSource->commit();
+					$this->redirect($url_scheme.'fmcatalogpurchase?status=1&message=Purchase Success !');
+				}catch(Exception $e){
+					$dataSource->rollback();
+					Cakelog::write('error', 'Payment.app_proleague 
+						id='.$id.' data:'.json_encode($data).' message:'.$e->getMessage());
+					$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=Terjadi kesalahan !');
+				}
+			}
+			else
+			{
+				Cakelog::write('error', 'Payment.app_proleague id='.$id.' data:'.json_encode($data));
+				$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=Terjadi kesalahan !');
+			}
+		}
+		else
+		{
+			Cakelog::write('error', 'Payment.app_proleague '.$id.'Not Found');
+			$this->redirect($url_scheme.'fmcatalogpurchase?status=0&message=Terjadi kesalahan !');
+		}
+	}
+
+	private function  get_game_team_id($fb_id, $league='epl')
+	{
+		$this->loadModel('Game');
+		$game_team_id = $this->Game->query("SELECT b.id FROM ffgame.game_users a 
+											INNER JOIN ffgame.game_teams b 
+											ON a.id = b.user_id WHERE a.fb_id=".$fb_id);
+		if($league == 'ita')
+		{
+			$game_team_id = $this->Game->query("SELECT b.id FROM ffgame_ita.game_users a 
+											INNER JOIN ffgame_ita.game_teams b 
+											ON a.id = b.user_id WHERE a.fb_id=".$fb_id);
+		}
+
+		return @$game_team_id[0]['b']['id'];
 	}
 
 	public function mobile_ongkir_payment($order_id = "")
