@@ -3482,22 +3482,7 @@ class ApiController extends AppController {
 		$trx_session_id = sha1(time());
 		$first_name = Sanitize::clean($this->request->data['first_name']);
 		$last_name = Sanitize::clean($this->request->data['last_name']);
-		$data = array('MALLID'=>$doku_mid,
-						'CHAINMERCHANT'=>'NA',
-						'AMOUNT'=>number_format($total_price,2,'.',''),
-						'PURCHASEAMOUNT'=>number_format($total_price,2,'.',''),
-						'TRANSIDMERCHANT'=>str_replace('-', '', $transaction_id),
-						'WORDS'=>$hash_words,
-						'REQUESTDATETIME'=>date("YmdHis"),
-						'CURRENCY'=>'360',
-						'PURCHASECURRENCY'=>'360',
-						'SESSIONID'=>$trx_session_id,
-						'NAME'=>$first_name.' '.$last_name,
-						'EMAIL'=>$this->request->data['email'],
-						'ADDITIONALDATA'=>encrypt_param($transaction_id),
-						'PAYMENTCHANNEL'=>$payment_channel,
-						'BASKET'=>$basket
-						);
+		
 
 		try{
 
@@ -3606,6 +3591,9 @@ class ApiController extends AppController {
 				));
 
 				$this->Doku->id = $rs_doku['Doku']['id'];
+				if(strlen($rs_doku['Doku']['session_id'])>0){
+					$trx_session_id = $rs_doku['Doku']['session_id'];
+				}
 		    	$this->Doku->save(array(
 						'catalog_order_id'=>$rs_order['MerchandiseOrder']['id'],
 						'po_number'=>$transaction_id,
@@ -3636,6 +3624,24 @@ class ApiController extends AppController {
 				CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] error doku entry '.json_encode($rs_doku));
 			}
 		}
+		
+		$data = array('MALLID'=>$doku_mid,
+						'CHAINMERCHANT'=>'NA',
+						'AMOUNT'=>number_format($total_price,2,'.',''),
+						'PURCHASEAMOUNT'=>number_format($total_price,2,'.',''),
+						'TRANSIDMERCHANT'=>str_replace('-', '', $transaction_id),
+						'WORDS'=>$hash_words,
+						'REQUESTDATETIME'=>date("YmdHis"),
+						'CURRENCY'=>'360',
+						'PURCHASECURRENCY'=>'360',
+						'SESSIONID'=>$trx_session_id,
+						'NAME'=>$first_name.' '.$last_name,
+						'EMAIL'=>$this->request->data['email'],
+						'ADDITIONALDATA'=>encrypt_param($transaction_id),
+						'PAYMENTCHANNEL'=>$payment_channel,
+						'BASKET'=>$basket
+						);
+		CakeLog::write('doku',date("Y-m-d H:i:s").' - [request] Doku Call'.json_encode($data));
 
 		$this->layout="ajax";
 		$this->set('response',array('status'=>1,'data'=>$data));

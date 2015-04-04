@@ -448,6 +448,8 @@ class UpgradeController extends AppController {
 						  $doku_mid.
 						  $doku_sharedkey.
 						  str_replace('-', '', $transaction_id));
+
+
 		$trx_session_id = sha1(time());
 		
 		$name_chunk = explode(" ",$this->userDetail['User']['name']);
@@ -568,6 +570,9 @@ class UpgradeController extends AppController {
 					$rs_doku = $this->Doku->findByPo_number($transaction_id);
 
 					if($rs_doku['Doku']['po_number']==$transaction_id){
+						if(strlen($rs_doku['Doku']['session_id']) > 0) {
+							$data['SESSIONID'] = $rs_doku['Doku']['session_id'];
+						}
 						$this->set('order_doku',$data);
 						return $data;
 					}
