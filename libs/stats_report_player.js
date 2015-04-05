@@ -381,7 +381,8 @@ function formulate_stats(team_id, modifier){
 
 	stats['In open play']=o.att_assist_openplay+'('+fm_points["att_assist_openplay"]+')' ;
 	stats['in set plays']=o.att_assist_setplay+'('+fm_points["att_assist_setplay"]+')' ;
-	stats['Total chance created']=o.total_att_assist+'('+fm_points["total_att_assist"]+')' ;
+	//stats['Total chance created']=o.total_att_assist+'('+fm_points["total_att_assist"]+')' ;
+	stats['Total chance created']=parseInt(o.att_assist_openplay) + parseInt(o.att_assist_setplay) +'('+parseInt((parseInt(fm_points["att_assist_openplay"]))+(parseInt(fm_points["att_assist_setplay"])))+')' ;
 	stats['Involved in chance buildup']=o.second_goal_assist+'('+fm_points["second_goal_assist"]+')' ;
 	stats['Created a Clear Cut Chance']=o.big_chance_created+'('+fm_points["big_chance_created"]+')' ;
 
