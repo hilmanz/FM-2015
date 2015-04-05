@@ -373,7 +373,8 @@ function formulate_stats(team_id, modifier){
 	stats['Shots that hit the post'] = o.post_scoring_att+'('+fm_points["post_scoring_att"]+')' ;
 
 
-	stats['Assists']= o.goal_assist+'('+fm_points["goal_assist"]+')' ;
+	//stats['Assists']= o.goal_assist+'('+fm_points["goal_assist"]+')' ;
+	stats['Assists'] = parseInt(o.goal_assist_openplay) + parseInt(o.goal_assist_setplay) + '('+parseInt(parseInt(fm_points["goal_assist_openplay"])+parseInt(fm_points["goal_assist_setplay"]))+')'
 	stats['Assists from open play']=o.goal_assist_openplay+'('+fm_points["goal_assist_openplay"]+')' ;
 	stats['Assist from set play']=o.goal_assist_setplay+'('+fm_points["goal_assist_setplay"]+')' ;
 	stats['Assists from set piece']=o.goal_assist_deadball+'('+fm_points["goal_assist_deadball"]+')' ;
