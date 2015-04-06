@@ -375,12 +375,12 @@ function formulate_stats(team_id, modifier){
 
 	//stats['Assists']= o.goal_assist+'('+fm_points["goal_assist"]+')' ;
 	stats['Assists'] = parseInt(o.goal_assist_openplay) + parseInt(o.goal_assist_setplay) + '('+parseInt(parseInt(fm_points["goal_assist_openplay"])+parseInt(fm_points["goal_assist_setplay"]))+')'
-	stats['Assists from open play']=o.goal_assist_openplay+'('+fm_points["goal_assist_openplay"]+')' ;
-	stats['Assist from set play']=o.goal_assist_setplay+'('+fm_points["goal_assist_setplay"]+')' ;
+	stats['Assists from open play']=o.goal_assist_openplay ;
+	stats['Assist from set play']=o.goal_assist_setplay ;
 	stats['Assists from set piece']=o.goal_assist_deadball+'('+fm_points["goal_assist_deadball"]+')' ;
 
-	stats['In open play']=o.att_assist_openplay+'('+fm_points["att_assist_openplay"]+')' ;
-	stats['in set plays']=o.att_assist_setplay+'('+fm_points["att_assist_setplay"]+')' ;
+	stats['In open play']=o.att_assist_openplay;
+	stats['in set plays']=o.att_assist_setplay;
 	//stats['Total chance created']=o.total_att_assist+'('+fm_points["total_att_assist"]+')' ;
 	stats['Total chance created']=parseInt(o.att_assist_openplay) + parseInt(o.att_assist_setplay) +'('+parseInt((parseInt(fm_points["att_assist_openplay"]))+(parseInt(fm_points["att_assist_setplay"])))+')' ;
 	stats['Involved in chance buildup']=o.second_goal_assist+'('+fm_points["second_goal_assist"]+')' ;

@@ -3758,7 +3758,7 @@ class ApiController extends AppController {
 		    {
 		    	CakeLog::write('doku','NOTIFY - '.date("Y-m-d H:i:s").' - TRANSACTION ALREADY PROCESSED AND SUCCEED : '.json_encode($data));
 		    }
-		    else if($doku['Doku']['trxstatus']=='FAILED' && $doku['Doku']['session_id'] == $session_id && $status == 'SUCCESS')
+		    else if($doku['Doku']['trxstatus']=='FAILED' && $doku['Doku']['session_id'] == $session_id && $status != 'SUCCESS')
 		    {
 		    	//jika transaksi sudah di flag FAILED, tapi ada transaksi baru yg flagnya SUCCESS
 		    	//selama session_id nya sama kita anggap valid.
