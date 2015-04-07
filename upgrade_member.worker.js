@@ -18,26 +18,20 @@ var pool  = mysql.createPool({
 	});
 
 var transport = nodemailer.createTransport(smtpTransport({
-    host: config.haraka.host,
-    port: config.haraka.port,
-    from: config.haraka.from,
-    auth: {
-        user: config.haraka.user,
-        pass: config.haraka.pass
-    }
-}));
+			    	host: "haraka.supersoccer.co.id", // hostname
+			    	secure: false, // use SSL
+			    	port: 587, // port for secure SMTP
+			    	auth:{
+			    		user:'test',
+			    		pass:'password'
+			    	},
+			    	greetingTimeout:30000,
+			    	authMethod:'CRAM-MD5',
+			    	debug:true,
+			    	name:'localhost'
+			    }));
 
-var transport = nodemailer.createTransport(smtpTransport({
-    host: config.mailgun.host,
-    port: config.mailgun.port,
-    from: config.mailgun.from,
-    auth: {
-        user: config.mailgun.user,
-        pass: config.mailgun.pass
-    }
-}));
-
-var template = require('./privateleague_mailer_template').template;
+var template = require('./proleague_mailer_template').template;
 
 var limit = 1000;
 
@@ -85,7 +79,7 @@ function seven_days_notif(conn, cb)
 							console.log(S(this.sql).collapseWhitespace().s);
 							console.log('length =',rs.length);
 							if(rs!=null && rs.length > 0){
-								sendMail(conn, transport, rs, "BAYAR BULANAN", template.invite, 
+								sendMail(conn, transport, rs, "BAYAR BULANAN", template.sevendays, 
 								function(data, err){
 									if(data.length > 0){
 										update_sevendays_notif(conn, data, callback);
@@ -123,7 +117,7 @@ function three_days_notif(conn, cb)
 							console.log(S(this.sql).collapseWhitespace().s);
 							console.log('length =',rs.length);
 							if(rs!=null && rs.length > 0){
-								sendMail(conn, transport, rs, "BAYAR BULANAN", template.invite, 
+								sendMail(conn, transport, rs, "BAYAR BULANAN", template.threedays, 
 								function(data, err){
 									if(data.length > 0){
 										update_threedays_notif(conn, data, callback);
