@@ -3851,13 +3851,41 @@ class ApiController extends AppController {
 					'n_status'=>1
 				));
 
-				$this->MembershipTransactions->query("INSERT INTO member_billings
+				$rs_billing = $this->MemberBillings->findByFb_id($trans['MembershipTransactions']['fb_id']);
+
+				if(count($rs_billing)){
+					if(time() > strtotime($rs_billing['MemberBillings']['expire']))
+					{
+						$this->MembershipTransactions->query("INSERT INTO member_billings
 													(fb_id,log_dt,expire)
 													VALUES('{$trans['MembershipTransactions']['fb_id']}',
 															NOW(), NOW() + INTERVAL 1 MONTH) 
 													ON DUPLICATE KEY UPDATE log_dt = NOW(), 
 													expire=NOW() + INTERVAL 1 MONTH,
 													is_sevendays_notif=0,is_threedays_notif=0");
+					}
+					else
+					{
+						$this->MembershipTransactions->query("INSERT INTO member_billings
+													(fb_id,log_dt,expire)
+													VALUES('{$trans['MembershipTransactions']['fb_id']}',
+															expire, expire + INTERVAL 1 MONTH) 
+													ON DUPLICATE KEY UPDATE log_dt = expire, 
+													expire=expire + INTERVAL 1 MONTH,
+													is_sevendays_notif=0,is_threedays_notif=0");
+					}
+				}
+				else
+				{
+					$this->MembershipTransactions->query("INSERT INTO member_billings
+													(fb_id,log_dt,expire)
+													VALUES('{$trans['MembershipTransactions']['fb_id']}',
+															NOW(), NOW() + INTERVAL 1 MONTH) 
+													ON DUPLICATE KEY UPDATE log_dt = NOW(), 
+													expire=NOW() + INTERVAL 1 MONTH,
+													is_sevendays_notif=0,is_threedays_notif=0");
+				}
+
 				$this->User->query("UPDATE users SET paid_member=1,paid_member_status=1 
 												WHERE fb_id='{$trans['MembershipTransactions']['fb_id']}'");	
 

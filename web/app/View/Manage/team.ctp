@@ -171,6 +171,22 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
                         <img src="<?=$this->Html->url('/images/pro 50.jpg')?>">
                     </a>
                 </div>
+            <?php elseif($userDetail['paid_member']==1 
+            &&$userDetail['paid_member_status']==0&& 
+            $userDetail['paid_plan']=='pro1'): ?>
+            <div class="banner250x250" style="height:70px;">
+                <a href="<?=$this->Html->url('/upgrade/plan')?>">
+                    <img src="<?=$this->Html->url('/images/perpanjang akun 25.jpg')?>">
+                </a>
+            </div>
+            <?php elseif($userDetail['paid_member']==1 
+            &&$userDetail['paid_member_status']==0&& 
+            $userDetail['paid_plan']=='pro2'): ?>
+            <div class="banner250x250" style="height:70px;">
+                <a href="<?=$this->Html->url('/upgrade/plan')?>">
+                    <img src="<?=$this->Html->url('/images/perpanjang akun 50.jpg')?>">
+                </a>
+            </div>
             <?php else: ?>
                 <div class="banner250x250" style="height:70px;">
                     <a href="<?=$this->Html->url('/upgrade/plan')?>">
