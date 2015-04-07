@@ -77,8 +77,8 @@ function seven_days_notif(conn, cb)
 						LIMIT ?,?", [start, limit], 
 						function(err, rs){
 							console.log(S(this.sql).collapseWhitespace().s);
-							console.log('length =',rs.length);
-							if(rs!=null && rs.length > 0){
+							if(rs!=null && rs.length > 0 && typeof rs != "undefined"){
+								console.log('length =',rs.length);
 								sendMail(conn, transport, rs, "BAYAR BULANAN", template.sevendays, 
 								function(data, err){
 									if(data.length > 0){
@@ -115,8 +115,8 @@ function three_days_notif(conn, cb)
 						LIMIT ?,?", [start, limit], 
 						function(err, rs){
 							console.log(S(this.sql).collapseWhitespace().s);
-							console.log('length =',rs.length);
-							if(rs!=null && rs.length > 0){
+							if(rs!=null && rs.length > 0 && typeof rs != "undefined"){
+								console.log('length =',rs.length);
 								sendMail(conn, transport, rs, "BAYAR BULANAN", template.threedays, 
 								function(data, err){
 									if(data.length > 0){
@@ -173,6 +173,7 @@ function expired_member(conn, cb)
 function sendMail(conn, transport, email, subject, mailContent, cb)
 {
 	var mailOption = {
+		from: 'support proleague <support.proleague@supersoccer.co.id>',
 		to: "",
 		subject: subject,
 		html: mailContent
