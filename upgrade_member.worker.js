@@ -77,10 +77,16 @@ function seven_days_notif(conn, cb)
 						LIMIT ?,?", [start, limit], 
 						function(err, rs){
 							console.log(S(this.sql).collapseWhitespace().s);
-							if(rs!=null && rs.length > 0 && typeof rs != "undefined"){
-								console.log('length =',rs.length);
+							console.log(rs);
+							if(rs!=null && typeof rs.length != "undefined"){
+								start += limit;
+								if(rs.length == 0){
+									loop = false;
+									callback();
+								}
 								sendMail(conn, transport, rs, "BAYAR BULANAN", template.sevendays, 
 								function(data, err){
+									console.log(data);
 									if(data.length > 0){
 										update_sevendays_notif(conn, data, callback);
 									}else{
@@ -115,8 +121,13 @@ function three_days_notif(conn, cb)
 						LIMIT ?,?", [start, limit], 
 						function(err, rs){
 							console.log(S(this.sql).collapseWhitespace().s);
-							if(rs!=null && rs.length > 0 && typeof rs != "undefined"){
-								console.log('length =',rs.length);
+							console.log(rs);
+							if(rs!=null && typeof rs.length != "undefined"){
+								start += limit;
+								if(rs.length == 0){
+									loop = false;
+									callback();
+								}
 								sendMail(conn, transport, rs, "BAYAR BULANAN", template.threedays, 
 								function(data, err){
 									if(data.length > 0){
@@ -154,8 +165,13 @@ function expired_member(conn, cb)
 						LIMIT ?,?", [start, limit], 
 						function(err, rs){
 							console.log(S(this.sql).collapseWhitespace().s);
-							console.log('length =',rs.length);
-							if(rs!=null && rs.length > 0){
+							console.log(rs);
+							if(rs!=null && typeof rs.length != "undefined"){
+								start += limit;
+								if(rs.length == 0){
+									loop = false;
+									callback();
+								}
 								update_paid_member_status(conn, rs, callback);
 							}else{
 								loop = false;
@@ -203,6 +219,7 @@ function sendMail(conn, transport, email, subject, mailContent, cb)
 				loop = false;
 				callback();
 			}
+			
 		},
 		function(err){
 			cb(data, err);
@@ -251,6 +268,7 @@ function update_threedays_notif(conn, data, cb)
 												WHERE fb_id=?", [data[i].fb_id], 
 									function(err, rs){
 										console.log(S(this.sql).collapseWhitespace().s);
+										console.log(rs);
 										i++;
 										callback();
 									});

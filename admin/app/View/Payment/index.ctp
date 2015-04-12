@@ -7,7 +7,12 @@
 		<tbody>
 			<tr class="odd">
 				<td><strong>Pro League User:</strong> <?=number_format($pro_league_user)?></td>
-				<td>Active Pro League User: <?=number_format($pro_league_user)?></td>
+				<td>Active Pro League User: <?=number_format($active_proleague_user)?></td>
+				<td>Proleague Transaction(UNIQUE): <?=number_format($total_proleague_transaction)?></td>
+			</tr>
+			<tr class="even">
+				<td>Active Pro25 User: <?=number_format($pro25)?></td>
+				<td>Active Pro50 User: <?=number_format($pro50)?></td>
 				<td>Trivia Game Player:<?=number_format($total_trivia)?></td>
 			</tr>
 			<tr class="even">

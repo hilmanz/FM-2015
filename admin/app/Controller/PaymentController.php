@@ -24,11 +24,22 @@ class PaymentController extends AppController {
 											'paid_member' => 1),
 											'fields' => 'DISTINCT User.id'));
 
-		$active_proleague_user = $this->User->find('count', array('conditions' => array(
-												'paid_member' => 1,
-												'paid_member_status' => 1
-											),
-											'fields' => 'DISTINCT User.id'));
+
+		$total_proleague_transaction = $this->MembershipTransaction->find('count',
+																			array(
+
+																				'conditions'=>array('transaction_type' => 'SUBSCRIPTION'),
+																				'group' => 'fb_id',
+																				'limit' => 100000)
+																			);
+
+		$pro25 = $this->User->query("SELECT count(a.id) as  total FROM fantasy.users a
+							INNER JOIN fantasy.member_billings b ON a.fb_id = b.fb_id WHERE 
+							a.paid_member_status = 1 AND a.paid_plan = 'pro1'");
+
+		$pro50 = $this->User->query("SELECT count(a.id) as  total FROM fantasy.users a
+							INNER JOIN fantasy.member_billings b ON a.fb_id = b.fb_id WHERE 
+							a.paid_member_status = 1 AND a.paid_plan = 'pro2'");
 
 		$rs_transaction = $this->MembershipTransaction->find('all', array('limit' => 100000));
 
@@ -57,7 +68,10 @@ class PaymentController extends AppController {
 		}
 
 		$this->set('pro_league_user', $pro_league_user);
-		$this->set('active_proleague_user', $active_proleague_user);
+		$this->set('active_proleague_user', $pro25[0][0]['total'] + $pro50[0][0]['total']);
+		$this->set('total_proleague_transaction', $total_proleague_transaction);
+		$this->set('pro25', $pro25[0][0]['total']);
+		$this->set('pro50', $pro50[0][0]['total']);
 		$this->set('total_trivia', $total_trivia);
 		$this->set('total_cat1', $total_cat1);
 		$this->set('total_cat2', $total_cat2);
@@ -95,6 +109,7 @@ class PaymentController extends AppController {
 													'fields'=>$fields,
 													'offset'=>$start,
 													'order'=>'id DESC',
+													'conditions'=>array('MembershipTransaction.n_status' => '1'),
 													'limit'=>$limit
 												));
 
