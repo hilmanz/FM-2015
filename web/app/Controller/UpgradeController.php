@@ -94,6 +94,9 @@ class UpgradeController extends AppController {
 	}
 	private function subscribe($plan){
 		$settings = Configure::read('SUBSCRIPTION_PLAN');
+		$enable_ecash = Configure::read('ENABLE_ECASH');
+		$this->set('enable_ecash', $enable_ecash);
+		
 		$po_number = $this->userDetail['User']['id'].'-'.date("YmdHis").'-99'.rand(10,99);
 		$plan_setting = $settings[$plan];
 		$this->set('plan_setting',$plan_setting);

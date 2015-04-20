@@ -199,7 +199,14 @@
 							<input type="radio" name="payment_method" value="coins" checked="checked"/> Coins<br />
 							<?php endif;?>
 							<?php if($can_use_ecash):?>
-							<input type="radio" name="payment_method" value="ecash"/> Ecash Mandiri (Rupiah)<br />
+
+							<?php
+								$disable_radiobut = '';
+								if($enable_ecash != "TRUE"){
+									$disable_radiobut = 'disabled="disabled"';
+								}
+							?>
+							<input type="radio" name="payment_method" value="ecash" <?=$disable_radiobut?> /> Ecash Mandiri (Rupiah)<br />
 							<input type="radio" name="payment_method" value="bank_transfer"/> Transfer Bank<br />
 							<input type="radio" name="payment_method" value="kartu_kredit"/> Kartu Kredit(Visa/Master)
 							<?php endif;?>

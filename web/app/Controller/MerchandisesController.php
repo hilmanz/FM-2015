@@ -639,7 +639,9 @@ class MerchandisesController extends AppController {
 	//12. we start locking items from here.
 
 	public function buy(){
-	
+		
+		$enable_ecash = Configure::read('ENABLE_ECASH');
+		$this->set('enable_ecash', $enable_ecash);
 		$can_use_ecash = true;
 		$can_use_coin = true;
 		$enable_ongkir = true;
