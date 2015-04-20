@@ -3833,8 +3833,10 @@ class ApiController extends AppController {
 		$this->render('default');
 
 	}
+
 	private function pro_subscribe($trx,$doku){
 		$this->loadModel('Game');
+		$this->loadModel('MemberBillings');
 		//get transaction_id
 		$url_mobile_notif = Configure::read('URL_MOBILE_NOTIF').'fm_payment_notification';
 		if($trx['RESULTMSG']=='SUCCESS'){
@@ -3899,12 +3901,25 @@ class ApiController extends AppController {
 
 				Cakelog::write('debug', 'api. pro_subscribe game_team_id '.$game_team_id_epl.' '.$game_team_id_ita);
 
+				$count_membership = $this->MembershipTransactions->find('count', array(
+				    	'conditions' => array(
+				    			'transaction_type' => 'SUBSCRIPTION',
+				    			'fb_id' => $trans['MembershipTransactions']['fb_id'],
+				    			'n_status' => '1'
+				    	)));
+
+				$count_membership = intval($count_membership);
+				$coin_transaction_name = 'PRO_BONUS_'.$count_membership;
+				$pro1_ss_dolar_name = 'PRO_LEAGUE_1_'.$count_membership;
+				$pro2_ss_dolar_name = 'PRO_LEAGUE_2_'.$count_membership;
+
 				if($user['User']['paid_plan']=='pro2'){
 				
 					$this->MembershipTransactions->query("
 										INSERT IGNORE INTO game_transactions
 										(fb_id,transaction_dt,transaction_name,amount,details)
-										VALUES('{$trans['MembershipTransactions']['fb_id']}',NOW(),'PRO_BONUS',7000,'PRO_BONUS')");
+										VALUES('{$trans['MembershipTransactions']['fb_id']}',NOW(),
+											'{$coin_transaction_name}',7000,'{$coin_transaction_name}')");
 					
 					$this->MembershipTransactions->query("INSERT INTO game_team_cash
 															(fb_id,cash)
@@ -3919,7 +3934,7 @@ class ApiController extends AppController {
 					if($game_team_id_epl != NULL){
 						$this->Game->addTeamExpendituresByLeague(
 												intval($game_team_id_epl),
-												'PRO_LEAGUE_2',
+												$pro2_ss_dolar_name,
 												1,
 												50000000,
 												'',
@@ -3932,7 +3947,7 @@ class ApiController extends AppController {
 					if($game_team_id_ita != NULL){
 						$this->Game->addTeamExpendituresByLeague(
 												intval($game_team_id_ita),
-												'PRO_LEAGUE_2',
+												$pro2_ss_dolar_name,
 												1,
 												50000000,
 												'',
@@ -3956,7 +3971,7 @@ class ApiController extends AppController {
 					if($game_team_id_epl != NULL){
 						$this->Game->addTeamExpendituresByLeague(
 												intval($game_team_id_epl),
-												'PRO_LEAGUE',
+												$pro1_ss_dolar_name,
 												1,
 												15000000,
 												'',
@@ -3969,7 +3984,7 @@ class ApiController extends AppController {
 					if($game_team_id_ita != NULL){
 						$this->Game->addTeamExpendituresByLeague(
 												intval($game_team_id_ita),
-												'PRO_LEAGUE',
+												$pro1_ss_dolar_name,
 												1,
 												15000000,
 												'',
