@@ -27,6 +27,11 @@ if(typeof argv.league !== 'undefined'){
 			config = require('./config.ita').config;
 			redis_key = 'ita';
 		break;
+		case 'copa':
+			console.log('COPA America Activated');
+			config = require('./config.copa').config;
+			redis_key = 'copa';
+		break;
 		default:
 			console.log('EPL Activated');
 			config = require('./config').config;

@@ -3,6 +3,9 @@
 <head>
 	<?php echo $this->Html->charset(); ?>
 	<?php echo $this->element('meta'); ?>
+     <script>
+        var CCAKE_WWW = "<?=$this->Html->url('/')?>";
+     </script>
 </head>
 <body>
 	<div id="fb-root"></div>

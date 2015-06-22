@@ -2208,7 +2208,7 @@ function getCash(fb_id,done){
 							//insert transactions
 							conn.query("INSERT IGNORE INTO "+config.database.frontend_schema+".game_transactions\
 										(fb_id,transaction_dt,transaction_name,amount,details)\
-										VALUES(?,NOW(),'START',0,'START')",[fb_id],function(err,rs){
+										VALUES(?,NOW(),'START',1000,'START')",[fb_id],function(err,rs){
 											
 											//update total cash
 											conn.query("INSERT INTO "+config.database.frontend_schema+".game_team_cash\

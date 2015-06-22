@@ -447,7 +447,8 @@ function assignScore(conn,game_id,stats,bet,done){
 		},
 		//we only adding cash when the game period is FullTime
 		function(score,cb){
-
+			cb(null,null);
+			/*
 			cash.adding_cash(conn,
 							 bet.game_team_id,
 							 'BET_'+bet.bet_name+'_'+game_id,score,
@@ -455,16 +456,18 @@ function assignScore(conn,game_id,stats,bet,done){
 							 function(err,rs){
 								cb(err,rs);
 								console.log('calculate',game_id,bet.game_team_id, score ,'adding_cash',rs);
-							});
+							});*/
 			
 		},
 		function(result,cb){
+			cb(null,null);
+			/*
 			cash.update_cash_summary(conn,
 							 bet.game_team_id,
 							 function(err,rs){
 								cb(err,rs);
 								console.log('calculate',game_id,bet.game_team_id, score ,'adding_cash',rs);
-							});
+							});*/
 		}
 		
 	],

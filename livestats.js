@@ -23,6 +23,11 @@ if(typeof argv.league !== 'undefined'){
 			config = require('./config.ita').config;
 			redis_key = 'ita';
 		break;
+		case 'copa':
+			console.log('COPA America Activated');
+			config = require('./config.copa').config;
+			redis_key = 'copa';
+		break;
 		default:
 			console.log('EPL Activated');
 			config = require('./config').config;
@@ -154,7 +159,10 @@ function populateIntoMasterPlayerProgress(conn,matchday,game_id,done){
 							});		
 						}else{
 							console.log('livestats','has reached fulltime, we not proceed',item.game_id);
-							cb(null);
+							//cb(null);
+							populateData(conn,modifiers,item.game_id,function(err){
+								cb(err);
+							});	
 						}
 					});
 				}
@@ -203,7 +211,8 @@ function populateData(conn,modifiers,game_id,done){
 						LIMIT ?,100;",
 						[game_id,start],
 						function(err,rs){
-							console.log(S(this.sql).collapseWhitespace().s);
+							console.log('populateData',S(this.sql).collapseWhitespace().s);
+							console.log('modifiers',rs);
 							if(rs!=null && rs.length > 0){
 								
 								insertPlayerStats(conn,game_id,modifiers,rs,
@@ -234,7 +243,7 @@ function populateData(conn,modifiers,game_id,done){
 		},
 		function(err){
 			var items = [];
-			//console.log(players);
+			console.log('populateData',players);
 			for(var i in players){
 
 				items.push({
@@ -275,29 +284,37 @@ function insertPlayerStats(conn,game_id,modifiers,data,done){
 	var def = {}; //total defending point
 	var atk = {}; //total attack point
 	var error = {}; //total mistake and errors
+	console.log('insertPlayerStats',stats);
 	async.each(data,function(player,next){
 		for(var i in stats){
 			if(stats[i]==player.stats_name){
 				//if(player.player_id=='p12297'){
+				try{
 					console.log('statsmod',player.name,'---',stats[i],'------',player.stats_name,'->',modifiers[player.stats_name][player.position.toLowerCase()]);	
-				//}
 				
-				if(typeof overall[player.player_id] === 'undefined'){
-					overall[player.player_id] = 0;
-					atk[player.player_id] = 0;
-					def[player.player_id] = 0;
-					error[player.player_id] = 0;
-				}
+						
+					//}
+					
+					if(typeof overall[player.player_id] === 'undefined'){
+						overall[player.player_id] = 0;
+						atk[player.player_id] = 0;
+						def[player.player_id] = 0;
+						error[player.player_id] = 0;
+					}
 
-				overall[player.player_id] += (player.stats_value * modifiers[player.stats_name][player.position.toLowerCase()]);
-				if(isDefStats(player.stats_name)){
-					def[player.player_id] += (player.stats_value * modifiers[player.stats_name][player.position.toLowerCase()]);	
+					overall[player.player_id] += (player.stats_value * modifiers[player.stats_name][player.position.toLowerCase()]);
+					if(isDefStats(player.stats_name)){
+						def[player.player_id] += (player.stats_value * modifiers[player.stats_name][player.position.toLowerCase()]);	
+					}
+					if(isAtkStats(player.stats_name)){
+						atk[player.player_id] += (player.stats_value * modifiers[player.stats_name][player.position.toLowerCase()]);	
+					}
+					if(isErrStats(player.stats_name)){
+						error[player.player_id] += (player.stats_value * modifiers[player.stats_name][player.position.toLowerCase()]);	
+					}
 				}
-				if(isAtkStats(player.stats_name)){
-					atk[player.player_id] += (player.stats_value * modifiers[player.stats_name][player.position.toLowerCase()]);	
-				}
-				if(isErrStats(player.stats_name)){
-					error[player.player_id] += (player.stats_value * modifiers[player.stats_name][player.position.toLowerCase()]);	
+				catch(e){
+					console.log('statsmod','error:',e.message);
 				}
 			}
 		}
@@ -554,7 +571,7 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 		},
 		function(cb){
 			//save it into redis cache
-			console.log(players);
+			console.log('match_',players);
 			redisClient.set('match_'+game_id,JSON.stringify(players),function(err,rs){
 				if(!err){
 					console.log('stats successfully stored');

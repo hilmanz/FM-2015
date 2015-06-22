@@ -449,3 +449,4 @@ Configure::write('INNITY_CHANNEL', array(
 Configure::write('DOKU_API','http://103.10.129.17/Suite/Receive');
 Configure::write('DOKU_MALLID',151);
 Configure::write('DOKU_SHAREDKEY','F51F48kJHack');
+Configure::write("SSGTE_START",'2010-01-01');

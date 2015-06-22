@@ -52,6 +52,10 @@ class ApiController extends AppController {
 			$this->league = 'ita';
 			$this->ffgamedb = 'ffgame_ita';
 			$this->ffgamestatsdb = 'ffgame_stats_ita';
+		}else if(@$_REQUEST['league']=='copa'){
+			$this->league = 'copa';
+			$this->ffgamedb = 'ffgame_copa';
+			$this->ffgamestatsdb = 'ffgame_stats_copa';
 		}else{
 			$this->league = 'epl';
 			$this->ffgamedb = 'ffgame';
@@ -1806,6 +1810,10 @@ class ApiController extends AppController {
 		return $total_expenses;
 	}
 	public function weekly_finance($week=1){
+
+		if(intval($this->request->query('week'))>0){
+			$week = intval($this->request->query('week'));
+		}
 		$this->loadModel('Point');
 
 		$api_session = $this->readAccessToken();
@@ -4798,8 +4806,8 @@ class ApiController extends AppController {
 			$fb_id = intval($this->request->data['fb_id']);
 			CakeLog::write('debug','param '.json_encode($param));
 			$result = $this->pay_with_coins($fb_id,$game_team_id,$param);
-			CakeLog::write('debug',$game_team_id.'-team_id');
-			CakeLog::write('debug',$game_team_id,'data ->'.json_encode($this->request->data));
+			CakeLog::write('debug',$fb_id.'-team_id');
+			CakeLog::write('debug',$fb_id,'data ->'.json_encode($this->request->data));
 			CakeLog::write('debug','catalog - '.json_encode($result));
 			$is_transaction_ok = $result['is_transaction_ok'];
 			$no_fund = @$result['no_fund'];
@@ -4893,7 +4901,7 @@ class ApiController extends AppController {
 
 	private function pay_with_coins($fb_id, $game_team_id, $shopping_cart){
 
-		CakeLog::write('debug',$game_team_id.' - pay with coins');
+		CakeLog::write('debug',$fb_id.' - pay with coins');
 		$game_team_id = intval($game_team_id);
 
 
@@ -4924,14 +4932,14 @@ class ApiController extends AppController {
 			if($item['merchandise_type']==0){
 				$all_digital = false;
 			}
-			if($item['stock'] <= 0){
+			if(intval($item['stock']) <= 0){
 				$all_stock_ok = false;
 			}
 		}
 		$kg = ceil($kg);
 		$cash = $this->Game->getCash($fb_id);
-		CakeLog::write('debug',$game_team_id.' cash : '.$cash);
-		CakeLog::write('debug',$game_team_id.' total coins : '.$total_coins);
+		CakeLog::write('debug',$fb_id.' cash : '.$cash);
+		CakeLog::write('debug',$fb_id.' total coins : '.$total_coins);
 
 		//1. check if the coins are sufficient
 		if(intval($cash) >= $total_coins){
@@ -5826,6 +5834,144 @@ class ApiController extends AppController {
 	
 		$this->render('default');
 	}
+	public function event_submit_bet($game_id){
+
+		$game_id = Sanitize::clean($game_id);
+		CakeLog::write('debug',date("Y-m-d H:i:s - ").'submit_bet - '.$game_id);
+
+		CakeLog::write('debug',date("Y-m-d H:i:s - ").'submit_bet - '.json_encode($this->request->query['req']));
+		
+		
+		if(isset($this->request->query['req'])){
+			$req = unserialize(decrypt_param(@$this->request->query['req']));
+			$fb_id = $req['fb_id'];
+			$bet_data = $req['data'];
+			
+			CakeLog::write("debug",json_encode($req));
+			/*
+			$fb_id = "100001023465395";
+			$data = array(
+				'SCORE_GUESS'=>array('home'=>1,'away'=>0,'coin'=>50),
+				'CORNERS_GUESS'=>array('home'=>1,'away'=>0,'coin'=>10),
+				'SHOT_ON_TARGET_GUESS'=>array('home'=>1,'away'=>0,'coin'=>0),
+				'CROSSING_GUESS'=>array('home'=>1,'away'=>0,'coin'=>10),
+				'INTERCEPTION_GUESS'=>array('home'=>1,'away'=>0,'coin'=>10),
+				'YELLOWCARD_GUESS'=>array('home'=>1,'away'=>0,'coin'=>0)
+			);
+			$req = encrypt_param(serialize(array('fb_id'=>$fb_id,'data'=>$data)));
+			$bet_data = $data;
+			*/
+			$game_team = $this->Game->getTeam($fb_id);
+			$game_team_id = $game_team['id'];
+
+			CakeLog::write("debug","1");
+
+			$matches = $this->Game->getMatches();
+			$the_match = array();
+			CakeLog::write("debug","2");			
+			foreach($matches['matches'] as $match){
+				if($match['game_id'] == $game_id){
+					$the_match = $match;
+					break;
+				}
+				
+			}
+			CakeLog::write("debug","3");
+			unset($matches);
+			$coin_ok = false;
+
+			//make sure that the coin is sufficient
+			$cash = $this->Game->getCash($fb_id);
+			CakeLog::write("debug",json_encode($cash));
+
+			$total_bets = 0;
+
+			CakeLog::write('debug',json_encode($bet_data));
+			foreach($bet_data as $name=>$val){
+				$total_bets += intval($val['coin']);
+			}
+
+			CakeLog::write("debug",json_encode($cash));
+
+			CakeLog::write('debug',date("Y-m-d H:i:s").
+									' - submit_bet - '.
+									$game_id.' - fb_id:'.$fb_id.' - game_team_id : '.
+									$game_team_id.' - cash : '.$cash.' - bet : '.$total_bets. 
+									' - '.json_encode($bet_data));
+			if($total_bets <= 100 ){
+				$coin_ok = true;
+			}else{
+				CakeLog::write('debug',date("Y-m-d H:i:s").
+									' - submit_bet - '.'coin not ok -> total_bets : '.$total_bets);
+			}
+
+			if($the_match['period']=='PreMatch' && $coin_ok){
+				
+				
+				foreach($bet_data as $name=>$val){
+					//all negative coins will be invalid
+					if($val['coin']<0){
+						$val['coint'] = 0;
+					}
+
+					$sql = "INSERT INTO ".$this->ffgamedb.".game_bets
+							(game_id,game_team_id,bet_name,home,away,coins,submit_dt)
+							VALUES
+							('{$game_id}',
+								'{$fb_id}',
+								'{$name}',
+								'{$val['home']}',
+								'{$val['away']}',
+								'{$val['coin']}',
+								NOW())
+							ON DUPLICATE KEY UPDATE
+							home = VALUES(home),
+							away = VALUES(away),
+							coins = VALUES(coins)";
+					$this->Game->query($sql,false);
+					CakeLog::write('debug',date("Y-m-d H:i:s - ").
+											'submit_bet - '.$game_id.
+											' - fb_id:'.$fb_id.' - game_team_id : '.
+									$game_team_id.' - cash : '.$cash.' - bet : '.$total_bets. 
+									' - '.$sql);
+
+				}
+				/*
+				$transaction_name = 'PLACE_BET_'.$game_id;
+				$bet_cost = abs(intval($total_bets)) * -1;
+				$sql = "INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+						(fb_id,transaction_dt,transaction_name,amount,details)
+						VALUES
+						('{$fb_id}',NOW(),'{$transaction_name}',{$bet_cost},'deduction')
+						ON DUPLICATE KEY UPDATE
+						amount = VALUES(amount);";
+				$this->Game->query($sql,false);
+				CakeLog::write('error',$sql);
+				$sql = "INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_team_cash
+						(fb_id,cash)
+						SELECT fb_id,SUM(amount) AS cash 
+						FROM ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+						WHERE fb_id = {$fb_id}
+						GROUP BY fb_id
+						ON DUPLICATE KEY UPDATE
+						cash = VALUES(cash);";
+				$this->Game->query($sql,false);
+				*/
+
+				$this->set('response',array('status'=>1,'game_id'=>$game_id,'fb_id'=>$fb_id));
+			}else{
+				$this->set('response',array('status'=>0,'game_id'=>$game_id,'fb_id'=>$fb_id));
+			}
+			
+		}else{
+			CakeLog::write('debug',date("Y-m-d H:i:s - ").'event_submit_bet - '.$game_id.' - no request');
+			$this->set('response',array('status'=>0,'game_id'=>$game_id,'fb_id'=>0,'error'=>'no request specified'));
+		}
+		
+		$this->layout="ajax";
+	
+		$this->render('default');
+	}
 
 	public function bet_info($game_id){
 		$this->layout="ajax";
@@ -5963,6 +6109,160 @@ class ApiController extends AppController {
 							array('fb_id'=>'100000213094071','score'=>90),
 							array('fb_id'=>'100001023465395','score'=>80));*/
 			//->
+			$this->set('response',array('status'=>1,
+								'game_id'=>$game_id,
+								'data'=>$items,
+								'match'=>$the_match,
+								'winners'=>$winners,
+								'fb_id'=>$fb_id,
+								'my_bet'=>$my_bet,
+								'can_place_bet'=>$can_place_bet)
+			);
+		}
+		
+		$this->render('default');
+	}
+	public function event_bet_info($game_id){
+		$this->layout="ajax";
+
+
+		
+		$fb_id = $this->request->query['fb_id'];
+
+		//get the game_team_id
+		$game_team = $this->Game->getTeam($fb_id);
+		$game_team_id = $game_team['id'];
+
+
+		$matches = $this->Game->getMatches();
+		$the_match = array();
+		
+		foreach($matches['matches'] as $match){
+			if($match['game_id'] == $game_id){
+				$the_match = $match;
+				break;
+			}
+			
+		}
+		unset($matches);
+		
+
+		$the_match['home_logo'] = 'http://widgets-images.s3.amazonaws.com/football/team/badges_65/'.
+									str_replace('t','',$the_match['home_id']).'.png';
+		$the_match['away_logo'] = 'http://widgets-images.s3.amazonaws.com/football/team/badges_65/'.
+									str_replace('t','',$the_match['away_id']).'.png';
+
+		if($the_match['period'] == 'PreMatch'){
+			$can_place_bet = true;
+		}else{
+			$can_place_bet = false;
+		}
+		//check if the user can place the bet
+		$sql = "SELECT * FROM ".$this->ffgamedb.".game_bets a
+				WHERE game_id='{$game_id}' AND game_team_id='{$fb_id}' LIMIT 10;";
+
+		
+		CakeLog::write('debug',date("Y-m-d H:i:s - ").'bet_info - '.$game_id.' - '.$fb_id.' - '.$game_team_id.' - '.$sql);
+		$check = $this->Game->query($sql,false);
+		CakeLog::write('debug',date("Y-m-d H:i:s - ").'bet_info - '.$game_id.' - '.$fb_id.' - '.$game_team_id.' - '.json_encode($the_match). ' - '.json_encode(@$check[0]['a']));
+		
+		if(isset($check[0]['a']) 
+				&& $check[0]['a']['game_team_id'] == $fb_id){
+			
+			$n = 0;
+			CakeLog::write('debug',date("Y-m-d H:i:s - ").'bet_info - '.$game_id.' - '.$fb_id.' - '.$game_team_id.' - has place bet');	
+		}else if($the_match['period'] != 'PreMatch'){
+			$can_place_bet = false;
+			$n = 0;
+			CakeLog::write('debug',date("Y-m-d H:i:s - ").'bet_info - '.$game_id.' - '.$fb_id.' - '.$game_team_id.' - cannot place bet :(');	
+		}else{
+			
+			$n=1;
+			CakeLog::write('debug',date("Y-m-d H:i:s - ").'bet_info - '.$game_id.' - '.$fb_id.' - '.$game_team_id.' - can place bet');	
+		}
+
+		$my_bet = array();
+		
+		$my_bet[] = $this->getBetValue('SCORE_GUESS',$check);
+		$my_bet[] = $this->getBetValue('CORNERS_GUESS',$check);
+		$my_bet[] = $this->getBetValue('SHOT_ON_TARGET_GUESS',$check);
+		$my_bet[] = $this->getBetValue('CROSSING_GUESS',$check);
+		$my_bet[] = $this->getBetValue('INTERCEPTION_GUESS',$check);
+		$my_bet[] = $this->getBetValue('YELLOWCARD_GUESS',$check);
+
+		if($n==1){
+			$items = array(
+				array('bet_name'=>'SCORE_GUESS'),
+				array('bet_name'=>'CORNERS_GUESS'),
+				array('bet_name'=>'SHOT_ON_TARGET_GUESS'),
+				array('bet_name'=>'CROSSING_GUESS'),
+				array('bet_name'=>'INTERCEPTION_GUESS'),
+				array('bet_name'=>'YELLOWCARD_GUESS')
+			);
+
+			$this->set('response',array('status'=>1,
+								'game_id'=>$game_id,
+								'data'=>$items,
+								'match'=>$the_match,
+								'fb_id'=>$fb_id,
+								'can_place_bet'=>$can_place_bet)
+			);
+
+		}else{
+
+			$rs = $this->Game->getBetInfo($game_id);
+			
+
+			$items = array(
+				array('bet_name'=>'SCORE_GUESS',
+												'home'=>intval($rs['data']['SCORE_GUESS']['home']),
+												'away'=>intval($rs['data']['SCORE_GUESS']['away'])),
+				array('bet_name'=>'CORNERS_GUESS',
+												'home'=>intval($rs['data']['CORNERS_GUESS']['home']),
+												'away'=>intval($rs['data']['CORNERS_GUESS']['away'])),
+				array('bet_name'=>'SHOT_ON_TARGET_GUESS',
+												'home'=>intval($rs['data']['SHOT_ON_TARGET_GUESS']['home']),
+												'away'=>intval($rs['data']['SHOT_ON_TARGET_GUESS']['away'])),
+				array('bet_name'=>'CROSSING_GUESS',
+												'home'=>intval($rs['data']['CROSSING_GUESS']['home']),
+												'away'=>intval($rs['data']['CROSSING_GUESS']['away'])),
+				array('bet_name'=>'INTERCEPTION_GUESS',
+												'home'=>intval($rs['data']['INTERCEPTION_GUESS']['home']),
+												'away'=>intval($rs['data']['INTERCEPTION_GUESS']['away'])),
+				array('bet_name'=>'YELLOWCARD_GUESS',
+												'home'=>intval($rs['data']['YELLOWCARD_GUESS']['home']),
+												'away'=>intval($rs['data']['YELLOWCARD_GUESS']['away'])),
+
+
+			);
+			$winners = array();
+			if(isset($rs['data']['winners'])){
+				$winners = $rs['data']['winners'];
+				
+				if(sizeof($winners)>0){
+					foreach($winners as $n=>$v){
+						
+						$winners[$n]['game_team_id'] = null;
+						$winners[$n]['fb_id'] = @$v['game_team_id'];
+					}
+				}
+			}
+
+			//dummy
+			/*
+			$winners = array(array('fb_id'=>'100000807572975','score'=>100),
+							array('fb_id'=>'100000213094071','score'=>90),
+							array('fb_id'=>'100001023465395','score'=>80));*/
+			//->
+			CakeLog::write('debug',serialize(array('status'=>1,
+								'game_id'=>$game_id,
+								'data'=>$items,
+								'match'=>$the_match,
+								'winners'=>$winners,
+								'fb_id'=>$fb_id,
+								'my_bet'=>$my_bet,
+								'can_place_bet'=>$can_place_bet)));
+
 			$this->set('response',array('status'=>1,
 								'game_id'=>$game_id,
 								'data'=>$items,
@@ -6872,7 +7172,7 @@ class ApiController extends AppController {
 					$this->User->query("INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
 										(fb_id,transaction_dt,transaction_name,amount,details)
 										VALUES
-										('{$fb_id}',NOW(),'START',0,'START')
+										('{$fb_id}',NOW(),'START',1000,'START')
 										ON DUPLICATE KEY UPDATE
 										amount = VALUES(amount)");
 
@@ -7655,8 +7955,11 @@ class ApiController extends AppController {
 		$this->layout="ajax";
 		$competition_id = 8;
 		$session_id = Configure::read('FM_SESSION_ID');
+		
 		if(@$_REQUEST['league']=='ita'){
 			$competition_id = 21;
+		}else if(@$_REQUEST['league']=='copa'){
+			$competition_id = 128;
 		}
 		$rs  = $this->Game->query("SELECT a.*,b.name as home_name,c.name as away_name
 										FROM ".$this->ffgamedb.".game_fixtures a
@@ -7667,6 +7970,15 @@ class ApiController extends AppController {
 										WHERE a.competition_id={$competition_id} AND session_id={$session_id}
 										ORDER BY a.matchday
 										LIMIT 380");
+		/*print "SELECT a.*,b.name as home_name,c.name as away_name
+										FROM ".$this->ffgamedb.".game_fixtures a
+										INNER JOIN ".$this->ffgamedb.".master_team b
+										ON a.home_id = b.uid
+										INNER JOIN ".$this->ffgamedb.".master_team c
+										ON a.away_id = c.uid
+										WHERE a.competition_id={$competition_id} AND session_id={$session_id}
+										ORDER BY a.matchday
+										LIMIT 380";*/
 		$fixture = array();
 		for($i=0;$i<sizeof($rs);$i++){
 			$p = $rs[$i]['a'];
@@ -8017,6 +8329,106 @@ class ApiController extends AppController {
 		
 		$this->set('response',$results);
 		$this->render('default');
+	}
+	public function ssgte_check(){
+
+		$results = array('status'=>1);
+		$email = $_REQUEST['email'];
+		if(strlen($email)>0){
+			$email = mysql_escape_string($email);	
+			$sql = "SELECT id,name,email,fb_id,register_date,phone_number 
+					FROM fantasy.users 
+					WHERE email='{$email}' 
+					AND register_date > ".Configure::read('SSGTE_START')." LIMIT 1";
+
+			$rs = $this->Game->query($sql);
+			if(sizeof($rs)>0){
+				$results['user'] = $rs[0]['users'];
+			}else{
+				$results = array('status'=>0);
+			}
+		}else{
+			$results = array('status'=>0);
+		}
+
+		
+		
+		$this->set('response',$results);
+		$this->render('default');
+	}
+	public function ssgte_stats($user_id){
+		$user_id = intval($user_id);
+		$sql = "SELECT id,name,email,fb_id,register_date,phone_number 
+					FROM fantasy.users 
+					WHERE id = {$user_id}
+					LIMIT 1";
+
+		$rs = $this->Game->query($sql);
+		if(sizeof($rs)>0){
+			$results = array('status'=>1);
+			$results['user'] = $rs[0]['users'];
+			$sql= "SELECT a.user_id,a.team_name,a.league,SUM(points+extra_points) AS total_points 
+						FROM fantasy.teams a 
+					INNER JOIN fantasy.points b
+					ON a.id = b.team_id AND b.league='epl'
+					WHERE user_id={$user_id} AND a.league='epl';";
+			$rs = $this->Game->query($sql,false);
+
+			$results['epl']=intval($rs[0][0]['total_points']);
+
+			
+			$sql= "SELECT a.user_id,a.team_name,a.league,SUM(points+extra_points) AS total_points 
+						FROM fantasy.teams a 
+					INNER JOIN fantasy.points b
+					ON a.id = b.team_id AND b.league='ita'
+					WHERE user_id={$user_id} AND a.league='ita';";
+			$rs = $this->Game->query($sql,false);
+			$results['ita']=intval($rs[0][0]['total_points']);
+
+			$results['total_points'] = $results['epl'] + $results['ita'];
+			
+		}else{
+			$results = array('status'=>0);
+		}
+		
+		
+		$this->set('response',$results);
+		$this->render('default');
+
+		/*
+		//for weekly points, make sure the points from other player are included
+		$this->loadModel('Weekly_point');
+		$this->Weekly_point->virtualFields['TotalPoints'] = 'SUM(Weekly_point.points + Weekly_point.extra_points)';
+		$options = array('fields'=>array('Weekly_point.id', 'Weekly_point.team_id', 
+							'Weekly_point.game_id', 'Weekly_point.matchday', 'Weekly_point.matchdate', 
+							'SUM(Weekly_point.points + Weekly_point.extra_points) AS TotalPoints', 'Team.id', 'Team.user_id', 
+							'Team.team_id','Team.team_name'),
+			'conditions'=>array('Weekly_point.team_id'=>$club['Team']['id'], 'Weekly_point.league' => $league),
+	        'limit' => 100,
+	        'group' => 'Weekly_point.matchday',
+	        'order' => array(
+	            'matchday' => 'asc'
+	        ));
+		$weekly_points = $this->Weekly_point->find('all',$options);
+		if(sizeof($weekly_points) > 0){
+			$weekly_team_points = array();
+			while(sizeof($weekly_points) > 0){
+				$p = array_shift($weekly_points);
+				$weekly_team_points[] = array(
+						'game_id'=>$p['Weekly_point']['game_id'],
+						'matchday'=>$p['Weekly_point']['matchday'],
+						'matchdate'=>$p['Weekly_point']['matchdate'],
+						'points'=>@ceil($p[0]['TotalPoints'])
+					);
+			}
+		}else{
+			$weekly_team_points[] = array(
+						'game_id'=>'',
+						'matchday'=>@$p['Weekly_point']['matchday'],
+						'matchdate'=>@$p['Weekly_point']['matchdate'],
+						'points'=>@$p[0]['TotalPoints']
+					);
+		}*/
 	}
 
 }

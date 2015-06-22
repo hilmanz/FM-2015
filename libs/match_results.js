@@ -20,6 +20,11 @@ if(typeof argv.league !== 'undefined'){
 			config = require(path.resolve('./config.ita')).config;
 
 		break;
+		case 'copa':
+			console.log('COPA Activated');
+			config = require(path.resolve('./config.copa')).config;
+
+		break;
 		default:
 			console.log('EPL Activated');
 			config = require(path.resolve('./config')).config;
@@ -333,6 +338,12 @@ function calculateTeamOverallPoints(game_id,callback){
 	
 }
 function getPlayerStats(game_id,team_id,data,callback){
+	try{
+		console.log('getPlayerStats',game_id,team_id,data);	
+	}catch(e){
+		console.log('getPlayerStats',"error "+e.message);	
+	}
+	
 	async.eachSeries(data,
 		function(data,callback){
 			savePlayerStats(game_id,team_id,data,function(err,rs){
@@ -554,6 +565,8 @@ function savePlayerStats(game_id,team_id,data,callback){
 			}else{
 				data.Stat.push({Type:'sub',$t:1});
 			}
+			console.log(data.PlayerRef);
+			console.log(data.Stat);
 			async.eachSeries(data.Stat,
 				function(item,onDone){
 					var q = conn.query("INSERT INTO "+config.database.statsdb+".master_match_result_stats\
@@ -564,7 +577,7 @@ function savePlayerStats(game_id,team_id,data,callback){
 								[game_id,team_id,data.PlayerRef,item.Type,item.$t],
 								function(err,rs){
 									if(err) console.log(err.message);
-									//console.log(this.sql);
+									console.log(this.sql);
 									onDone();	
 								});
 

@@ -21,6 +21,10 @@ if(typeof argv.league !== 'undefined'){
 			console.log('Serie A Activated');
 			config = require('./config.ita').config;
 		break;
+		case 'copa':
+			console.log('COPA America Activated');
+			config = require('./config.copa').config;
+		break;
 		default:
 			console.log('EPL Activated');
 			config = require('./config').config;

@@ -424,7 +424,8 @@ class Game extends AppModel {
 		
 		$rs = $this->query("SELECT * FROM {$db}.pro_booster 
 							WHERE game_team_id={$game_team_id}  LIMIT 100;");
-
+		CakeLog::write('probooster',"SELECT * FROM {$db}.pro_booster 
+							WHERE game_team_id={$game_team_id}  LIMIT 100;");
 		return $rs;	
 	}
 

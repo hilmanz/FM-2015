@@ -40,8 +40,8 @@ class CoinsController extends AppController {
 									ON teams.user_id = user.id
 									INNER JOIN ".$_SESSION['ffgamedb'].".master_team master_team
 									ON master_team.uid = teams.team_id
-									INNER JOIN ".$_SESSION['ffgamedb'].".game_team_cash cash
-									ON cash.game_team_id = game_team.id
+									INNER JOIN game_team_cash cash
+									ON cash.fb_id = user.fb_id
 									WHERE game_team.id IN (".implode(',',$team_ids).")",false);
 		$this->set('teams',$teams);
 	}
@@ -108,10 +108,10 @@ class CoinsController extends AppController {
 
 					if($current_coin != $new_coin){
 						//send notification
-						$this->Game->query("INSERT INTO notifications
+						/*$this->Game->query("INSERT INTO notifications
 											(content,url,dt,game_team_id)
 											VALUES
-											('{$message}','#',NOW(),{$team_id[$i]})");
+											('{$message}','#',NOW(),{$team_id[$i]})");*/
 						$success++;
 						$success_id[] = $rs;
 

@@ -240,7 +240,9 @@ class LoginController extends AppController {
 		$this->loadModel('User');
 		
 		$user_session = $this->Session->read('Userlogin.info');
-
+		//pasang external tracking code here
+		curlGet('http://avn.innity.com/conversion/?cb=26575&conversion=719&value=[VALUE]');
+		//---->
 		//1. check if the user is already registered in database
 		$rs = $this->User->findByFb_id($user_session['fb_id']);
 
