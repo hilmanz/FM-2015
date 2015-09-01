@@ -17,7 +17,7 @@ var pool = {};
 var frontend_schema = "";
 var PHPUnserialize = require('php-unserialize');
 var redisClient = {};
-
+var notifications = require(path.resolve('./libs/api/notifications'));
 var config = {};
 var league = 'epl';
 
@@ -2753,6 +2753,16 @@ exports.redeemCode = redeemCode;
 exports.apply_perk = apply_perk;
 exports.check_perk = check_perk;
 exports.add_expenditure = add_expenditure;
+exports.getInbox = function(game_team_id,since_id,callback){
+	prepareDb(function(conn){
+		notifications.getMessage(conn,game_team_id,league,since_id,
+		function(err,rs){
+			conn.release();
+			callback(err,rs);
+		});
+	});
+	
+}
 exports.setPool = function(p){
 	pool = p;
 	match.setPool(pool);

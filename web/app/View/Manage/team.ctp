@@ -242,9 +242,7 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
                 </select>
                 <?php if($can_update_formation):?>
                 <a id="btn_save" class="showPopup button" href="#popup-messages">SIMPAN LINE-UP</a>
-                <a id="btn_tactices" class="showPopup button" href="<?=$this->Html->url('/manage/tactics')?>">
-                    TACTICS
-                </a>
+                
                 <?php endif;?>
 				<a id="btn_inbox" href="#popup-notifications">&nbsp;</a>
                 </div>
@@ -340,6 +338,11 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
                     <div class="coverlayer" style="width:100%;height:100px;position:absolute;top:-27px;"></div>
                 </div><!-- end .starter -->
             </div><!-- end .widget -->
+            <div class="widget tr action-button">
+                <a id="btn_tactices" class="showPopup button" href="<?=$this->Html->url('/manage/tactics')?>">
+                    TACTICS
+                </a>
+            </div>
             <!--
             <div class="widget tr action-button">
                 <a class="prev" href="javascript:;">PREV</a>
@@ -982,4 +985,103 @@ $(document).ready(function(){
         <span class="player-name"></span>
     </div><!-- end .jersey-player -->
 </script>
-<!-- Conversion: Supersoccer_activity_game_page --><img src="http://avn.innity.com/conversion/?cb=77480&conversion=710&value=[VALUE]" width="1" height="1" border="0">
+
+
+
+<script type="text/template" id="tplsalarynego">
+    <%
+    console.log(data);
+
+    %>
+    <div clas="widget">
+        <div class="offer-table">
+        <h1>Negosiasi Kontrak</h1>
+        <table width="100%" class="theTable footable">
+        <tr>
+            <td colspan="2">
+            <img src="http://omo.akamai.opta.net/image.php?custID=c8bb60c8f6d0184c33a87e6f3041b9cc&sport=football&entity=player&description=<%=(data.player.team_id).replace('t','')%>&dimensions=103x155&id=<%=data.player.uid.replace('p','')%>"/>
+            </td>
+        </tr>
+         <tr>
+            <td>Name</td>
+            <td><%=data.player.name%></td>
+        </tr>
+        <tr>
+            <td>Position</td>
+            <td><%=data.player.position%></td>
+        </tr>
+        <tr>
+            <td>Current Salary</td>
+            <td>ss$<%=number_format(data.player.salary)%></td>
+        </tr>
+        <tr>
+            <td>Transfer Value</td>
+            <td>ss$<%=number_format(data.player.transfer_value)%></td>
+        </tr>
+        <tr>
+            <td colspan="2"><h3>Opinions on You</h3></td>
+        </tr>
+        <%for(var i in data.statuses){%>
+        <tr>
+            <td colspan="2">
+            <%=data.statuses[i]%>
+            </td>
+        </tr>
+        <%}%>
+        <tr>
+            <td>Tawaran Gaji</td>
+            <td><div class="offer_box nego">
+                    <span class="dolar">ss$</span><input type="text" name="offer_price" value="0"/>
+                    </div></td>
+        </tr>
+        <%if(data.player.position!='Goalkeeper'){%>
+        <tr>
+            <td>Bonus Mencetak Gol</td>
+            <td>
+                <div class="offer_box nego">
+                    <span class="dolar">ss$</span><input type="text" name="goal_bonus" value="0"/>
+                </div>
+            </td>
+        </tr>
+        <% }else if(data.player.position=='Goalkeeper' || data.player.position=='Defender'){%>
+            <tr>
+                <td>Bonus untuk Cleansheet</td>
+                <td><div class="offer_box nego">
+                    <span class="dolar">ss$</span><input type="text" name="cleansheet" value="0"/>
+                    </div></td>
+            </tr>
+        <%}else{%>
+        <tr>
+            <td>Bonus untuk Cleansheet</td>
+            <td><div class="offer_box nego"> <span class="dolar">ss$</span><input type="text" name="cleansheet" value="0"/></div></td>
+        </tr>
+        <%}%>
+        </table>
+        
+        
+         
+        <p><a href="#/offer/<%=data.nego_id%>/<%=data.player.uid%>" class="button">OFFER</a>
+            <a href="#" class="button" onclick="$.fancybox.close();return false;">BATAL</a></p>
+
+        </div>
+        <div class="offer-loading">
+             <h1>Mengontak Agen</h1>
+             <h3>Harap tunggu sebentar..</h3>
+             <p><img src="<?=$this->Html->url('/css/fancybox/fancybox_loading@2x.gif')?>"/></p>
+        </div>
+
+        <div class="offer-result">
+            <div class="text"></div>
+        </div>
+    </div>
+    
+</script>
+<script type="text/template" id="tplsalaryexpired">
+    
+    <div class="confirm">
+        <h1>Maaf, transaksi ini sudah tidak tersedia !</h1>
+        
+        <a href="#" class="button" onclick="$.fancybox.close();return false;">BATAL</a></p>
+    </div>
+    
+</script>

@@ -286,7 +286,36 @@ class ApiController extends AppController {
 		$this->set('response',array('status'=>1,'data'=>$response));
 		$this->render('default');
 	}
+	private function aboutme(){
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$this->loadModel('Info');
+		$api_session = $this->readAccessToken();
+		$fb_id = $api_session['fb_id'];
+		$user = $this->User->findByFb_id($fb_id);
+		$game_team = $this->Game->getTeam($fb_id);
 
+		return array(
+			'fb_id'=>$fb_id,
+			'user'=>$user,
+			'game_team'=>$game_team,
+			'api_session'=>$api_session
+		);
+	}
+	public function inbox(){
+		$me = $this->aboutme();
+
+		$since_id = intval(@$_REQUEST['since_id']);
+		$responses = array();
+
+		if($since_id >= 0){
+			$responses = $this->Game->getInbox($me['game_team']['id'],
+									$since_id);
+			
+		}
+		$this->set('response',$responses);
+		$this->render('default');
+	}
 	public function save_formation(){
 		$this->loadModel('Team');
 		$this->loadModel('User');
@@ -2657,7 +2686,7 @@ class ApiController extends AppController {
 							ON a.home_id = b.uid
 							INNER JOIN ".$this->ffgamedb.".master_team c
 							ON a.away_id = c.uid
-							WHERE a.game_id='{$game_id}' AND a.session_id=2014
+							WHERE a.game_id='{$game_id}' AND a.session_id=2015
 							LIMIT 1;");
 
 		$response = $this->Game->livestats($game_id);
@@ -8336,7 +8365,7 @@ class ApiController extends AppController {
 		$email = $_REQUEST['email'];
 		if(strlen($email)>0){
 			$email = mysql_escape_string($email);	
-			$sql = "SELECT id,name,email,fb_id,register_date,phone_number 
+			$sql = "SELECT id,name,register_date 
 					FROM fantasy.users 
 					WHERE email='{$email}' 
 					AND register_date > ".Configure::read('SSGTE_START')." LIMIT 1";
@@ -8358,7 +8387,7 @@ class ApiController extends AppController {
 	}
 	public function ssgte_stats($user_id){
 		$user_id = intval($user_id);
-		$sql = "SELECT id,name,email,fb_id,register_date,phone_number 
+		$sql = "SELECT id,name,register_date 
 					FROM fantasy.users 
 					WHERE id = {$user_id}
 					LIMIT 1";
@@ -8376,7 +8405,7 @@ class ApiController extends AppController {
 
 			$results['epl']=intval($rs[0][0]['total_points']);
 
-			
+
 			$sql= "SELECT a.user_id,a.team_name,a.league,SUM(points+extra_points) AS total_points 
 						FROM fantasy.teams a 
 					INNER JOIN fantasy.points b

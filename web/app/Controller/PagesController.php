@@ -119,9 +119,13 @@ class PagesController extends AppController {
 			$this->set('disable_login',true);
 			$this->layout="default";
 		}
+		//$this->set('disable_login',true);
+		//$this->layout="default";
+		//$this->render('/Pages/coming_soon');
 		$this->render(implode('/', $path));
 	}
 	private function getHomeContent(){
+
 		$this->getLastWeekTopManagers();
 		$this->getTopPlayers();
 	}

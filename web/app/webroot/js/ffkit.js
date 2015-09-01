@@ -11,7 +11,9 @@ var App = Backbone.Router.extend({
     "sale/:player_id/:option":"sale_player",
     "buy/:player_id/:option":"buy_player",
     "stats_detail/:tab":"player_stats_tab",
-    "close_detail":"hide_player_stats"
+    "close_detail":"hide_player_stats",
+    "nego/:nego_id":"nego_salary",
+    "offer/:nego_id/:player_id":"offer_salary",
   },
   hire:hire,
   dismiss:dismiss,
@@ -22,15 +24,60 @@ var App = Backbone.Router.extend({
   sale_player:sale_player,
   buy_player:buy_player,
   player_stats_tab:player_stats_tab,
-  hide_player_stats:hide_player_stats
+  hide_player_stats:hide_player_stats,
+  nego_salary:nego_salary,
+  offer_salary:offer_salary,
 });
+function nego_salary(nego_id){
 
+	api_call(api_url+'game/nego/'+nego_id,function(response){
+		if(response.status==1){
+			 $.fancybox.close();
+			 
+			 render_view(tplsalarynego,"#popup-messages .popupContent .entry-popup",
+							{data:response});
+			
+			$(".offer-loading").hide();
+			$(".offer-table").show();
+			$(".offer-result").hide();
+
+		}else{
+			render_view(tplsalarynegoexpired,'#popup-messages .popupContent .entry-popup',
+							{data:response});
+		}
+		 $.fancybox([
+		            { href : '#popup-messages' }
+		        ]);
+	});
+}
 function get_notification(player_id,callback){
 	api_post(api_url+'game/get_notification',
 			{player_id:player_id},
 			function(response){
 				callback(response.data);
 			});
+}
+function offer_salary(nego_id,player_id){
+	var offer_price = parseInt($("input[name=offer_price").val());
+	var goal_bonus = parseInt($("input[name=goal_bonus").val());
+	var cleansheet_bonus = parseInt($("input[name=cleansheet_bonus").val());
+	$(".offer-loading").show();
+	$(".offer-table").hide();
+	$(".offer-result").hide();
+	api_post(api_url+'game/offer/'+nego_id,{
+		offer_price:offer_price,
+		goal_bonus:goal_bonus,
+		player_id:player_id,
+		cleansheet_bonus:cleansheet_bonus	
+	},function(response){
+		$(".offer-loading").hide();
+		if(response.status==1){
+			$(".offer-result .text").html('Penawaran telah disampaikan kepada agen yang bersangkutan. Silahkan cek inbox loe beberapa saat lagi !');
+		}else{
+			$(".offer-result .text").html(response.message);
+		}
+		$(".offer-result").show();
+	});
 }
 function buy_player(player_id,option){
 	document.location = "#";
@@ -41,7 +88,11 @@ function buy_player(player_id,option){
 	$('.nomoney').hide();
 	$('.invalid_transfer').hide();
 	$('.window_closed').hide();
-	api_post(api_url+'game/buy',{player_id:player_id},
+	var offer_price = parseInt($("input[name=offer_price").val());
+	if(offer_price < 0){
+		offer_price = 0;
+	}
+	api_post(api_url+'game/buy_player',{player_id:player_id,offer_price:offer_price},
 			function(response){
 				$('.saving').hide();
 				if(typeof response.status!=='undefined' && response.status == 1){

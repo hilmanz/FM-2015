@@ -931,3 +931,13 @@ exports.EcashValidate = function(req,res){
 		res.json(200,rs);
 	});
 }
+
+exports.getInbox = function(req,res){
+	if(typeof req.query.since_id === 'undefined'){
+		req.query.since_id = 0;
+	}
+	console.log(req.query.since_id);
+	gameplay.getInbox(req.params.team_id,req.query.since_id,function(err,rs){
+		res.json(200,rs);
+	});
+}

@@ -45,6 +45,40 @@ class Game extends AppModel {
 		$response = $this->api_call('/teams');
 		return $response;
 	}
+	public function nego_salary_window($window_id,$game_team_id,$nego_id){
+		$response = $this->api_call('/nego/'.$nego_id,array('game_team_id'=>$game_team_id,'window_id'=>$window_id));
+		$response['data']['player']['transfer_value'] = $response['data']['transfer']['offer_price'];
+		$rs = array('status'=>$response['status'],
+					'nego_id'=>$nego_id,
+					'player'=>$response['data']['player'],
+					'dof'=>$response['data']['dof'],
+					'quadrant_bonus'=>$response['data']['quadrant_bonus'],
+					'rooster_bonus'=>$response['data']['rooster_bonus'],
+					'goal_mod'=>$response['data']['goal_mod'],
+					'cleansheet_mod'=>$response['data']['cleansheet_mod'],
+					'base_agreement_score'=>$response['data']['base_agreement_score'],
+					'player_rank'=>$response['data']['player_rank'],
+					'salary_bonus'=>$response['data']['salary_bonus'],
+					'player_decision'=>$response['data']['player_decision'],
+					'transfer_window_id'=>$response['data']['tw_id'],
+					'statuses'=>$response['data']['statuses']);
+		return $rs;
+	}
+	public function offer_salary($window_id,$game_team_id,$nego_id,
+								$player_id,
+								$offer_price,$goal_bonus,$cleansheet_bonus){
+		
+		$response = $this->api_post('/offer/'.$nego_id,array(
+								'player_id'=>$player_id,
+								'game_team_id'=>$game_team_id,
+								'window_id'=>$window_id,
+								'offer_price'=>$offer_price,
+								'goal_bonus'=>$goal_bonus,
+								'cleansheet_bonus'=>intval($cleansheet_bonus)
+								));
+		
+		return $response;
+	}
 	public function transfer_window(){
 		$response = $this->api_call('/transfer_window');
 		return $response;
@@ -113,11 +147,12 @@ class Game extends AppModel {
 	/*
 	* buy_player
 	*/
-	public function buy_player($window_id,$team_id,$player_id){
+	public function buy_player($window_id,$team_id,$player_id,$offer_price){
 		$response = $this->api_post('/buy',array(
 			'window_id'=>$window_id,
 			'game_team_id'=>$team_id,
-			'player_id'=>$player_id
+			'player_id'=>$player_id,
+			'offer_price'=>$offer_price
 		));
 		return $response;
 	}
@@ -554,6 +589,11 @@ class Game extends AppModel {
 	public function getInputAttempt($game_team_id,$input_name){
 		$name = $input_name.'_'.$game_team_id;
 		$rs = $this->api_call('/getInputAttempt',array('name'=>$name));
+		return $rs;
+	}
+	public function getInbox($game_team_id,$since_id){
+		
+		$rs = $this->api_call('/inbox/'.$game_team_id,array('game_team_id'=>$game_team_id,'since_id'=>$since_id));
 		return $rs;
 	}
 

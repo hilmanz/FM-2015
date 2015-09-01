@@ -11,6 +11,7 @@ var mysql = require('mysql');
 var redis = require('redis');
 var dummy_api_key = '1234567890';
 var auth = require('./libs/api/auth');
+
 var argv = require('optimist').argv;
 var config = require('./config').config;
 
@@ -43,7 +44,7 @@ var users = require('./libs/services/users');
 var team = require('./libs/services/team'); // soccer team
 //var player = require('./libs/services/player'); //soccer player 
 var gameplay = require('./libs/services/gameplay'); // gameplay service
-
+var transfer = require('./libs/services/transfer'); //transfer window service
 gameplay.setLeague(league);
 
 //mysql pool
@@ -61,6 +62,9 @@ auth.setPool(pool);
 users.setConfig(config);
 users.setPool(pool);
 users.setLeague(league);
+transfer.setConfig(config);
+transfer.setPool(pool);
+transfer.setLeague(league);
 
 
 var app = express();
@@ -108,7 +112,7 @@ app.get('/fixtures/', [auth.canAccess],gameplay.fixtures);
 app.get('/fixtures', [auth.canAccess],gameplay.fixtures);
 app.get('/match/list',[auth.canAccess],gameplay.fixtures);
 
-
+app.get('/inbox/:team_id',[auth.canAccess],gameplay.getInbox);
 app.get('/players/:team_id',[auth.canAccess],team.getPlayers);
 app.get('/top_players/:total',[auth.canAccess],team.getMasterTopPlayers);
 app.get('/teams', [auth.canAccess],team.getTeams);
@@ -123,10 +127,13 @@ app.get('/best_player/:game_team_id',[auth.canAccess],gameplay.best_player);
 app.get('/player/:id',[auth.canAccess],gameplay.player_data);
 app.post('/user/register',[auth.canAccess],users.register);
 app.post('/create_team',[auth.canAccess],team.create);
+app.get('/nego/:nego_id',[auth.canAccess],transfer.nego);
+app.post('/offer/:nego_id',[auth.canAccess],transfer.offer);
 app.get('/user/financial_statement',user.list);
 app.get('/game/rank',user.list);
 app.post('/sale',[auth.canAccess],gameplay.sale);
-app.post('/buy',[auth.canAccess],gameplay.buy);
+//app.post('/buy',[auth.canAccess],gameplay.buy);
+app.post('/buy',[auth.canAccess],transfer.buy);
 app.post('/add_expenditure',[auth.canAccess],gameplay.add_expenditure);
 app.get('/cash/:fb_id', [auth.canAccess],gameplay.getCash);
 app.get('/getEcashUrl', [auth.canAccess],gameplay.getEcashUrl);

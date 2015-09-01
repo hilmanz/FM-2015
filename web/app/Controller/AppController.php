@@ -46,7 +46,7 @@ class AppController extends Controller {
 	
 	
 	public function beforeFilter(){
-
+		
 		if(isset($this->request->query['email'])
 			&& isset($this->request->query['osign'])){
 			$this->Session->write('pending_redirect',
@@ -104,6 +104,8 @@ class AppController extends Controller {
 			$this->ApiInit();
 			
 		}else{
+
+			
 			$this->loadModel('Ticker');
 			$last_session = intval($this->Session->read('LastSession'));
 			

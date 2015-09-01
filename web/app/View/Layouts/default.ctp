@@ -252,7 +252,18 @@
 			<tbody>
             <%for(var i in messages){%>
                 <tr>
-                    <td style="width:125px;"><%=messages[i].dt%></td><td><%=messages[i].content%></td>
+                    <td style="width:125px;">
+                    <%=messages[i].dt%></td><td><%=messages[i].content%>
+                    <%
+                    if(typeof(messages[i].meta !== 'undefined')){
+                        if(messages[i].msg_type=='transfer_nego' && messages[i].meta.transfer_status=="success"){%>
+                            <a href="#/nego/<%=messages[i].meta.nego_id%>" class="button">NEGOTIATE SALARY</a>
+                        <%}%>
+
+                    <%   
+                    }
+                    %>
+                    </td>
                 </tr>
             <%}%>
 			</tbody>
@@ -264,34 +275,39 @@
 
 var notifications = {};
 var has_read_notification = <?=intval(@$has_read_notification)?>;
- get_notification(0,function(data){
-            notifications = data;
-            if(has_read_notification==1){
-                $("#btn_inbox").html('INBOX');
+function onLoop(){
+    get_notification(0,function(data){
+        notifications = data;
+        if(has_read_notification==1){
+            $("#btn_inbox").html('INBOX');
+        }else{
+             if(data.total_new>0){
+                $("#btn_inbox").html('INBOX ('+data.total_new+')');
             }else{
-                 if(data.total_new>0){
-                    $("#btn_inbox").html('INBOX ('+data.total_new+')');
-                }else{
-                    $("#btn_inbox").html('INBOX');
-                }
+                $("#btn_inbox").html('INBOX');
             }
+        }
+       
+    });
+    setTimeout(function(){
+       onLoop();
+    },60000);//per 1minutes we do these things
+}
+ 
+$("#btn_inbox").fancybox({
+        beforeLoad : function(){
+            api_call('<?=$this->Html->url('/game/read_notification')?>',function(response){
+                 render_view(tplinbox,"#popup-notifications .popupContent .entry-popup",notifications);
+                    $('.loading').hide();
+                    $('.inbox').show();
+                    $("#btn_inbox").html('INBOX');
+            });
            
-        });
-        $("#btn_inbox").fancybox({
-            beforeLoad : function(){
-                api_call('<?=$this->Html->url('/game/read_notification')?>',function(response){
-                     render_view(tplinbox,"#popup-notifications .popupContent .entry-popup",notifications);
-                        $('.loading').hide();
-                        $('.inbox').show();
-                        $("#btn_inbox").html('INBOX');
-                });
-               
-            },
-           
-        });
+        },
+       
+    });
 
-
-
+onLoop();
 //banner functions
 function banner_click(banner_id,url){
     banner_id = parseInt(banner_id);

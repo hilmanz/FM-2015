@@ -4,7 +4,6 @@ require_once APP . 'Vendor' . DS. 'stats.locale.php';
 $can_purchase = true;
 if(time() > $close_time['ts'] && Configure::read('debug') == 0){
     $can_purchase = false;
-}
 */
 ?>
 <script>
@@ -747,9 +746,15 @@ $("#btnBuy").fancybox({
         <h1>Beli Pemain</h1>
         <h3>Nilai Transfer : <?=number_format($transfer_value)?></h3>
         <h3>Uang : <?=number_format($team_bugdet)?></h3>
+        <h3>Penawaran Anda : </h3>
+        <div class="offer_box">
+            <span class="dolar">ss$</span>
+            <input type="text" name="offer_price" value="<?=$transfer_value?>" onclick="$(this).val('');"/>
+        </div>
         <opta widget="playerprofile" sport="football" competition="8" season="2013" team="<%=team%>" 
           player="<%=uid%>" show_image="true" show_nationality="true" opta_logo="false" 
           narrow_limit="400"></opta>
+          <p>Tips : harga penawaran sebaiknya lebih tinggi dari nilai transfer yang tercantum agar peluang anda mendapatkan pemain ini lebih besar !</p>
         <p><a href="#/buy/<%=player_id%>/1" class="button">BELI</a>
             <a href="#" class="button" onclick="$.fancybox.close();return false;">BATAL</a></p>
     </div>
@@ -759,8 +764,9 @@ $("#btnBuy").fancybox({
         <p><img src="<?=$this->Html->url('/css/fancybox/fancybox_loading@2x.gif')?>"/></p>
     </div>
     <div class="success" style="display:none;">
-        <h1>Selamat</h1>
-        <h3><%=player_name%> sudah menjadi pemain <span class="yellow"><%=my_club%></span>, semoga pembelian Anda akan membantu <span class="yellow"><%=my_club%></span> menjadi lebih sukses !</h3>
+        <h1>Informasi</h1>
+        <h3>Klub dan agen <%=player_name%> sudah berhasil kami hubungi. Mereka akan memberikan kabar kepada anda segera.</h3>
+        <p>Tips : Check Inbox beberapa saat lagi</p>
        
     </div>
     <div class="failure" style="display:none;">

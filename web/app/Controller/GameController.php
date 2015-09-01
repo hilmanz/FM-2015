@@ -129,24 +129,35 @@ class GameController extends AppController {
 		$this->loadModel('Notification');
 		
 		$game_team_id = $this->userData['team']['id'];
+
 		$notifications = $this->Notification->find('all',array(
 											  'conditions'=>array('Notification.game_team_id'=>array(0, $game_team_id),
 											  						'league'=>$_SESSION['league']),
 											  'order'=>array("Notification.id" => "DESC"),
-											  'limit 25'));
+											  'limit'=>25));
+
 		$messages = array();
+
 		$new_messages = 0;
 		if(sizeof($notifications)>0){
 			foreach($notifications as $notif){
 				if((time() - strtotime($notif['Notification']['dt']))<=(24*60*60)){
 					$new_messages++;
 				}
+			
+				$notif['Notification']['content'] = htmlspecialchars($notif['Notification']['content']);
+				$notif['Notification']['meta'] = json_decode($notif['Notification']['meta'],true);
 				$messages[] = $notif['Notification'];
 			}
 		}
+		if($new_messages > intval($this->Session->read("current_new_message"))){
+			$this->Session->write('current_new_message',$new_messages);
+			$this->Session->write('has_read_notification',0);
+		}
+		
 		header('Content-type: application/json');
 		print json_encode(array('status'=>'1',
-								'data'=>array('messages'=>$messages,'total_new'=>$new_messages)));
+								'data'=>array('messages'=>$messages,'total_new'=>$new_messages,'current_messages'=>$this->Session->read("current_new_message"))));
 		die();
 	}
 	public function read_notification(){
@@ -223,6 +234,7 @@ class GameController extends AppController {
 	}
 	/**
 	* buy a player
+	* @obselete
 	*/
 	public function buy(){
 		$this->loadModel('Team');
@@ -263,6 +275,150 @@ class GameController extends AppController {
 				$this->ActivityLog->writeLog($this->userDetail['User']['id'],'PURCHASED_PLAYER');
 				$this->Info->write('buy player',$msg);
 			}
+		}else{
+			$rs = array('status'=>3,'message'=>'Transfer window is closed');
+		}
+
+		
+		header('Content-type: application/json');
+		print json_encode($rs);
+		die();
+	}
+
+	/*
+	* api for negotiate salary window
+	*/
+	public function nego($nego_id){
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$userData = $this->getUserData();
+		$nego_id = intval(Sanitize::clean($nego_id));
+
+		$window = $this->Game->transfer_window();
+		$window_id = intval(@$window['id']);
+		
+		//check if the transfer window is opened, or the player is just registered within 24 hours
+		$is_new_user = false;
+		$can_transfer = false;
+		if(time()<strtotime($this->userDetail['User']['register_date'])+(24*60*60)){
+			$is_new_user = true;
+		}
+
+		if(!$is_new_user){
+			if(strtotime(@$window['tw_open']) <= time() && strtotime(@$window['tw_close'])>=time()){
+				$can_transfer = true;
+				
+			}
+		}else{
+			$can_transfer = true;
+		}
+		if(@$window['is_pro'] && $this->userDetail['User']['paid_member'] <= 0){
+			$can_transfer = false;
+		}
+		if($can_transfer){
+			$rs = $this->Game->nego_salary_window($window_id,$userData['team']['id'],$nego_id);
+		
+		}else{
+			$rs = array('status'=>3,'message'=>'Transfer window is closed');
+		}
+
+		
+		header('Content-type: application/json');
+		print json_encode($rs);
+		die();
+	}
+	/*
+	* api for sending a salary offer
+	*/
+	public function offer($nego_id){
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$userData = $this->getUserData();
+		$nego_id = intval(Sanitize::clean($nego_id));
+
+		$window = $this->Game->transfer_window();
+		$window_id = intval(@$window['id']);
+		
+		//check if the transfer window is opened, or the player is just registered within 24 hours
+		$is_new_user = false;
+		$can_transfer = false;
+		if(time()<strtotime($this->userDetail['User']['register_date'])+(24*60*60)){
+			$is_new_user = true;
+		}
+
+		if(!$is_new_user){
+			if(strtotime(@$window['tw_open']) <= time() && strtotime(@$window['tw_close'])>=time()){
+				$can_transfer = true;
+				
+			}
+		}else{
+			$can_transfer = true;
+		}
+		if(@$window['is_pro'] && $this->userDetail['User']['paid_member'] <= 0){
+			$can_transfer = false;
+		}
+		if($can_transfer){
+			$rs = $this->Game->offer_salary($window_id,$userData['team']['id'],$nego_id,
+											intval($this->request->data['player_id']),
+											intval($this->request->data['offer_price']),
+											intval(@$this->request->data['goal_bonus']),
+											intval(@$this->request->data['cleansheet_bonus']));
+			
+		}else{
+			$rs = array('status'=>3,'message'=>'Transfer window is closed');
+		}
+
+		
+		header('Content-type: application/json');
+		print json_encode($rs);
+		die();
+	}
+	/*
+	* now to buy a player, you need to negotiate transfer value to the club
+	* there's several things to factor before the club agreed to sell the player
+	* 1. bargain poin / pricing sweet spots
+	* 2. normally the club can o
+	*/
+	public function buy_player(){
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$userData = $this->getUserData();
+		$player_id = Sanitize::clean($this->request->data['player_id']);
+		$offer_price = Sanitize::clean(intval(@$this->request->data['offer_price']));
+		$window = $this->Game->transfer_window();
+		$window_id = intval(@$window['id']);
+
+		//check if the transfer window is opened, or the player is just registered within 24 hours
+		$is_new_user = false;
+		$can_transfer = false;
+		if(time()<strtotime($this->userDetail['User']['register_date'])+(24*60*60)){
+			$is_new_user = true;
+		}
+
+		if(!$is_new_user){
+			if(strtotime(@$window['tw_open']) <= time() && strtotime(@$window['tw_close'])>=time()){
+				$can_transfer = true;
+				
+			}
+		}else{
+			$can_transfer = true;
+		}
+		if(@$window['is_pro'] && $this->userDetail['User']['paid_member'] <= 0){
+			$can_transfer = false;
+		}
+		if($can_transfer){
+			$rs = $this->Game->buy_player($window_id,$userData['team']['id'],$player_id,$offer_price);
+		
+			//reset financial statement
+			$this->Session->write('FinancialStatement',null);
+			
+
+			if(@$rs['status']==1){
+				$msg = "@p1_".$this->userDetail['User']['id']." ingin membeli {$player_id} seharga SS$".number_format($offer_price);
+				$this->ActivityLog->writeLog($this->userDetail['User']['id'],'PURCHASED_PLAYER');
+				$this->Info->write('buy player',$msg);
+			}
+
 		}else{
 			$rs = array('status'=>3,'message'=>'Transfer window is closed');
 		}

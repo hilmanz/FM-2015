@@ -524,6 +524,10 @@ class ManageController extends AppController {
 		
 		$this->set('popup_setformation', $this->popup_setformation());
 		$this->set('sidebar_banner',$sidebar_banner);
+		//enable OPTA Widget
+		//$this->set('ENABLE_OPTA',true);
+		//$this->set('OPTA_CUSTOMER_ID',Configure::read('OPTA_CUSTOMER_ID'));
+		//-->
 	}
 	public function player($player_id){
 		

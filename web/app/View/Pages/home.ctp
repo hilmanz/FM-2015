@@ -8,14 +8,15 @@
                     <div id="videoIntro">
 						<div onclick="thevid=document.getElementById('thevideo'); thevid.style.display='block'; this.style.display='none'"><img style="cursor: pointer;" src="<?=$this->Html->url('/content/cover_video.jpg')?>" alt="" /></div>
 						
-<div id="thevideo" style="display: none;">
-<object width="100%" height="350" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0">
-<param name="allowFullScreen" value="true" /><param name="allowscriptaccess" value="always" />
-<param name="src" value="http://www.youtube.com/v/r0R7n9hvfKo?version=3&amp;hl=en_US&amp;autoplay=1" />
-<param name="allowfullscreen" value="true" /><embed width="100%" height="350" type="application/x-shockwave-flash" src="http://www.youtube.com/v/r0R7n9hvfKo?version=3&amp;hl=en_US&amp;autoplay=1" allowFullScreen="true" allowscriptaccess="always" allowfullscreen="true" />
-</object></div>
+        <div id="thevideo" style="display: none;">
+        <object width="100%" height="350" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0">
+        <param name="allowFullScreen" value="true" /><param name="allowscriptaccess" value="always" />
+        <param name="src" value="http://www.youtube.com/v/r0R7n9hvfKo?version=3&amp;hl=en_US&amp;autoplay=1" />
+        <param name="allowfullscreen" value="true" /><embed width="100%" height="350" type="application/x-shockwave-flash" src="http://www.youtube.com/v/r0R7n9hvfKo?version=3&amp;hl=en_US&amp;autoplay=1" allowFullScreen="true" allowscriptaccess="always" allowfullscreen="true" />
+        </object>
+            </div>
 			
-                    </div>		
+            </div>		
     			</li>
             
 	          </ul>

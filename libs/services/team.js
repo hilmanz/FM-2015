@@ -11,6 +11,7 @@ exports.setConfig = function(c){
 exports.setPool = function(pool){
 	team.setPool(pool);
 }
+
 exports.getTeams = function(req,res){
 	team.getTeams(function(err,team){
 		if(err) handleError(res);
