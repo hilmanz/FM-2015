@@ -117,8 +117,9 @@ var negotiate_transfer_process = function(conn,
 		function(player,tw_id,cb){
 			console.log('tw_id : ',tw_id);
 			//total purchase so far in current transfer window
-			conn.query("SELECT COUNT(id) AS total FROM "+config.database.database+".game_transfer_history\
-						WHERE tw_id=? AND game_team_id=?",[tw_id,game_team_id],
+			conn.query("SELECT COUNT(id) AS total \
+						FROM "+config.database.database+".game_transfer_history\
+						WHERE tw_id=? AND game_team_id=? AND transfer_type=1",[tw_id,game_team_id],
 						function(err,rs){
 							cb(err,player,tw_id,rs[0].total);
 						});

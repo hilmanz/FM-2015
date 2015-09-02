@@ -386,7 +386,9 @@ function getPlayers(game_team_id,callback){
 			prepareDb(function(conn){
 				async.waterfall([
 					function(callback){
-						conn.query("SELECT b.* \
+						conn.query("SELECT a.salary as player_salary,a.goal_bonus,\
+									a.cleansheet_bonus,a.morale,a.fitness,\
+									b.* \
 						FROM "+config.database.database+".game_team_players a\
 						INNER JOIN "+config.database.database+".master_player b \
 						ON a.player_id = b.uid\
@@ -544,14 +546,14 @@ function getTeamPlayerDetail(game_team_id,player_id,callback){
 			a.first_name,a.last_name,a.known_name,a.birth_date,\
 			a.weight,a.height,a.jersey_num,a.real_position,a.real_position_side,\
 			a.country,team_id AS original_team_id,\
-			b.name AS original_team_name,a.salary,a.transfer_value\
+			b.name AS original_team_name,a.salary,a.transfer_value,\
+			c.salary AS player_salary,c.goal_bonus,c.cleansheet_bonus,c.fitness,c.morale\
 			FROM "+config.database.database+".master_player a\
 			LEFT JOIN "+config.database.database+".master_team b\
 			ON a.team_id = b.uid\
-			WHERE a.uid IN (\
-				SELECT player_id FROM "+config.database.database+".game_team_players \
-				WHERE game_team_id=? AND player_id=?\
-			)\
+			INNER JOIN "+config.database.database+".game_team_players c\
+			ON c.player_id = a.uid \
+			WHERE c.game_team_id = ? AND c.player_id = ?\
 			LIMIT 1;";
 	prepareDb(function(conn){
 		conn.query(sql,

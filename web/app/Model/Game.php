@@ -47,8 +47,10 @@ class Game extends AppModel {
 	}
 	public function nego_salary_window($window_id,$game_team_id,$nego_id){
 		$response = $this->api_call('/nego/'.$nego_id,array('game_team_id'=>$game_team_id,'window_id'=>$window_id));
-		$response['data']['player']['transfer_value'] = $response['data']['transfer']['offer_price'];
-		$rs = array('status'=>$response['status'],
+		
+		if($response['status']==1){
+			$response['data']['player']['transfer_value'] = $response['data']['transfer']['offer_price'];
+			$rs = array('status'=>$response['status'],
 					'nego_id'=>$nego_id,
 					'player'=>$response['data']['player'],
 					'dof'=>$response['data']['dof'],
@@ -62,6 +64,10 @@ class Game extends AppModel {
 					'player_decision'=>$response['data']['player_decision'],
 					'transfer_window_id'=>$response['data']['tw_id'],
 					'statuses'=>$response['data']['statuses']);
+		}else{
+			$rs = $response;
+		}
+		
 		return $rs;
 	}
 	public function offer_salary($window_id,$game_team_id,$nego_id,

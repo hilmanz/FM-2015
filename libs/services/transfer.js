@@ -37,13 +37,23 @@ exports.setPool = function(pool){
 exports.nego = function(req,res){
 	var game_team_id = req.query.game_team_id;
 	var nego_id = req.params.nego_id;
+	
 	salary_nego.negotiate_salary_window(game_team_id,
 										nego_id,
 										0,
 										league,
 										function(err,rs){
 											if(!err){
-												res.send(200,{status:1,data:rs});
+												buy_player.is_player_in_club(game_team_id,
+																			rs.player.uid,
+																			league,
+												function(err,is_in_club){
+													if(!is_in_club){
+														res.send(200,{status:1,data:rs});
+													}else{
+														res.send(200,{status:0,message:'Sorry, the negotiation is already closed'});
+													}
+												});
 											}else{
 												handleError(res);
 											}

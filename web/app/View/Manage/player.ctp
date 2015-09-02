@@ -249,10 +249,9 @@ $weekly_performance = null;
                 <h3 class="clubname"><?=h($data['player']['name'])?></h3>
             </div>
         </div>
-        <div class="club-info fl">
-            <p>Gaji Mingguan</p>
-            <h4>ss$ <?=number_format($data['player']['salary'])?></h4>
-        </div>
+       
+       
+        
         <div class="club-info fl" style="width:150px;">
             <p>Nilai Transfer</p>
             <h4>
@@ -273,10 +272,20 @@ $weekly_performance = null;
                     echo number_format($transfer_value);
                 ?>
             </h4>
+            <p>Gaji Mingguan</p>
+            <h4>ss$ <?=number_format($data['player']['player_salary'])?></h4>
+        </div>
+         <div class="club-info fl">
+            <p>Goal Bonus</p>
+            <h4>ss$ <?=number_format($data['player']['goal_bonus'])?></h4>
+            <p>Cleansheet Bonus</p>
+            <h4>ss$ <?=number_format($data['player']['cleansheet_bonus'])?></h4>
         </div>
         <div class="club-info fl">
-            <p>Status</p>
-            <h4>N/A</h4>
+            <p>Morales</p>
+            <h4><?=$data['player']['morale']?>%</h4>
+            <p>Fitness</p>
+            <h4><?=$data['player']['fitness']?>%</h4>
         </div>
         <div class="club-info fl">
             <h5>
@@ -295,7 +304,7 @@ $weekly_performance = null;
         <div class="content">
             <div id="tabs-Info">
                 <div class="player-detail">
-                    <opta widget="playerprofile" sport="football" competition="8" season="2013" 
+                    <opta widget="playerprofile" sport="football" competition="8" season="2015" 
                         team="<?=str_replace('t','',$data['player']['original_team_id'])?>" player="<?=str_replace("p","",$data['player']['player_id'])?>" show_image="true" show_nationality="true" opta_logo="false" narrow_limit="400"></opta>
                 </div>
                 

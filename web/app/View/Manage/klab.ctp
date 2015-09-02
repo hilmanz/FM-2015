@@ -665,7 +665,7 @@ function isStaffExist($staff_token,$name){
                     <td><?=h($player['country'])?></td>
                     <td><?=$player_pos?></td>
                    
-                    <td class="alignright">ss$ <?=number_format($player['salary'])?></td>
+                    <td class="alignright">ss$ <?=number_format($player['player_salary'])?></td>
                     <?php
                       if($player['points']!=0){
                         $last_performance = floatval($player['last_performance']);
