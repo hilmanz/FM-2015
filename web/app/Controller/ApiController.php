@@ -313,6 +313,7 @@ class ApiController extends AppController {
 									$since_id);
 			
 		}
+
 		$this->set('response',$responses);
 		$this->render('default');
 	}
@@ -2717,6 +2718,210 @@ class ApiController extends AppController {
 		$this->set('raw',true);
 		$this->render('default');
 	}
+	public function transfer_bid(){
+		$player_id = $this->request->data['player_id'];
+		$offer_price = intval(@$this->request->data['value']);
+		if($offer_price < 0){
+			$offer_price = 0;
+		}
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$api_session = $this->readAccessToken();
+		$fb_id = $api_session['fb_id'];
+		$user = $this->User->findByFb_id($fb_id);
+		
+		
+		if(strlen($user['User']['avatar_img'])<2){
+			$user['User']['avatar_img'] = "http://graph.facebook.com/".$fb_id."/picture";
+		}else{
+			$user['User']['avatar_img'] = Configure::read('avatar_web_url').'120x120_'.$user['User']['avatar_img'];
+		}
+
+		$game_team = $this->Game->getTeam($fb_id);
+
+		
+
+		$window = $this->Game->transfer_window();
+		$window_id = intval(@$window['id']);
+		
+		//check if the transfer window is opened, or the player is just registered within 24 hours
+		$is_new_user = false;
+		$can_transfer = false;
+
+		if(time()<strtotime($user['User']['register_date'])+(24*60*60)){
+			$is_new_user = true;
+		}
+
+		if(!$is_new_user){
+			if(strtotime(@$window['tw_open']) <= time() && strtotime(@$window['tw_close'])>=time()){
+				$can_transfer = true;
+				
+			}
+		}else{
+			$can_transfer = true;
+		}
+
+		if(strlen($player_id)<2){
+			
+			$rs = array('status'=>'0','error'=>'no data available');
+
+		}else{
+			if($can_transfer){
+				
+
+				$rs = $this->Game->buy_player($window_id,$game_team['id'],
+						$player_id,
+						$offer_price);
+		
+				//reset financial statement
+				$this->Session->write('FinancialStatement',null);
+	
+			}else{
+				$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 11';
+				if($this->league == 'ita'){
+					$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 17';
+				}
+				$rs = array('status'=>3,'message'=>$msg);
+			}
+		}
+
+		
+
+		$this->set('response',$rs);
+		$this->render('default');
+	}
+
+	/**
+	* open transfer salary negotiation window
+	*/
+	public function transfer_negotiation_window($nego_id){
+		$nego_id = intval($nego_id);
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$api_session = $this->readAccessToken();
+		$fb_id = $api_session['fb_id'];
+		$user = $this->User->findByFb_id($fb_id);
+		
+		
+		if(strlen($user['User']['avatar_img'])<2){
+			$user['User']['avatar_img'] = "http://graph.facebook.com/".$fb_id."/picture";
+		}else{
+			$user['User']['avatar_img'] = Configure::read('avatar_web_url').'120x120_'.$user['User']['avatar_img'];
+		}
+
+		$game_team = $this->Game->getTeam($fb_id);
+
+		
+
+		$window = $this->Game->transfer_window();
+		$window_id = intval(@$window['id']);
+		
+		//check if the transfer window is opened, or the player is just registered within 24 hours
+		$is_new_user = false;
+		$can_transfer = false;
+
+		if(time()<strtotime($user['User']['register_date'])+(24*60*60)){
+			$is_new_user = true;
+		}
+
+		if(!$is_new_user){
+			if(strtotime(@$window['tw_open']) <= time() && strtotime(@$window['tw_close'])>=time()){
+				$can_transfer = true;
+				
+			}
+		}else{
+			$can_transfer = true;
+		}
+
+		if(strlen($nego_id)<1){
+			
+			$rs = array('status'=>'0','error'=>'no data available');
+
+		}else{
+			if($can_transfer){
+			
+				$rs = $this->Game->nego_salary_window($window_id,$game_team['id'],$nego_id);
+			}else{
+				$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 11';
+				if($this->league == 'ita'){
+					$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 17';
+				}
+				$rs = array('status'=>3,'message'=>$msg);
+			}
+		}
+
+		
+
+		$this->set('response',$rs);
+		$this->render('default');
+	}
+	public function transfer_negotiate($nego_id){
+		$nego_id = intval($nego_id);
+		
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$api_session = $this->readAccessToken();
+		$fb_id = $api_session['fb_id'];
+		$user = $this->User->findByFb_id($fb_id);
+		
+		
+		if(strlen($user['User']['avatar_img'])<2){
+			$user['User']['avatar_img'] = "http://graph.facebook.com/".$fb_id."/picture";
+		}else{
+			$user['User']['avatar_img'] = Configure::read('avatar_web_url').'120x120_'.$user['User']['avatar_img'];
+		}
+
+		$game_team = $this->Game->getTeam($fb_id);
+
+		
+
+		$window = $this->Game->transfer_window();
+		$window_id = intval(@$window['id']);
+		
+		//check if the transfer window is opened, or the player is just registered within 24 hours
+		$is_new_user = false;
+		$can_transfer = false;
+
+		if(time()<strtotime($user['User']['register_date'])+(24*60*60)){
+			$is_new_user = true;
+		}
+
+		if(!$is_new_user){
+			if(strtotime(@$window['tw_open']) <= time() && strtotime(@$window['tw_close'])>=time()){
+				$can_transfer = true;
+				
+			}
+		}else{
+			$can_transfer = true;
+		}
+
+		if(strlen($nego_id)<1){
+			
+			$rs = array('status'=>'0','error'=>'no data available');
+
+		}else{
+			if($can_transfer){
+			
+				
+				$rs = $this->Game->offer_salary($window_id,$game_team['id'],$nego_id,
+											intval($this->request->data['player_id']),
+											intval(@$this->request->data['offer_price']),
+											intval(@$this->request->data['goal_bonus']),
+											intval(@$this->request->data['cleansheet_bonus']));
+			}else{
+				$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 11';
+				if($this->league == 'ita'){
+					$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 17';
+				}
+				$rs = array('status'=>3,'message'=>$msg);
+			}
+		}
+
+		
+
+		$this->set('response',$rs);
+		$this->render('default');
+	}
 	/**
 	* buy a player
 	*/
@@ -2770,18 +2975,13 @@ class ApiController extends AppController {
 				$this->Session->write('FinancialStatement',null);
 				
 
-				if(@$rs['status']==1){
-					$msg = "@p1_".$user['User']['id']." telah membeli {$rs['data']['name']} seharga SS$".number_format($rs['data']['transfer_value']);
-					
-				}else if(@$rs['status']==2){
-					$rs = array('status'=>2,'message'=>'No Money');
-					
-				}else if(@$rs['status']==-1){
-					$rs = array('status'=>-1,'message'=>'you cannot buy a player who already sold from the same transfer window');
-					
-				}else if(isset($rs['error'])){
-					$rs = array('status'=>'0','error'=>'Transaction Failed');
-				}
+				$rs = $this->Game->buy_player($window_id,$userData['team']['id'],
+						$player_id,
+						$offer_price);
+		
+				//reset financial statement
+				$this->Session->write('FinancialStatement',null);
+	
 			}else{
 				$msg = 'Transfer window SuperSoccer Football Manager sedang tutup, silahkan balik lagi tanggal 11';
 				if($this->league == 'ita'){

@@ -170,6 +170,7 @@ var negotiate_transfer_process = function(conn,
 							if(rs!=null && rs.length==1){
 								dof = game_config.staff_bonus.dof[rs[0].rank];
 							}
+							console.log('dof',dof);
 							cb(err,player,tw_id,total_purchase,budget,player_quadrant,dof);
 						});
 		},

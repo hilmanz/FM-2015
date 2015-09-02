@@ -144,12 +144,14 @@ class GameController extends AppController {
 				if((time() - strtotime($notif['Notification']['dt']))<=(24*60*60)){
 					$new_messages++;
 				}
-			
-				$notif['Notification']['content'] = htmlspecialchars($notif['Notification']['content']);
+				//print("sebelum : ".$notif['Notification']['content']."<br/>");
+				$notif['Notification']['content'] = utf8_encode($notif['Notification']['content']);
+				//print("sesudah : ".$notif['Notification']['content']."<br/>");
 				$notif['Notification']['meta'] = json_decode($notif['Notification']['meta'],true);
 				$messages[] = $notif['Notification'];
 			}
 		}
+
 		if($new_messages > intval($this->Session->read("current_new_message"))){
 			$this->Session->write('current_new_message',$new_messages);
 			$this->Session->write('has_read_notification',0);
@@ -377,7 +379,7 @@ class GameController extends AppController {
 	* now to buy a player, you need to negotiate transfer value to the club
 	* there's several things to factor before the club agreed to sell the player
 	* 1. bargain poin / pricing sweet spots
-	* 2. normally the club can o
+	* 2. normally the club can 
 	*/
 	public function buy_player(){
 		$this->loadModel('Team');
