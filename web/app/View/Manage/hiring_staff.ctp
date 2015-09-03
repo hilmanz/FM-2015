@@ -12,22 +12,25 @@
                         <div class=" staff-list" id="available">
                             <?php
                                 foreach($officials as $official):
-                                    $img = str_replace(' ','_',strtolower($official['name'])).'.jpg';
+                                    $img = str_replace(' ','_',strtolower($official['staff_type'])).'.jpg';
                             ?>
                             <div class="thumbStaff">
                                 <div class="avatar-big">
                                     <img src="<?=$this->Html->url('/content/thumb/'.$img)?>" />
                                 </div><!-- end .avatar-big -->
                                 <p><?=h($official['name'])?></p>
+                                <p class="rank">
+                                    <?php for($i=0;$i<$official['rank'];$i++):?>
+                                        <img src="<?=$this->Html->url('/images/Icon_star.gif')?>"/>
+                                    <?php endfor;?>
+                                </p>
                                 <div>
                                     SS$ <?=number_format($official['salary'])?> / minggu
                                 </div>
                                 <div>
-                                    <?php if(@$official['hired']):?>
-                                        <a href="?dismiss=1&id=<?=$official['id']?>" class="button">Berhentikan</a>
-                                    <?php else:?>
-                                        <a href="?hire=1&id=<?=$official['id']?>" class="button">Rekrut</a>
-                                    <?php endif;?>
+                                    <a href="<?=$this->Html->url('/manage/hiring_staff?hire=1&id='.$official['id'])?>" class="button">
+                                        Rekrut
+                                    </a>
                                 </div>
                             </div><!-- end .thumbStaff -->
                             <?php
@@ -42,12 +45,10 @@
         </div><!-- end #content -->
     <div id="sidebar" class="tr">
         <div class="widget">
-            <div class="cash-left"
-                <h3 class="red">SISA UANG</h3>
-                <h1>SS$ <?=number_format($team_bugdet)?></h1>
-                <h3 class="red">Est. PENGELUARAN MINGGUAN</h3>
-                <h1>SS$ <?=number_format($weekly_salaries*4)?></h1> 
-            </div>
+            <h3>Informasi</h3>
+            <p>
+                Setiap perekrutan akan dikenakan biaya hiring sebesar Gaji dari staff yang bersangkutan.
+            </p>
         </div><!-- end .widget -->
     </div><!-- end #sidebar -->
     </div><!-- end #thecontent -->

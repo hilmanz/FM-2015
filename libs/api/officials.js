@@ -15,6 +15,7 @@ var mysql = require('mysql');
 var dateFormat = require('dateformat');
 var redis = require('redis');
 var formations = require(path.resolve('./libs/game_config')).formations;
+var S = require('string');
 var pool = {};
 
 exports.setPool = function(p){
@@ -30,13 +31,9 @@ function prepareDb(callback){
 function official_list(game_team_id,done){
 	prepareDb(function(conn){
 		async.waterfall([
+				
 				function(callback){
-					get_master_officials(conn,function(err,officials){
-						callback(err,officials);
-					});
-				},
-				function(officials,callback){
-					get_user_officials(conn,game_team_id,officials,function(err,result){
+					get_user_officials(conn,game_team_id,function(err,result){
 						callback(err,result);
 					});
 				}
@@ -49,23 +46,34 @@ function official_list(game_team_id,done){
 	});
 }
 
-function hire_official(game_team_id,official_id,callback){
+function hire_official(game_team_id,staff_id,callback){
 	prepareDb(function(conn){
 		async.waterfall(
 			[
 				function(callback){
-					conn.query("INSERT IGNORE INTO "+config.database.database+".game_team_officials\
-					(game_team_id,official_id,recruit_date)\
+					conn.query("SELECT * FROM "+config.database.database+".master_staffs\
+								 WHERE id IN (?) LIMIT 1;",[staff_id],function(err,rs){
+								 	console.log(S(this.sql).collapseWhitespace().s);
+								 	callback(err,rs[0]);
+								 });
+				},
+				function(staff,callback){
+					conn.query("INSERT IGNORE INTO "+config.database.database+".game_team_staffs\
+					(game_team_id,staff_id,name,staff_type,salary,recruit_date,rank)\
 					VALUES\
-					(?,?,NOW());",[game_team_id,official_id],function (err,rs){
-						callback(err,rs.insertId);
+					(?,?,?,?,?,NOW(),?);",
+					[game_team_id,staff.id,staff.name,staff.staff_type,staff.salary,staff.rank],
+					function (err,rs){
+						console.log(S(this.sql).collapseWhitespace().s);
+						callback(err,rs.insertId,staff.id);
 					});		
 				},
-				function(staff_id,callback){
-					conn.query("SELECT b.id,b.name FROM "+config.database.database+".game_team_officials a\
-								INNER JOIN "+config.database.database+".game_officials b\
-								ON a.official_id = b.id\
-								WHERE a.id=?;",[staff_id],function(err,rs){
+				function(insertId,staff_id,callback){
+					conn.query("SELECT * FROM "+config.database.database+".game_team_staffs a\
+								WHERE a.game_team_id = ? AND a.staff_id = ?;",
+								[game_team_id,staff_id],
+								function(err,rs){
+									console.log(S(this.sql).collapseWhitespace().s);
 									console.log(rs);
 									callback(err,rs[0]);
 								});
@@ -82,8 +90,10 @@ function hire_official(game_team_id,official_id,callback){
 }
 function remove_official(game_team_id,official_id,callback){
 	prepareDb(function(conn){
-		conn.query("DELETE FROM "+config.database.database+".game_team_officials WHERE game_team_id = ? AND official_id = ?",
+		conn.query("DELETE FROM "+config.database.database+".game_team_staffs \
+					WHERE game_team_id = ? AND staff_id = ?",
 					[game_team_id,official_id],function (err,rs){
+						console.log(S(this.sql).collapseWhitespace().s);
 						conn.release();
 						callback(err,rs);
 						
@@ -91,31 +101,32 @@ function remove_official(game_team_id,official_id,callback){
 	});
 }
 
-function get_master_officials(conn,callback){
-	
-	conn.query("SELECT * FROM "+config.database.database+".game_officials ORDER BY id LIMIT 20;",[],callback);
 
+
+function get_master_staffs(game_team_id,type,callback){
+	prepareDb(function(conn){
+		conn.query("SELECT * FROM "+config.database.database+".master_staffs \
+					WHERE id NOT IN (SELECT staff_id FROM\
+							 "+config.database.database+".game_team_staffs\
+						WHERE game_team_id = ?) AND staff_type = ? LIMIT 20;",
+					[game_team_id,type],function (err,rs){
+						console.log(S(this.sql).collapseWhitespace().s);
+						conn.release();
+						callback(err,rs);
+					});
+	});
 }
-function get_user_officials(conn,game_team_id,officials,done){
+
+function get_user_officials(conn,game_team_id,done){
 	async.waterfall(
 		[
 			function(callback){
-				conn.query("SELECT * FROM "+config.database.database+".game_team_officials WHERE game_team_id = ? LIMIT 20;",
+				conn.query("SELECT * FROM "+config.database.database+".game_team_staffs\
+						    WHERE game_team_id = ? LIMIT 30;",
 							[game_team_id],
 							function(err,rs){
 								callback(err,rs);
 							});
-			},
-			function(result,callback){
-				for(var i in officials){
-					for(var j in result){
-						if(officials[i].id == result[j].official_id){
-							officials[i].hired = true;
-							break;
-						}
-					}
-				}
-				callback(null,officials);
 			}
 		],
 		function(err,result){
@@ -126,3 +137,5 @@ function get_user_officials(conn,game_team_id,officials,done){
 exports.official_list = official_list;
 exports.hire_official = hire_official;
 exports.remove_official = remove_official;
+
+exports.get_master_staffs = get_master_staffs;

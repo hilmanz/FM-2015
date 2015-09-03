@@ -144,7 +144,21 @@ exports.fire_staff = function(req,res){
 	});
 }
 
+exports.official_market = function(req,res){
 
+		gameplay.officials.get_master_staffs(
+			req.params.game_team_id,
+			req.query.type,
+		function(err,rs){
+
+			if(err){
+				console.error(err.message,err.stack);
+				handleError(res);
+			}else{
+				res.json(200,{status:1,data:rs});
+			}
+		});
+}
 exports.getBudget = function(req,res){
 	gameplay.getBudget(req.params.game_team_id,
 		function(err,rs){
@@ -609,7 +623,7 @@ exports.matchstatus = function(req,res){
 	});
 }
 function handleError(res){
-	res.send(501,{error:'no data available'});
+	res.send(200,{status:0,error:'no data available'});
 }
 //sale a player
 exports.sale = function(req,res){

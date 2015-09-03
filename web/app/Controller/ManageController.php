@@ -413,7 +413,37 @@ class ManageController extends AppController {
 		}
 		return $matches;
 	}
-	
+	public function staff(){
+		$userData = $this->userData;
+		//budget
+		$budget = $this->Game->getBudget($userData['team']['id']);
+
+		if(isset($this->request->query['dismiss'])){
+			$official_id = intval($this->request->query['id']);
+			if($official_id>0){
+				$this->Game->dismiss_staff($userData['team']['id'],$official_id);
+			}
+		}
+		if(@$this->request->query['dismiss']==1){
+			$official_id = intval($this->request->query['id']);
+			if($official_id>0){
+				$this->Game->dismiss_staff($userData['team']['id'],$official_id);
+			}
+		}
+		//get officials
+		$officials = $this->Game->getAvailableOfficials($userData['team']['id']);
+
+		//estimated costs
+		$total_weekly_salary = 0;
+		foreach($officials as $official){
+			
+			$total_weekly_salary+=$official['salary'];
+			
+		}
+		$this->set('team_bugdet',$budget);
+		$this->set('officials',$officials);
+		$this->set('weekly_salaries',$total_weekly_salary);
+	}
 	public function hiring_staff(){
 		
 		$userData = $this->userData;
@@ -424,22 +454,25 @@ class ManageController extends AppController {
 				$rs = $this->Game->hire_staff($userData['team']['id'],$official_id);
 				if($rs['status']==1){
 					$msg = "@p1_".$this->userDetail['User']['id']." telah merekrut {$rs['officials']['name']} baru.";
-					$this->Info->write('set formation',$msg);
+					$this->Info->write('hire staff',$msg);
 				}
+				$this->Session->setFlash("Staff berhasil di rekrut !");
+				$this->redirect('/manage/staff');
 			}
 		}
+		/*
 		if(isset($this->request->query['dismiss'])){
 			$official_id = intval($this->request->query['id']);
 			if($official_id>0){
 				$this->Game->dismiss_staff($userData['team']['id'],$official_id);
 			}
-		}
+		}*/
 		//budget
 		$budget = $this->Game->getBudget($userData['team']['id']);
 		$this->set('team_bugdet',$budget);
 
 		//get officials
-		$officials = $this->Game->getAvailableOfficials($userData['team']['id']);
+		$officials = $this->Game->getMasterStaffs($userData['team']['id'],$this->request->query['type']);
 
 		//estimated costs
 		$total_weekly_salary = 0;

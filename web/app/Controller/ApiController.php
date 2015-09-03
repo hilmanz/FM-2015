@@ -2996,6 +2996,139 @@ class ApiController extends AppController {
 		$this->set('response',$rs);
 		$this->render('default');
 	}
+	/**
+	* staff list
+	*/
+	public function staffs(){
+		
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$api_session = $this->readAccessToken();
+		$fb_id = $api_session['fb_id'];
+		$user = $this->User->findByFb_id($fb_id);
+		
+		
+		if(strlen($user['User']['avatar_img'])<2){
+			$user['User']['avatar_img'] = "http://graph.facebook.com/".$fb_id."/picture";
+		}else{
+			$user['User']['avatar_img'] = Configure::read('avatar_web_url').'120x120_'.$user['User']['avatar_img'];
+		}
+
+		$game_team = $this->Game->getTeam($fb_id);
+		
+		$officials = $this->Game->getAvailableOfficials($game_team['id']);
+
+		$this->set('response',array('status'=>1,'data'=>$officials,'slots'=>array(
+				    'dof'=>array('name'=>'Director of Football','effect'=>'Player Transfer Discounts'),
+				    'marketing'=>array('name'=>'Marketing Manager','effect'=>'Increase Revenue, Increase player transfer offers,Increase Sponsorship revenue'),
+				    'pr'=>array('name'=>'Public Relations','effect'=>'Increase Revenue, Increase Stadium Occupancy'),
+				    'scout'=>array('name'=>'Scout','effect'=>'Player Statistic Accuracy'),
+				    'security'=>array('name'=>'Security Officer','effect'=>'Increase ticket revenue, reduce the affect of security related events'),
+				    'gk_coach'=>array('name'=>'Goalkeeper Coach','effect'=>'Increase player fitness, player points, tactics'),
+				    'def_coach'=>array('name'=>'Defender Coach','effect'=>'Increase player fitness, player points, tactics'),
+				    'mid_coach'=>array('name'=>'Midfielder Coach','effect'=>'Increase player fitness, player points, tactics'),
+				    'fw_coach'=>array('name'=>'Forward Coach','effect'=>'Increase player fitness, player points, tactics'),
+				    'physio'=>array('name'=>'Forward Coach','effect'=>'Increase player fitness'),
+				)));
+
+		$this->render('default');
+	}
+	/*
+	* api for staff available for hiring
+	*/
+	public function staff_market(){
+		
+		$type = @$this->request->query['type'];
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$api_session = $this->readAccessToken();
+		$fb_id = $api_session['fb_id'];
+		$user = $this->User->findByFb_id($fb_id);
+		if($type==''){
+			$this->set('response',array('status'=>0,'message'=>'the staff you are looking for is not available yet !'));
+		}else{
+			if(strlen($user['User']['avatar_img'])<2){
+				$user['User']['avatar_img'] = "http://graph.facebook.com/".$fb_id."/picture";
+			}else{
+				$user['User']['avatar_img'] = Configure::read('avatar_web_url').'120x120_'.$user['User']['avatar_img'];
+			}
+
+			$game_team = $this->Game->getTeam($fb_id);
+			
+			$officials = $this->Game->getMasterStaffs($game_team['id'],$type);
+
+			$this->set('response',array('status'=>1,'data'=>$officials,'slots'=>array(
+					    'dof'=>array('name'=>'Director of Football','effect'=>'Player Transfer Discounts'),
+					    'marketing'=>array('name'=>'Marketing Manager','effect'=>'Increase Revenue, Increase player transfer offers,Increase Sponsorship revenue'),
+					    'pr'=>array('name'=>'Public Relations','effect'=>'Increase Revenue, Increase Stadium Occupancy'),
+					    'scout'=>array('name'=>'Scout','effect'=>'Player Statistic Accuracy'),
+					    'security'=>array('name'=>'Security Officer','effect'=>'Increase ticket revenue, reduce the affect of security related events'),
+					    'gk_coach'=>array('name'=>'Goalkeeper Coach','effect'=>'Increase player fitness, player points, tactics'),
+					    'def_coach'=>array('name'=>'Defender Coach','effect'=>'Increase player fitness, player points, tactics'),
+					    'mid_coach'=>array('name'=>'Midfielder Coach','effect'=>'Increase player fitness, player points, tactics'),
+					    'fw_coach'=>array('name'=>'Forward Coach','effect'=>'Increase player fitness, player points, tactics'),
+					    'physio'=>array('name'=>'Forward Coach','effect'=>'Increase player fitness'),
+					)));
+
+		}
+		
+		
+		$this->render('default');
+	}
+	public function hire_staff($staff_id){
+		$staff_id = intval($staff_id);
+
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$api_session = $this->readAccessToken();
+		$fb_id = $api_session['fb_id'];
+		$user = $this->User->findByFb_id($fb_id);
+
+		
+		if(strlen($user['User']['avatar_img'])<2){
+			$user['User']['avatar_img'] = "http://graph.facebook.com/".$fb_id."/picture";
+		}else{
+			$user['User']['avatar_img'] = Configure::read('avatar_web_url').'120x120_'.$user['User']['avatar_img'];
+		}
+
+		$game_team = $this->Game->getTeam($fb_id);
+		
+		
+		$rs = $this->Game->hire_staff($game_team['id'],$staff_id);
+		$this->set('response',array('status'=>1,'data'=>$rs));
+
+		
+		
+		
+		$this->render('default');
+	}
+	public function fire_staff($staff_id){
+		$staff_id = intval($staff_id);
+
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$api_session = $this->readAccessToken();
+		$fb_id = $api_session['fb_id'];
+		$user = $this->User->findByFb_id($fb_id);
+
+		
+		if(strlen($user['User']['avatar_img'])<2){
+			$user['User']['avatar_img'] = "http://graph.facebook.com/".$fb_id."/picture";
+		}else{
+			$user['User']['avatar_img'] = Configure::read('avatar_web_url').'120x120_'.$user['User']['avatar_img'];
+		}
+
+		$game_team = $this->Game->getTeam($fb_id);
+		
+		
+		$rs = $this->Game->dismiss_staff($game_team['id'],$staff_id);
+		$this->set('response',array('status'=>1,'data'=>$rs));
+
+		
+		
+		
+		$this->render('default');
+	}
 	public function transfer_status(){
 		$this->loadModel('Team');
 		$this->loadModel('User');

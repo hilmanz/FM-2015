@@ -678,3 +678,5 @@ CREATE TABLE ffgame_ita.pro_booster (
 
 
 ALTER TABLE `ffgame`.`master_transfer_window`     ADD COLUMN `is_pro` TINYINT(3) DEFAULT '0' NULL AFTER `window_name`;
+
+ALTER TABLE `ffgame`.`game_team_staffs`     ADD COLUMN `staff_id` INT(5) NULL AFTER `game_team_id`;

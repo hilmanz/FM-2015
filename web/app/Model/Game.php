@@ -119,6 +119,14 @@ class Game extends AppModel {
 			return $response['officials'];
 		}
 	}
+	public function getMasterStaffs($team_id,$type){
+		$response = $this->api_call('/official/market/'.$team_id,
+			array('type'=>$type));
+		
+		if($response['status']==1){
+			return $response['data'];
+		}
+	}
 	public function getCash($fb_id){
 		$response = $this->api_call('/cash/'.$fb_id);
 		if($response['status']==1){

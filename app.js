@@ -171,6 +171,7 @@ app.get('/team/player/:game_team_id/:id',[auth.canAccess],gameplay.player_team_d
 app.get('/team/sponsors/:game_team_id',[auth.canAccess],gameplay.getActiveSponsors);
 app.get('/team/budget/:game_team_id',[auth.canAccess],gameplay.getBudget);
 app.get('/official/list/:game_team_id',[auth.canAccess],gameplay.official_list);
+app.get('/official/market/:game_team_id',[auth.canAccess],gameplay.official_market);
 app.post('/official/hire',[auth.canAccess],gameplay.hire_staff);
 app.post('/official/fire',[auth.canAccess],gameplay.fire_staff);
 app.get('/sponsorship/list/:team_id',[auth.canAccess],gameplay.getSponsors);
