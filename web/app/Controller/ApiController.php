@@ -3075,6 +3075,255 @@ class ApiController extends AppController {
 		
 		$this->render('default');
 	}
+	public function dummy_player_offer(){
+		$me = $this->aboutme();
+		//generate offer
+		//get random player 
+		$rs = $this->User->query("SELECT b.* FROM 
+								ffgame.game_team_players a
+								INNER JOIN ffgame.master_player b
+								ON a.player_id = b.uid 
+								WHERE game_team_id = ".$me['game_team']['id']);
+
+		$n = sizeof($rs);
+		$i = rand(0,$n-1);
+		$target_player = $rs[$i]['b'];
+		$rolls = (rand(1,24)/24);
+		$transfer_value = $target_player['transfer_value'] + ($target_player['transfer_value'] * (0.8 * $rolls));
+		$offered_player = array(
+			'player_id'=>$target_player['uid'],
+			'team_id'=>$target_player['team_id'],
+			'name'=>$target_player['name'],
+			'original_transfer_value'=>$target_player['transfer_value'],
+			'transfer_value'=>round($transfer_value),
+			'rolls'=>$rolls
+		);
+		$team_interested = array('name'=>'Inter Milan');
+		$msg_id = time();
+		$msg_type = "offer";
+		$content = "Dear Manager,<br/> kami dari ".$team_interested['name']." 
+					tertarik dengan pemain anda `".$offered_player['name']."`.
+					<br/> Semoga dengan nilai transfer ini, klub anda mau melepas `".
+					$offered_player['name']."`. Kami Tunggu Kabar Baik dari anda. </br><br/> 
+					Salam,<br/><br/>Manager Inter Milan";
+		
+
+
+		$expired = date("Y-m-d H:i:s",time()+(60*60*6));
+		$this->User->query("INSERT INTO ".$this->ffgamedb.".player_offers
+							(game_team_id,player_id,offered_price,interested_club,offer_date,offer_expired,n_status)
+							VALUES
+							({$me['game_team']['id']},
+							 '{$offered_player['player_id']}',
+							 {$offered_player['transfer_value']},
+							 '{$team_interested['name']}',
+							 NOW(),'{$expired}',
+							 0);");
+		$rs = $this->User->query("SELECT id FROM ".$this->ffgamedb.".player_offers a
+									WHERE game_team_id = {$me['game_team']['id']} 
+									ORDER BY id DESC LIMIT 1;");
+
+		$offer_id = $rs[0]['a']['id'];
+
+		$meta = array('interested_club'=>$team_interested,
+						'offered_player'=>$offered_player,
+						'offer_id'=>$offer_id);
+
+		
+		$meta = json_encode($meta);
+		$this->User->query("INSERT INTO fantasy.notifications(dt,game_team_id,content,url,
+							msg_id,msg_type,league,meta)
+							VALUES(NOW(),{$me['game_team']['id']},
+									'{$content}','','{$msg_id}','{$msg_type}','epl','{$meta}');");
+
+		$this->set('response',array('status'=>1,'data'=>$offered_player,'team'=>$team_interested));
+		$this->render('default');
+	}
+	public function dummy_friendly_match_offer(){
+		$me = $this->aboutme();
+
+		$data = array('play_as'=>'home','name'=>'Inter Milan',
+										'opponent_id'=>1,
+									'matchdate'=>'2015-10-28 00:00:00',
+									'date'=>"28 oktober 2015",
+									"estimated_revenue"=>1600000,
+									"morale_bonus_value"=>20,
+									"morale_bonus"=>"+20");
+
+		$msg_id = time();
+		$msg_type = "friendly_match";
+		$content = "Dear Manager,<br/> kami dari ".$data['name']." 
+					ingin mengundang anda dalam pertandingan friendly pada tanggal `".$data['date']."`.
+					<br/>. Kami Tunggu Kabar Baik dari anda. </br><br/> 
+					Salam,<br/><br/>Manager ".$data['name'];
+		
+
+
+		$expired = date("Y-m-d H:i:s",time()+(60*60*6));
+		$this->User->query("INSERT INTO ".$this->ffgamedb.".friendly_match
+							(game_team_id,matchdate,play_as,opponent_id,
+								opponent_name,revenue,morale_bonus,
+								expired_date,
+								n_status)
+							VALUES
+							({$me['game_team']['id']},
+							 '{$data['matchdate']}',
+							 '{$data['play_as']}',
+							 '{$data['opponent_id']}',
+							 '{$data['name']}',
+							 {$data['estimated_revenue']},
+							 {$data['morale_bonus_value']},
+							 '{$expired}',
+							 0);");
+
+		$rs = $this->User->query("SELECT id FROM ".$this->ffgamedb.".friendly_match a
+									WHERE game_team_id = {$me['game_team']['id']} 
+									ORDER BY id DESC LIMIT 1;",false);
+
+		$offer_id = $rs[0]['a']['id'];
+
+
+		$meta = array('team_name'=>$data['name'],
+						
+						'offer_id'=>$offer_id,
+						'match_date'=>$data['date'],
+						'expired_on'=>date("d/m/Y",strtotime($expired)),
+						'estimated_revenue'=>$data['estimated_revenue'],
+						'morale_bonus'=>$data['morale_bonus']);
+
+		
+		$meta = json_encode($meta);
+		$this->User->query("INSERT INTO fantasy.notifications(dt,game_team_id,content,url,
+							msg_id,msg_type,league,meta)
+							VALUES(NOW(),{$me['game_team']['id']},
+									'{$content}','','{$msg_id}','{$msg_type}','epl','{$meta}');");
+
+		$this->set('response',array('status'=>1,'data'=>$data));
+		$this->render('default');
+	}
+	public function dummy_friendly_match_result(){
+		$me = $this->aboutme();
+
+		$rs = $this->User->query("SELECT * FROM ".$this->ffgamedb.".friendly_match a
+									WHERE game_team_id = {$me['game_team']['id']} 
+									ORDER BY id DESC LIMIT 1;",false);
+
+		$match = $rs[0]['a'];
+		$msg_id = time();
+		$msg_type = "friendly_result";
+		$content = "Hasil Pertandingan persahabatan dengan ".$match['opponent_name'];
+		
+		$home = array(
+			'team_name'=>$me['user']['Team']['team_name'],
+			'score'=>1,
+			'goals'=>array("Hererra ('65)"),
+			'yellow_cards'=>array("Smalling ('31),Carrick ('46)"),
+			'red_cards'=>array()
+		);
+		$away = array(
+			'team_name'=>'Inter Milan',
+			'score'=>0,
+			'goals'=>array(),
+			'yellow_cards'=>array("Medel ('60),Miranda ('76)"),
+			'red_cards'=>array()
+		);
+		$results = mysql_escape_string(json_encode(array('match_id'=>$match['id'],
+							'home'=>$home,
+							'away'=>$away,
+							'revenue'=>$match['revenue'],
+							'morale_bonus'=>$match['morale_bonus'],
+							'penonton'=>rand(50000,75000))));
+
+		
+		$expired = date("Y-m-d H:i:s",time()+(60*60*6));
+
+
+		$this->User->query("INSERT INTO ".$this->ffgamedb.".friendly_match_result
+							(friendly_id,results)
+							VALUES
+							({$match['id']},
+							 '{$results}');");
+
+	
+
+
+		
+		
+		
+		$this->User->query("INSERT INTO fantasy.notifications(dt,game_team_id,content,url,
+							msg_id,msg_type,league,meta)
+							VALUES(NOW(),{$me['game_team']['id']},
+									'{$content}','','{$msg_id}','{$msg_type}','epl','{$results}');");
+
+		$this->set('response',array('status'=>1));
+		$this->render('default');
+	}
+	public function accept_offer($offer_id){
+		require_once APP . 'Vendor' . DS. 'lib/Predis/Autoloader.php';
+
+		$me = $this->aboutme();
+		$offer_id = intval(Sanitize::clean($offer_id));
+
+		
+		
+		
+		$rs = $this->Game->accept_offer($me['game_team']['id'],$offer_id,$this->nextMatch['match']);
+		$league = $_SESSION['league'];
+		$game_team_id = $me['game_team']['id'];
+
+		if(isset($rs['data']['uid'])){
+			$player_id = $rs['data']['uid'];
+
+			Predis\Autoloader::register();
+			$this->redisClient = new Predis\Client(array(
+												    'host'     => Configure::read('REDIS.Host'),
+												    'port'     => Configure::read('REDIS.Port'),
+												    
+												));
+			$this->redisClient->del('game_team_lineup_'.$league.'_'.$game_team_id);
+			$this->redisClient->del('getPlayers_'.$league.'_'.$game_team_id);
+			$this->redisClient->del('getPlayerTeamStats_'.$league.'_'.$game_team_id.'_'.$player_id);
+			$this->redisClient->del('getPlayerDailyTeamStats_'.$league.'_'.$game_team_id.'_'.$player_id);
+			
+		}
+		
+		header('Content-type: application/json');
+		print json_encode($rs);
+		die();
+	}
+	public function decline_offer($offer_id){
+		require_once APP . 'Vendor' . DS. 'lib/Predis/Autoloader.php';
+		$me = $this->aboutme();
+		
+		$offer_id = intval(Sanitize::clean($offer_id));
+
+		
+		
+		
+		$rs = $this->Game->decline_offer($me['game_team']['id'],$offer_id,$this->nextMatch['match']);
+		$league = $_SESSION['league'];
+		$game_team_id = $me['game_team']['id'];
+
+		if(isset($rs['data']['uid'])){
+			$player_id = $rs['data']['uid'];
+
+			Predis\Autoloader::register();
+			$this->redisClient = new Predis\Client(array(
+												    'host'     => Configure::read('REDIS.Host'),
+												    'port'     => Configure::read('REDIS.Port'),
+												    
+												));
+			$this->redisClient->del('game_team_lineup_'.$league.'_'.$game_team_id);
+			$this->redisClient->del('getPlayers_'.$league.'_'.$game_team_id);
+			$this->redisClient->del('getPlayerTeamStats_'.$league.'_'.$game_team_id.'_'.$player_id);
+			$this->redisClient->del('getPlayerDailyTeamStats_'.$league.'_'.$game_team_id.'_'.$player_id);
+			
+		}
+		
+		header('Content-type: application/json');
+		print json_encode($rs);
+		die();
+	}
 	public function hire_staff($staff_id){
 		$staff_id = intval($staff_id);
 

@@ -260,7 +260,16 @@
                         if(messages[i].msg_type=='transfer_nego' && messages[i].meta.transfer_status=="success"){%>
                             <a href="#/nego/<%=messages[i].meta.nego_id%>" class="button">NEGOTIATE SALARY</a>
                         <%}%>
-
+                        <%if(messages[i].msg_type=='offer' && messages[i].meta != null){
+                                console.log(messages[i]);
+                            %>
+                            <div class="price">
+                                Offered Price : ss$ <%=number_format(messages[i].meta.offered_player.transfer_value)%>
+                            </div>
+                            <a href="#/accept_offer/<%=messages[i].meta.offer_id%>" class="button">TERIMA</a>
+                            <a href="#/decline_offer/<%=messages[i].meta.offer_id%>" class="button">TOLAK</a>
+                            <p>*Penawaran ini hanya berlaku selama 6 jam sejak penawaran ini dikirim.</p>
+                        <%}%>
                     <%   
                     }
                     %>

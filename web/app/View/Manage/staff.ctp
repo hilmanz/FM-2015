@@ -11,6 +11,11 @@ $role = array(
     'fw_coach'=>array('name'=>'Forward Coach','effect'=>'Increase player fitness, player points, tactics'),
     'physio'=>array('name'=>'Forward Coach','effect'=>'Increase player fitness'),
 );
+$coach_tactics = array('gk_coach'=>array(7),
+                        'def_coach'=>array(5,6,7),
+                        'mid_coach'=>array(1,2,3,4),
+                        'fw_coach'=>array(1,2,3,4,6));
+
 ?>
 <div id="fillDetailsPage">
      <?php echo $this->element('infobar'); ?>

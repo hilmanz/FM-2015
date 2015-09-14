@@ -70,6 +70,122 @@ class Game extends AppModel {
 		
 		return $rs;
 	}
+	public function accept_offer($game_team_id,$offer_id,$nextMatch){
+		$status = 0;
+		$data = array();
+		$message = "";
+		$game_team_id = intval($game_team_id);
+		$offer_id = intval($offer_id);
+
+		$offer = $this->query("SELECT * FROM ".$_SESSION['ffgamedb'].".player_offers a
+					 WHERE id = {$offer_id} LIMIT 1");
+		
+		if(isset($offer[0]['a']['id']) && $offer[0]['a']['game_team_id'] == $game_team_id){
+			//pastikan offer belum expired, dan status masih pending
+			if(strtotime($offer[0]['a']['offer_expired']) > time() 
+					&& $offer[0]['a']['n_status']==0){
+
+				$rs  = $this->process_accept_offer($game_team_id,$offer_id,$offer[0]['a'],$nextMatch);
+				$status = $rs['status'];
+				$message = $rs['message'];
+				$data = $rs['data'];
+				
+			}else{
+				$status = 2;
+				$message = "Mohon maaf, penawaran ini sudah tidak berlaku lagi !";
+			}
+		}else{
+			$status = 0;
+			$message = "Mohon Maaf, penawaran tidak dapat ditemukan !";
+		}
+		return array('status'=>$status,'data'=>$data,'message'=>$message);
+	}
+	public function decline_offer($game_team_id,$offer_id,$nextMatch){
+		$status = 0;
+		$data = array();
+		$message = "";
+		$game_team_id = intval($game_team_id);
+		$offer_id = intval($offer_id);
+
+		$offer = $this->query("SELECT * FROM ".$_SESSION['ffgamedb'].".player_offers a
+					 WHERE id = {$offer_id} LIMIT 1");
+		
+		if(isset($offer[0]['a']['id']) && $offer[0]['a']['game_team_id'] == $game_team_id){
+			//pastikan offer belum expired, dan status masih pending
+			if(strtotime($offer[0]['a']['offer_expired']) > time() 
+					&& $offer[0]['a']['n_status']==0){
+
+				$rs  = $this->process_decline_offer($game_team_id,$offer_id,$offer[0]['a'],$nextMatch);
+				$status = $rs['status'];
+				$message = $rs['message'];
+				
+				
+			}else{
+				$status = 2;
+				$message = "Mohon maaf, penawaran ini sudah tidak berlaku lagi !";
+			}
+		}else{
+			$status = 0;
+			$message = "Mohon Maaf, penawaran tidak dapat ditemukan !";
+		}
+		return array('status'=>$status,'data'=>$data,'message'=>$message);
+	}
+	private function process_accept_offer($game_team_id,$offer_id,$offer,$nextMatch){
+		
+		$player_id = $offer['player_id'];
+		//remove the player
+		$remove_player = $this->query("DELETE FROM ".$_SESSION['ffgamedb'].".game_team_players 
+								WHERE game_team_id = {$game_team_id} AND player_id = '{$player_id}';");
+		//add money
+		$add_money  = $this->query("INSERT INTO ".$_SESSION['ffgamedb'].".game_team_expenditures
+											(game_team_id,item_name,item_type,amount,
+												game_id,match_day,item_total,base_price)
+											VALUES(
+											{$game_team_id},
+											'player_sold',1,{$offer['offered_price']},
+											'{$nextMatch['game_id']}','{$nextMatch['matchday']}',1,1)
+
+									ON DUPLICATE KEY UPDATE
+									amount = amount + VALUES(amount);");
+
+	
+		//update offer status
+		$update_status = $this->query("UPDATE ".$_SESSION['ffgamedb'].".player_offers
+												SET n_status=1 WHERE id = {$offer_id};");
+		//get player data
+		$rs = $this->query("SELECT * FROM ".$_SESSION['ffgamedb'].".master_player a 
+									WHERE uid = '".$offer['player_id']."' LIMIT 1");
+
+		if(isset($remove_player) && isset($add_money) && isset($update_status)){
+			$status = 1;
+		}else{
+			$status = 0;
+		}
+		
+
+		return array('status'=>$status,'data'=>$rs[0]['a'],'remove_player'=>$remove_player,'update_status'=>$update_status,'add_money'=>$add_money,'message'=>"Transfer `".$rs[0]['a']['name']."` sudah selesai. `".$rs[0]['a']['name']."` akan segera berangkat menuju klub barunya. `".$rs[0]['a']['name']."` Mengucapkan terima kasih kepada klub, manajer, para pemain, dan para fans atas dukungannya selama ini.");
+
+
+	}
+	private function process_decline_offer($game_team_id,$offer_id,$offer,$nextMatch){
+		
+		$player_id = $offer['player_id'];
+		
+	
+		//update offer status
+		$update_status = $this->query("UPDATE ".$_SESSION['ffgamedb'].".player_offers
+												SET n_status=2 WHERE id = {$offer_id};");
+		//get player data
+		$rs = $this->query("SELECT * FROM ".$_SESSION['ffgamedb'].".master_player a 
+									WHERE uid = '".$offer['player_id']."' LIMIT 1");
+
+		$status = 1;
+		
+
+		return array('status'=>$status,'message'=>"Kami telah menginformasikan ".$offer['interested_club']." bahwa penawaran mereka telah ditolak.");
+
+
+	}
 	public function offer_salary($window_id,$game_team_id,$nego_id,
 								$player_id,
 								$offer_price,$goal_bonus,$cleansheet_bonus){
@@ -133,10 +249,11 @@ class Game extends AppModel {
 			return $response['cash'];
 		}
 	}
-	public function hire_staff($team_id,$official_id){
+	public function hire_staff($team_id,$official_id,$meta){
 		$response = $this->api_post('/official/hire',array(
 			'team_id'=>$team_id,
-			'official_id'=>$official_id
+			'official_id'=>$official_id,
+			'meta'=>$meta
 		));
 		return $response;
 	}

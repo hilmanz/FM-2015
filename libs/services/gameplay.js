@@ -11,9 +11,14 @@ exports.setConfig = function(c){
 }
 exports.setLeague = function(l){
 	gameplay.setLeague(l);
+	gameplay.officials.setLeague(l);
+	
 }
 exports.setPool = function(pool){
 	gameplay.setPool(pool);
+}
+exports.setRedisClient = function(client){
+	gameplay.officials.setRedisClient(client);
 }
 
 exports.getLineup = function(req,res){
@@ -117,8 +122,10 @@ exports.official_list = function(req,res){
 	});
 }
 exports.hire_staff = function(req,res){
+	
 	gameplay.officials.hire_official(req.body.team_id,
 									 req.body.official_id,
+									 req.body.meta,
 		function(err,rs){
 			console.log(rs);
 			if(err){
@@ -133,6 +140,7 @@ exports.hire_staff = function(req,res){
 	});
 }
 exports.fire_staff = function(req,res){
+	
 	gameplay.officials.remove_official(req.body.team_id,
 									 req.body.official_id,
 		function(err,rs){

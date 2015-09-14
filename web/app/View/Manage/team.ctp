@@ -1085,3 +1085,32 @@ $(document).ready(function(){
     </div>
     
 </script>
+<script type="text/template" id="tplofferexpired">
+    
+    <div class="confirm">
+        <h1><%=data.message%></h1>
+        
+        <a href="#" class="button" onclick="$.fancybox.close();return false;">OK</a></p>
+    </div>
+    
+</script>
+
+<script type="text/template" id="tplacceptoffer">
+    
+    <div class="confirm">
+        <h1><%=data.message%></h1>
+        
+        <a href="#" class="button" onclick="$.fancybox.close();return false;">OK</a></p>
+    </div>
+    
+</script>
+
+<script type="text/template" id="tpldeclineoffer">
+    
+    <div class="confirm">
+        <h1><%=data.message%></h1>
+        
+        <a href="#" class="button" onclick="$.fancybox.close();return false;">OK</a></p>
+    </div>
+    
+</script>

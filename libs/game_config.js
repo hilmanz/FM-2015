@@ -294,3 +294,28 @@ exports.quadrant_comparison = {
 	'-3':-0.4,
 	'-4':-0.5,
 };
+exports.player_base_mod = {
+	fatigue:0.5, //fatigue per match -> 100 x -0.5 = -50
+	regen:5 //base regen
+};
+exports.coach_regen_bonus = [0,0.1,0.2,0.3,0.4,0.5];
+exports.coach_fatigue_bonus = [0,0.05,0.1,0.15,0.2,0.25];
+
+
+exports.morale_mods = {
+	fitness70:-5,
+	fitness60:-15,
+	fitness50:-20,
+	played_avg:10,
+	played_last_2match:15,
+	unplayed_acc_match:5, //times how many unplayed
+	happy_with_coach:20,
+	starting:20,
+	sub:10,
+	personal_problem:-30,
+	refused_transfer:-40,
+	salary_refused:-40,
+	vice_captain:10,
+	picking:-30,
+	homesick:-20
+}

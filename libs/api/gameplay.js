@@ -12,6 +12,7 @@ var dateFormat = require('dateformat');
 var redis = require('redis');
 var S = require('string');
 var formations = require(path.resolve('./libs/game_config')).formations;
+var game_config = require(path.resolve('./libs/game_config'))	;
 var player_stats_category = require(path.resolve('./libs/game_config')).player_stats_category;
 var pool = {};
 var frontend_schema = "";
@@ -379,113 +380,218 @@ function position_valid(players,setup,formation){
 }
 //get user's players
 function getPlayers(game_team_id,callback){
-	
-	redisClient.get('getPlayers_'+league+'_'+game_team_id,function(err,rs){
-		if(JSON.parse(rs)==null){
-			console.log('getPlayers',game_team_id,'get from db');
-			prepareDb(function(conn){
+	async.waterfall([
+		function(cb){
+			redisClient.get('getPlayers_'+league+'_'+game_team_id,function(err,rs){
+				if(JSON.parse(rs)==null){
+					console.log('getPlayers',game_team_id,'get from db');
+					prepareDb(function(conn){
+						async.waterfall([
+							function(callback){
+								conn.query("SELECT a.game_team_id,\
+											a.salary as player_salary,a.goal_bonus,\
+											a.cleansheet_bonus,a.morale,a.fitness,\
+											b.* \
+								FROM "+config.database.database+".game_team_players a\
+								INNER JOIN "+config.database.database+".master_player b \
+								ON a.player_id = b.uid\
+								WHERE game_team_id = ? ORDER BY b.position ASC,b.last_name ASC \
+								LIMIT 200;",
+								[game_team_id],
+								function(err,rs){
+									callback(err,rs);
+								});
+							},
+							function(players,callback){
+								var results = [];
+								async.eachSeries(players,function(player,done){
+
+									async.waterfall([
+										function(cb){
+											conn.query("SELECT SUM(points) AS total_points\
+														FROM "+config.database.statsdb+".game_team_player_weekly\
+														WHERE game_team_id = ? AND player_id = ?;",
+														[
+														 game_team_id,
+														 player.uid
+														],
+														function(err,rs){
+															try{
+																cb(err,rs[0].total_points);
+															}catch(e){
+																cb(err,0);
+															}
+														});
+										},
+										function(total_points,cb){
+											
+											if(typeof total_points !== 'number'){
+												total_points = 0;
+											}
+											conn.query("SELECT performance \
+														FROM "+config.database.statsdb+".game_match_player_points a\
+														WHERE game_team_id=? AND player_id=?\
+														AND points <> 0\
+														AND EXISTS (SELECT 1 FROM "+config.database.database+".game_fixtures b\
+														WHERE b.game_id = a.game_id AND (b.home_id = ? OR b.away_id=?)\
+														LIMIT 1) ORDER BY id DESC LIMIT 1;",
+														[
+															game_team_id,
+															player.uid,
+															player.team_id,
+															player.team_id
+														],
+														function(err,rs){
+															try{
+																cb(err,total_points,rs[0].performance);
+															}catch(e){
+																cb(err,total_points,0);
+															}
+														});
+										},
+										function(total_points,performance,cb){
+											if(typeof performance !== 'number'){
+												performance = 0;
+											}
+											player.points = parseFloat(total_points);
+											player.last_performance = parseFloat(performance);
+											player.player_id = player.uid;
+											results.push(player);
+											cb(null,results);
+										}
+
+									],
+									function(err,rs){
+										done();
+									});
+								},function(err){
+									callback(err,results);
+								});
+							}
+						],
+						function(err,result){
+							console.log('getPlayers',result);
+							
+							conn.release();
+							redisClient.set('getPlayers_'+league+'_'+game_team_id,
+											JSON.stringify(result),
+											function(err,redis_status){
+								callback(err,result);	
+							});
+								
+							
+						});
+					});
+				}else{
+					console.log('getPlayers',game_team_id,'get from redis');
+					cb(err,JSON.parse(rs));
+				}
+			});
+		},
+		function(players,cb){
+			console.log('getPlayers',players);
+			//each players
+			var compiled = [];
+			async.eachSeries(players,function(player,next){
 				async.waterfall([
-					function(callback){
-						conn.query("SELECT a.salary as player_salary,a.goal_bonus,\
-									a.cleansheet_bonus,a.morale,a.fitness,\
-									b.* \
-						FROM "+config.database.database+".game_team_players a\
-						INNER JOIN "+config.database.database+".master_player b \
-						ON a.player_id = b.uid\
-						WHERE game_team_id = ? ORDER BY b.position ASC,b.last_name ASC \
-						LIMIT 200;",
-						[game_team_id],
-						function(err,rs){
-							callback(err,rs);
+					function(done){
+						var name = "p_"+league+"_"+player.game_team_id+"_"+player.player_id;
+						redisClient.get(name,function(data){
+							done(null,name,data);
 						});
 					},
-					function(players,callback){
-						var results = [];
-						async.eachSeries(players,function(player,done){
+					function(name,data,done){
+						/*
+						sering dipasang
+						jarang dimaenin
+						kecapean
+						happy dengan gajinya
+						picking order kebanyakan, chance dimaenin jadi makin kecil
+						ga happy dengan gajinya
+						dimainin di 2 match terakhir
+						ga diamenin di match terakhir – akumulasi
+						badan lagi ga enak
+						ga dikasih bonus
+						happy karena ada bonus
+						happy dengan coachnya
+						Fit 100%
+						Fit > 80%
+						starting XI → akumulasi
+						Fit < 60 %
+						lagi masalah sama pacar / keluarga
+						homesick
+						dapet tawaran dari klub gede tapi club ga mau lepas
+						minta naek gaji, tapi ditolak
+						dipilih jadi kapten
+						dipilih jadi vice captain
+						*/
+						if(data==null){
+							player.regen=game_config.player_base_mod.regen;
+							player.bonus=0;
+							player.fatigue = game_config.player_base_mod.fatigue;
+							player.morale_bonuses = [];
+							player.morale = 100;
+							player.fitness = 100;
+							player.played_avg = 0;
+							player.played_last_2match = 0;
+							player.unplayed_acc_match = 0;
+							player.happy_with_coach = 0;
+							player.starting = 0;
+							player.sub = 0;
+							player.personal_problem = 0;
+							player.refused_transfer = 0;
+							player.salary_refused = 0;
+							player.vice_captain = 0;
+							player.picking = 0;
+							player.homesick = 0;
 
-							async.waterfall([
-								function(cb){
-									conn.query("SELECT SUM(points) AS total_points\
-												FROM "+config.database.statsdb+".game_team_player_weekly\
-												WHERE game_team_id = ? AND player_id = ?;",
-												[
-												 game_team_id,
-												 player.uid
-												],
-												function(err,rs){
-													try{
-														cb(err,rs[0].total_points);
-													}catch(e){
-														cb(err,0);
-													}
-												});
-								},
-								function(total_points,cb){
-									
-									if(typeof total_points !== 'number'){
-										total_points = 0;
-									}
-									conn.query("SELECT performance \
-												FROM "+config.database.statsdb+".game_match_player_points a\
-												WHERE game_team_id=? AND player_id=?\
-												AND points <> 0\
-												AND EXISTS (SELECT 1 FROM "+config.database.database+".game_fixtures b\
-												WHERE b.game_id = a.game_id AND (b.home_id = ? OR b.away_id=?)\
-												LIMIT 1) ORDER BY id DESC LIMIT 1;",
-												[
-													game_team_id,
-													player.uid,
-													player.team_id,
-													player.team_id
-												],
-												function(err,rs){
-													try{
-														cb(err,total_points,rs[0].performance);
-													}catch(e){
-														cb(err,total_points,0);
-													}
-												});
-								},
-								function(total_points,performance,cb){
-									if(typeof performance !== 'number'){
-										performance = 0;
-									}
-									player.points = parseFloat(total_points);
-									player.last_performance = parseFloat(performance);
-									
-									results.push(player);
-									cb(null,results);
-								}
-
-							],
-							function(err,rs){
-								done();
+							data = JSON.stringify(player);
+							redisClient.set(name,data,function(err){
+								console.log("p_"+league+"_"+player.game_team_id+"_"+player.player_id+"-->created");
+								compiled.push(player);
+								done(err);
 							});
-						},function(err){
-							callback(err,results);
-						});
+						}else{
+
+							var o = JSON.parse(data);
+							player.regen = o.regen;
+							player.bonus = o.bonus;
+							player.fatigue = o.fatigue;
+							player.morale = o.morale;
+							player.fitness = o.fitness;
+							player.morale_bonuses = o.morale_bonuses;
+							player.played_avg = o.played_avg;
+							player.played_last_2match = o.played_last_2match;
+							player.unplayed_acc_match = o.unplayed_acc_match; //pas dimainin set jadi 0 lagi
+							player.happy_with_coach = o.happy_with_coach;
+							player.starting = o.starting;
+							player.sub = o.sub;
+							player.personal_problem = o.personal_problem;
+							player.refused_transfer = o.refused_transfer;
+							player.salary_refused = o.salary_refused;
+							player.vice_captain = o.vice_captain;
+							player.picking = o.picking;
+							player.homesick = o.homesick;
+							//skip
+							console.log("p_"+league+"_"+player.game_team_id+"_"+player.player_id+"-->exists");
+							compiled.push(player);
+							done(err);
+						}
 					}
 				],
-				function(err,result){
-					console.log('getPlayers',result);
-					
-					conn.release();
-					redisClient.set('getPlayers_'+league+'_'+game_team_id,
-									JSON.stringify(result),
-									function(err,redis_status){
-						callback(err,result);	
-					});
-						
-					
+				function(err,rs){
+					next();
 				});
+			},
+			function(err){
+				console.log('compiled',compiled);
+				cb(err,compiled);
 			});
-		}else{
-			console.log('getPlayers',game_team_id,'get from redis');
-			callback(err,JSON.parse(rs));
 		}
+	],
+	function(err,rs){
+		callback(err,rs);
 	});
-	
-	
 }
 
 //get user's budget

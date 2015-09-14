@@ -450,8 +450,14 @@ class ManageController extends AppController {
 
 		if(isset($this->request->query['hire'])){
 			$official_id = intval($this->request->query['id']);
+			if(isset($this->request->query['r'])){
+				$hashed_data = decrypt_param($this->request->query['r']);	
+			}else{
+				$hashed_data = false;
+			}
+			
 			if($official_id>0){
-				$rs = $this->Game->hire_staff($userData['team']['id'],$official_id);
+				$rs = $this->Game->hire_staff($userData['team']['id'],$official_id,$hashed_data);
 				if($rs['status']==1){
 					$msg = "@p1_".$this->userDetail['User']['id']." telah merekrut {$rs['officials']['name']} baru.";
 					$this->Info->write('hire staff',$msg);
@@ -460,13 +466,7 @@ class ManageController extends AppController {
 				$this->redirect('/manage/staff');
 			}
 		}
-		/*
-		if(isset($this->request->query['dismiss'])){
-			$official_id = intval($this->request->query['id']);
-			if($official_id>0){
-				$this->Game->dismiss_staff($userData['team']['id'],$official_id);
-			}
-		}*/
+		
 		//budget
 		$budget = $this->Game->getBudget($userData['team']['id']);
 		$this->set('team_bugdet',$budget);
@@ -477,12 +477,45 @@ class ManageController extends AppController {
 		//estimated costs
 		$total_weekly_salary = 0;
 		foreach($officials as $official){
+
 			if(isset($official['hired'])){
 				$total_weekly_salary+=$official['salary'];
 			}
 		}
+		foreach($officials as $n=>$official){
+			if($official['staff_type']=='gk_coach' ||
+				$official['staff_type']=='def_coach' ||
+				$official['staff_type']=='mid_coach' ||
+				$official['staff_type']=='fwd_coach'){
+				$random_tactic = $this->getRandomTactics($official['staff_type'],
+														 $official['rank']);
+				$officials[$n]['tactics'] = $random_tactic['name'];
+				$officials[$n]['hashed_data'] = encrypt_param(
+										json_encode(array('staff_id'=>$official['id'],
+														'tactics'=>$random_tactic)));	
+			}
+			
+		}
 		$this->set('officials',$officials);
 		$this->set('weekly_salaries',$total_weekly_salary);
+	}
+	private function getRandomTactics($coach,$rank){
+		if($rank>2){
+			$tactics_name = array('','More Shoots','More Crosses','Focus on Through Ball','Create Chances','More Tackles','Dribbling','More Blocks');
+			$coach_tactics = array('gk_coach'=>array(7),
+	                        'def_coach'=>array(5,6,7),
+	                        'mid_coach'=>array(1,2,3,4),
+	                        'fwd_coach'=>array(1,2,3,4,6));
+
+			$tactics = $coach_tactics[$coach];
+			$n = sizeof($tactics)-1;
+			$i = rand(0,$n);
+			return array('name'=>$tactics_name[$tactics[$i]],'id'=>$tactics[$i]);
+		}else{
+			return array('id'=>0,'name'=>'N/A');
+		}
+        
+		
 	}
 	public function team(){
 

@@ -441,6 +441,75 @@ class GameController extends AppController {
 		print json_encode($rs);
 		die();
 	}
+
+	public function accept_offer($offer_id){
+		require_once APP . 'Vendor' . DS. 'lib/Predis/Autoloader.php';
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$userData = $this->getUserData();
+		$offer_id = intval(Sanitize::clean($offer_id));
+
+		
+		
+		
+		$rs = $this->Game->accept_offer($userData['team']['id'],$offer_id,$this->nextMatch['match']);
+		$league = $_SESSION['league'];
+		$game_team_id = $userData['team']['id'];
+
+		if(isset($rs['data']['uid'])){
+			$player_id = $rs['data']['uid'];
+
+			Predis\Autoloader::register();
+			$this->redisClient = new Predis\Client(array(
+												    'host'     => Configure::read('REDIS.Host'),
+												    'port'     => Configure::read('REDIS.Port'),
+												    
+												));
+			$this->redisClient->del('game_team_lineup_'.$league.'_'.$game_team_id);
+			$this->redisClient->del('getPlayers_'.$league.'_'.$game_team_id);
+			$this->redisClient->del('getPlayerTeamStats_'.$league.'_'.$game_team_id.'_'.$player_id);
+			$this->redisClient->del('getPlayerDailyTeamStats_'.$league.'_'.$game_team_id.'_'.$player_id);
+			
+		}
+		
+		header('Content-type: application/json');
+		print json_encode($rs);
+		die();
+	}
+	public function decline_offer($offer_id){
+		require_once APP . 'Vendor' . DS. 'lib/Predis/Autoloader.php';
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$userData = $this->getUserData();
+		$offer_id = intval(Sanitize::clean($offer_id));
+
+		
+		
+		
+		$rs = $this->Game->decline_offer($userData['team']['id'],$offer_id,$this->nextMatch['match']);
+		$league = $_SESSION['league'];
+		$game_team_id = $userData['team']['id'];
+
+		if(isset($rs['data']['uid'])){
+			$player_id = $rs['data']['uid'];
+
+			Predis\Autoloader::register();
+			$this->redisClient = new Predis\Client(array(
+												    'host'     => Configure::read('REDIS.Host'),
+												    'port'     => Configure::read('REDIS.Port'),
+												    
+												));
+			$this->redisClient->del('game_team_lineup_'.$league.'_'.$game_team_id);
+			$this->redisClient->del('getPlayers_'.$league.'_'.$game_team_id);
+			$this->redisClient->del('getPlayerTeamStats_'.$league.'_'.$game_team_id.'_'.$player_id);
+			$this->redisClient->del('getPlayerDailyTeamStats_'.$league.'_'.$game_team_id.'_'.$player_id);
+			
+		}
+		
+		header('Content-type: application/json');
+		print json_encode($rs);
+		die();
+	}
 	public function next_match(){
 		$this->loadModel('Team');
 		$this->loadModel('User');

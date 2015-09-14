@@ -68,6 +68,7 @@ transfer.setLeague(league);
 
 
 var app = express();
+//for session
 var RedisStore = require('connect-redis')(express);
 
 // all environments
@@ -92,6 +93,10 @@ var client = redis.createClient(config.redis.port,config.redis.host);
 client.on("error", function (err) {
     console.log("Error " + err);
 });
+
+gameplay.setRedisClient(client);
+
+
 app.use(function(req,res,next){
 	//bind everything we need
 	req.redisClient = client;

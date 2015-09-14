@@ -372,7 +372,7 @@ Configure::write('API_SALT',md5("hello world"));
 Configure::write('INITIAL_BUDGET','10000000');
 Configure::write('REDIS.Host','127.0.0.1');
 Configure::write('REDIS.Port',6379);
-Configure::write('REDIS.Database','15');
+//Configure::write('REDIS.Database','15');
 Configure::write('avatar_img_dir','/home/duf/node_workspace/fantasy_wc/web/app/webroot/files/');
 Configure::write('avatar_web_dir','/files/');
 Configure::write('avatar_web_url','http://localhost/fm_2014/files/');

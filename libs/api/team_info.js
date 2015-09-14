@@ -97,7 +97,15 @@ var getTeamInfoProcess = function(conn,
 						[data.team.id],
 						 function(err,rs){
 						 	console.log(rs);
-						 	data.team_points = rs[0];
+						 	if(rs.length>0){
+						 		data.team_points = rs[0];
+						 	}else{
+						 		data.team_points = {
+						 			quadrant:4,
+						 			total_points:0,
+						 			rank:99999999999
+						 		};
+						 	}
 						 	cb(err);
 						});
 		},

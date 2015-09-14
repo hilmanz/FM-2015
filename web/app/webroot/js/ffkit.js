@@ -14,6 +14,8 @@ var App = Backbone.Router.extend({
     "close_detail":"hide_player_stats",
     "nego/:nego_id":"nego_salary",
     "offer/:nego_id/:player_id":"offer_salary",
+    "accept_offer/:offer_id":"accept_offer",
+    "decline_offer/:offer_id":"decline_offer"
   },
   hire:hire,
   dismiss:dismiss,
@@ -27,7 +29,53 @@ var App = Backbone.Router.extend({
   hide_player_stats:hide_player_stats,
   nego_salary:nego_salary,
   offer_salary:offer_salary,
+  accept_offer:accept_offer,
+  decline_offer:decline_offer
 });
+function accept_offer(offer_id){
+
+	api_call(api_url+'game/accept_offer/'+offer_id,function(response){
+		if(response.status==1){
+			 $.fancybox.close();
+			 
+			 render_view(tplacceptoffer,"#popup-messages .popupContent .entry-popup",
+							{data:response});
+			
+			$(".offer-loading").hide();
+			$(".offer-table").show();
+			$(".offer-result").hide();
+
+		}else{
+			render_view(tplofferexpired,'#popup-messages .popupContent .entry-popup',
+							{data:response});
+		}
+		 $.fancybox([
+		            { href : '#popup-messages' }
+		        ]);
+	});
+}
+function decline_offer(offer_id){
+
+	api_call(api_url+'game/decline_offer/'+offer_id,function(response){
+		if(response.status==1){
+			 $.fancybox.close();
+			 
+			 render_view(tpldeclineoffer,"#popup-messages .popupContent .entry-popup",
+							{data:response});
+			
+			$(".offer-loading").hide();
+			$(".offer-table").show();
+			$(".offer-result").hide();
+
+		}else{
+			render_view(tplofferexpired,'#popup-messages .popupContent .entry-popup',
+							{data:response});
+		}
+		 $.fancybox([
+		            { href : '#popup-messages' }
+		        ]);
+	});
+}
 function nego_salary(nego_id){
 
 	api_call(api_url+'game/nego/'+nego_id,function(response){

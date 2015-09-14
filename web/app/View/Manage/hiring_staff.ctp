@@ -27,8 +27,16 @@
                                 <div>
                                     SS$ <?=number_format($official['salary'])?> / minggu
                                 </div>
+                                <?php if(isset($official['tactics'])):?>
                                 <div>
-                                    <a href="<?=$this->Html->url('/manage/hiring_staff?hire=1&id='.$official['id'])?>" class="button">
+                                    <h4>Available Tactic(s) :</h4> <?=$official['tactics']?>
+                                </div>
+                                <?php endif;?>
+                                <div>
+                                    <?php if(!isset($official['hashed_data'])){
+                                        $official['hashed_data'] = encrypt_param(json_encode(array('staff_id'=>$official['id'])));
+                                    }?>
+                                    <a href="<?=$this->Html->url('/manage/hiring_staff?hire=1&id='.$official['id'].'&r='.$official['hashed_data'])?>" class="button">
                                         Rekrut
                                     </a>
                                 </div>
