@@ -307,8 +307,12 @@ exports.morale_mods = {
 	fitness60:-15,
 	fitness50:-20,
 	played_avg:10,
+	happy_with_salary:10,
+	unhappy_with_salary:-10,
 	played_last_2match:15,
-	unplayed_acc_match:5, //times how many unplayed
+	unplayed_acc_match:-5, //x how many unplayed
+	rarely_played:-20,
+	played_acc_match:20,
 	happy_with_coach:20,
 	starting:20,
 	sub:10,
@@ -316,6 +320,13 @@ exports.morale_mods = {
 	refused_transfer:-40,
 	salary_refused:-40,
 	vice_captain:10,
+	captain:30,
+	winning:10,
 	picking:-30,
-	homesick:-20
+	homesick:-20,
+	no_bonus: -15,
+	has_bonus: 15,
+	fit100: 20,
+	fit80 : 10
 }
+

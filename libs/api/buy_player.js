@@ -45,6 +45,7 @@ exports.is_player_in_club = function(game_team_id,player_id,league,callback){
 					[game_team_id,player_id],
 		function(err,rs){
 			console.log(S(this.sql).collapseWhitespace().s);
+			conn.release();
 			try{
 				if(rs!=null && rs[0].id > 0){
 					callback(err,true);

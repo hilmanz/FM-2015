@@ -150,6 +150,9 @@ var negotiate_salary_window_proc = function(conn,
 							if(rs!=null){
 								rank = rs[0].rank;
 							}
+							if(rank > 20){
+								rank = 20;
+							}
 							data.player_rank = Math.ceil(rank/5);
 							cb(err);
 						});
@@ -200,7 +203,7 @@ var generateStatuses = function(data){
 	var statuses = [];
 	
 	if(data.quadrant_bonus >= 0){
-		statuses.push("Peringkat klub lo ga menarik (+"+data.quadrant_bonus+")");
+		statuses.push("Peringkat klub lo menarik (+"+data.quadrant_bonus+")");
 	}else{
 		statuses.push("Peringkat klub lo ga menarik ("+data.quadrant_bonus+")");
 	}
@@ -324,6 +327,9 @@ function compareQuadrant(player_rank,club_rank){
 	//player 2, club 1 -> berarti +1
 	//player 1, club 1 -> berarti +0
 	//player 3, club 4 -> berarti -1
+	if(typeof club_rank == undefined){
+		club_rank = 4;
+	}
 	var diff = player_rank - club_rank;
 	return game_config.quadrant_comparison[diff];
 }

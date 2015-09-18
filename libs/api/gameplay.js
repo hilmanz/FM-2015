@@ -496,7 +496,7 @@ function getPlayers(game_team_id,callback){
 				async.waterfall([
 					function(done){
 						var name = "p_"+league+"_"+player.game_team_id+"_"+player.player_id;
-						redisClient.get(name,function(data){
+						redisClient.get(name,function(err,data){
 							done(null,name,data);
 						});
 					},
@@ -524,6 +524,7 @@ function getPlayers(game_team_id,callback){
 						minta naek gaji, tapi ditolak
 						dipilih jadi kapten
 						dipilih jadi vice captain
+						menang di pertandingan terakhir
 						*/
 						if(data==null){
 							player.regen=game_config.player_base_mod.regen;
@@ -534,6 +535,8 @@ function getPlayers(game_team_id,callback){
 							player.fitness = 100;
 							player.played_avg = 0;
 							player.played_last_2match = 0;
+							player.played_acc_match = 0;
+							player.winning = 0;
 							player.unplayed_acc_match = 0;
 							player.happy_with_coach = 0;
 							player.starting = 0;
@@ -542,6 +545,7 @@ function getPlayers(game_team_id,callback){
 							player.refused_transfer = 0;
 							player.salary_refused = 0;
 							player.vice_captain = 0;
+							player.captain = 0;
 							player.picking = 0;
 							player.homesick = 0;
 
@@ -554,6 +558,9 @@ function getPlayers(game_team_id,callback){
 						}else{
 
 							var o = JSON.parse(data);
+							if(typeof o.played_acc_match === 'undefined') o.played_acc_match = 0;
+							if(typeof o.captain === 'undefined') o.captain = 0;
+							if(typeof o.winning === 'undefined') o.winning = 0;
 							player.regen = o.regen;
 							player.bonus = o.bonus;
 							player.fatigue = o.fatigue;
@@ -562,20 +569,23 @@ function getPlayers(game_team_id,callback){
 							player.morale_bonuses = o.morale_bonuses;
 							player.played_avg = o.played_avg;
 							player.played_last_2match = o.played_last_2match;
+							player.played_acc_match = o.played_acc_match;
 							player.unplayed_acc_match = o.unplayed_acc_match; //pas dimainin set jadi 0 lagi
 							player.happy_with_coach = o.happy_with_coach;
 							player.starting = o.starting;
+							player.winning = o.winning;
 							player.sub = o.sub;
 							player.personal_problem = o.personal_problem;
 							player.refused_transfer = o.refused_transfer;
 							player.salary_refused = o.salary_refused;
 							player.vice_captain = o.vice_captain;
+							player.captain = o.captain;
 							player.picking = o.picking;
 							player.homesick = o.homesick;
 							//skip
 							console.log("p_"+league+"_"+player.game_team_id+"_"+player.player_id+"-->exists");
 							compiled.push(player);
-							done(err);
+							done(null);
 						}
 					}
 				],
@@ -635,7 +645,7 @@ function getPlayerDetail(player_id,callback){
 					
 					conn.release();
 					if(rs!=null && rs.length==1){
-						callback(err,rs[0]);	
+						callback(err,rs[0]);re	
 					}else{
 						callback(err,null);
 					}
@@ -662,22 +672,49 @@ function getTeamPlayerDetail(game_team_id,player_id,callback){
 			WHERE c.game_team_id = ? AND c.player_id = ?\
 			LIMIT 1;";
 	prepareDb(function(conn){
-		conn.query(sql,
+		async.waterfall(
+		[function(cb){
+			conn.query(sql,
 				[game_team_id,player_id],
 				function(err,rs){
-					conn.release();
-						try{
-							if(rs.length==1){
-								callback(err,rs[0]);	
-							}else{
-								callback(err,null);
-							}
-						}catch(e){
-							callback(err,null);
+					console.log(S(this.sql).collapseWhitespace().s);
+					try{
+						if(rs.length==1){
+							cb(err,rs[0]);	
+						}else{
+							cb(err,null);
 						}
-						
-					
+					}catch(e){
+						cb(err,null);
+					}
 				});
+		},
+		function(rs,cb){
+			
+			if(rs!=null){
+				console.log('p_'+league+'_'+game_team_id+'_'+player_id);
+				redisClient.get('p_'+league+'_'+game_team_id+'_'+player_id,function(err,data){
+					
+					if(data!=null){
+						var o = JSON.parse(data);
+						rs.morale = o.morale;
+						rs.fitness = o.fitness;
+						rs.morale_bonuses = o.morale_bonuses;
+
+						
+					}
+					console.log(rs);
+					cb(null,rs);
+				});
+			}else{
+				cb(null,rs);
+			}
+		}],
+		function(err,rs){
+			conn.release();
+			callback(err,rs);
+		});
+		
 	});
 	
 }

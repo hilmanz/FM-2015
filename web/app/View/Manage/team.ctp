@@ -1034,7 +1034,7 @@ $(document).ready(function(){
                     <span class="dolar">ss$</span><input type="text" name="offer_price" value="0"/>
                     </div></td>
         </tr>
-        <%if(data.player.position!='Goalkeeper'){%>
+        <%if(data.player.position!='Goalkeeper' && data.player.position != 'Defender'){%>
         <tr>
             <td>Bonus Mencetak Gol</td>
             <td>

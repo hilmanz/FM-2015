@@ -77,7 +77,7 @@ function decline_offer(offer_id){
 	});
 }
 function nego_salary(nego_id){
-
+	console.log('nego_salary');
 	api_call(api_url+'game/nego/'+nego_id,function(response){
 		if(response.status==1){
 			 $.fancybox.close();
@@ -90,7 +90,7 @@ function nego_salary(nego_id){
 			$(".offer-result").hide();
 
 		}else{
-			render_view(tplsalarynegoexpired,'#popup-messages .popupContent .entry-popup',
+			render_view(tplsalaryexpired,'#popup-messages .popupContent .entry-popup',
 							{data:response});
 		}
 		 $.fancybox([
@@ -108,7 +108,11 @@ function get_notification(player_id,callback){
 function offer_salary(nego_id,player_id){
 	var offer_price = parseInt($("input[name=offer_price").val());
 	var goal_bonus = parseInt($("input[name=goal_bonus").val());
-	var cleansheet_bonus = parseInt($("input[name=cleansheet_bonus").val());
+	var cleansheet_bonus = parseInt($("input[name=cleansheet").val());
+
+	if(typeof goal_bonus === 'undefined' || isNaN(goal_bonus)) goal_bonus = 0;
+	if(typeof cleansheet_bonus === 'undefined' || isNaN(cleansheet_bonus)) cleansheet_bonus = 0;
+
 	$(".offer-loading").show();
 	$(".offer-table").hide();
 	$(".offer-result").hide();

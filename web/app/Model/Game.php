@@ -54,7 +54,7 @@ class Game extends AppModel {
 					'nego_id'=>$nego_id,
 					'player'=>$response['data']['player'],
 					'dof'=>$response['data']['dof'],
-					'quadrant_bonus'=>$response['data']['quadrant_bonus'],
+					'quadrant_bonus'=>intval(@$response['data']['quadrant_bonus']),
 					'rooster_bonus'=>$response['data']['rooster_bonus'],
 					'goal_mod'=>$response['data']['goal_mod'],
 					'cleansheet_mod'=>$response['data']['cleansheet_mod'],

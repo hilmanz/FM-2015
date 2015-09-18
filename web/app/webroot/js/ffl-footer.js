@@ -162,7 +162,10 @@ $(function() {
 		
 	// extend the jScollPane by merging	
 	$.extend( true, jspapi, extensionPlugin );
-	jspapi.addHoverFunc();
+	try{
+		jspapi.addHoverFunc();	
+	}catch(e){}
+	
 
 });
 
