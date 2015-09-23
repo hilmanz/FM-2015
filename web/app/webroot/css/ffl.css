@@ -2898,3 +2898,11 @@ padding-left:40px;
 	height:20px;
 }
 
+.morale {
+  padding: 15px;
+  overflow: hidden;
+  border-radius: 5px;
+  margin: 20px 0;
+  min-height: 32px;
+  width:100%;
+}

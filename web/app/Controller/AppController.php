@@ -153,8 +153,9 @@ class AppController extends Controller {
 						)
 					)
 				);
+
 				$this->userDetail = $this->User->findByFb_id($this->userData['fb_id']);
-				$this->set('register_is_completed',$this->userDetail['User']['register_completed']);
+				$this->set('register_is_completed',@$this->userDetail['User']['register_completed']);
 
 				/*
 				if($this->userDetail['User']['n_status']==1 && 
@@ -329,6 +330,7 @@ class AppController extends Controller {
 									
 					$this->openTime = $open_time;
 					$this->set('open_time',$open_time);
+					
 				}else{
 
 					if(strtotime($upcoming_match['end_dt']) >= strtotime($future_match['start_dt'])){

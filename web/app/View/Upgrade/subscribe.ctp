@@ -59,7 +59,8 @@
                 ?>
                 <input type="radio" name="payment_method" value="ecash" <?=$disabled_radio?>/> Ecash Mandiri (Rupiah)<br />
                 <input type="radio" name="payment_method" value="bank_transfer"/> Transfer Bank<br />
-                <input type="radio" name="payment_method" value="kartu_kredit"/> Kartu Kredit(Visa/Master)
+                <input type="radio" name="payment_method" value="kartu_kredit"/> Kartu Kredit(Visa/Master)<br/>
+                <input type="radio" name="payment_method" value="voucher"/> Voucher FM
               </div>
               <div>
                 <input type="hidden" name="plan" value="<?=$plan?>"/>

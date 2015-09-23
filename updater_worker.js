@@ -1,19 +1,5 @@
 /**
-match_results_updater.js
-these app will check if there's a new matchresults updates available.
-it will load the data.. parse the xml.. and update the stats for each player's stats.
-
-steps : 
-1. check if there's a new file in the folder by crosschecking the file lists with those in database.
-2. if there's a new file, we read the xml. and then update our master_report stats.
-3. based on the master_report stats, we update individual user's starting players stats
-4. flag the file so we dont have to process it anymore.
-
-remember, each files is related to 1 game_id. so every summary must be grouped by game_id.
-PS : these only process the master data.
-
-@TODO
-let's process unprocessed match.
+updater.worker.js
 **/
 /////THE MODULES/////////
 var argv = require('optimist').argv;
@@ -161,7 +147,9 @@ function process_report(queue_id,game_id,since_id,until_id,done){
 	async.waterfall([
 		function(callback){
 			var is_finished = false;
-			lineup_stats.update(queue_id,game_id,since_id,until_id,function(err,is_done){
+			console.log('lineup_stats update',game_id,since_id,until_id);
+			lineup_stats.update(queue_id,game_id,since_id,until_id,
+			function(err,is_done){
 				is_finished = is_done;
 				callback(err,is_done);
 			});

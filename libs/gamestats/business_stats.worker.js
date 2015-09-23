@@ -24,6 +24,7 @@ var config = require(path.resolve('./config')).config;
 var stadium_earning_category = require(path.resolve('./libs/game_config')).stadium_earning_category;
 var stadium_earnings = require(path.resolve('./libs/game_config')).stadium_earnings;
 var cost_mods = require(path.resolve('./libs/game_config')).cost_modifiers;
+var game_config = require(path.resolve('./libs/game_config'));
 var mysql = require('mysql');
 var S = require('string');
 var pool  = {};
@@ -49,21 +50,22 @@ exports.setConfig = function(c){
 
 
 var total_teams = 0;
-console.log('business_stats : pool opened');
+console.log('business','business_stats : pool opened');
 exports.update = function(since_id,until_id,game_id,done){
-	
+	console.log('business','business','update',since_id,until_id,game_id);
 	async.waterfall(
 		[
 			function(callback){
 				//get total teams participated
 				pool.getConnection(function(err,conn){
-					console.log('open connection');
+					console.log('business','business','open connection');
 					conn.query("SELECT COUNT(*) as total FROM "+config.database.database+".game_users",
 								[],
 								function(err,rs){
+										console.log('business','business','close connection');
 										conn.release();
 										total_teams = rs[0].total;
-										console.log('total_teams',total_teams);
+										console.log('business','business','total_teams',total_teams);
 										callback(err);
 										
 								});
@@ -85,14 +87,14 @@ exports.update = function(since_id,until_id,game_id,done){
 						function(callback){
 							calculateIncomeForAllHomeTeams(since_id,until_id,game_id,game,home_team,away_team,
 								function(err,team_updated){
-									console.log('all home team is done');
+									console.log('business','all home team is done');
 									callback(err,team_updated);
 								});
 						},
 						function(callback){
 							calculateIncomeForAllAwayTeams(since_id,until_id,game_id,game,home_team,away_team,
 								function(err,team_updated){
-									console.log('all away team is done');
+									console.log('business','all away team is done');
 									callback(err,team_updated);
 								});
 						}
@@ -114,12 +116,12 @@ exports.update = function(since_id,until_id,game_id,done){
 }
 exports.done = function(){
 	pool.end(function(err){
-		if(err) console.log('business_stats','error',err.message);
-		console.log('business_stats','pool closed');
+		if(err) console.log('business','business_stats','error',err.message);
+		console.log('business','business_stats','pool closed');
 	});
 }
 function calculateIncomeForAllHomeTeams(since_id,until_id,game_id,game,home_team,away_team,done){
-	console.log('calculate all home teams');
+	console.log('business','calculate all home teams');
 	var limit = 100;
 	var start = 0;
 	try{
@@ -129,12 +131,14 @@ function calculateIncomeForAllHomeTeams(since_id,until_id,game_id,game,home_team
 		var away_rank = 0;
 
 		pool.getConnection(function(err,conn){
-			console.log('getting the team\'s rank');
+			console.log('business','getting the team\'s rank');
 			async.waterfall(
 			[
 				function(callback){
 					//getting home rank
-					conn.query("SELECT t_position AS rank FROM "+config.database.database+".master_standings WHERE team_id=? LIMIT 1;",
+					conn.query("SELECT t_position AS rank \
+								FROM "+config.database.database+".master_standings \
+								WHERE team_id=? LIMIT 1;",
 							   	[team_id],
 								   function(err,rs){
 								   		if(!err){
@@ -148,7 +152,9 @@ function calculateIncomeForAllHomeTeams(since_id,until_id,game_id,game,home_team
 				},
 				function(rs,callback){
 					//getting away rank
-					conn.query("SELECT t_position AS rank FROM "+config.database.database+".master_standings WHERE team_id=? LIMIT 1;",
+					conn.query("SELECT t_position AS rank \
+								FROM "+config.database.database+".master_standings \
+								WHERE team_id=? LIMIT 1;",
 							   	[away_team_id],
 								   function(err,rs){
 								   		if(!err){
@@ -164,8 +170,8 @@ function calculateIncomeForAllHomeTeams(since_id,until_id,game_id,game,home_team
 			],
 			function(err,result){
 				conn.release();
-				console.log('home_rank',home_rank);
-				console.log('AWAY RANK',away_rank);
+				console.log('business','home_rank',home_rank);
+				console.log('business','AWAY RANK',away_rank);
 				processHomeTeams(since_id,until_id,start,limit,team_id,game_id,home_rank,away_rank,game,done);
 				
 			});
@@ -176,7 +182,7 @@ function calculateIncomeForAllHomeTeams(since_id,until_id,game_id,game,home_team
 	
 }
 function calculateIncomeForAllAwayTeams(since_id,until_id,game_id,game,home_team,away_team,done){
-	console.log('calculate all away teams');
+	console.log('business','calculate all away teams');
 
 	try{
 		var limit = 100;
@@ -194,7 +200,7 @@ function calculateIncomeForAllAwayTeams(since_id,until_id,game_id,game,home_team
 function processHomeTeams(since_id,until_id,start,limit,team_id,game_id,rank,away_rank,game,done){
 	
 	pool.getConnection(function(err,conn){
-		console.log('open connection, processing home team');
+		console.log('business','open connection, processing home team');
 		conn.query("SELECT a.*,e.rank FROM "+config.database.database+".game_teams a\
 					INNER JOIN "+config.database.database+".game_users b\
 					ON a.user_id = b.id\
@@ -208,9 +214,9 @@ function processHomeTeams(since_id,until_id,start,limit,team_id,game_id,rank,awa
 					WHERE a.team_id = ? AND a.n_status=1 AND a.id BETWEEN ? AND ? LIMIT ?,?;",
 					[team_id,since_id,until_id,start,limit],
 					function(err,rs){
-						console.log(S(this.sql).collapseWhitespace().s);
+						console.log('business',S(this.sql).collapseWhitespace().s);
 							conn.release();
-								console.log('processing each home teams');
+								console.log('business','processing each home teams');
 								async.eachSeries(rs,
 									function(team,callback){
 										async.waterfall([
@@ -247,7 +253,7 @@ function processHomeTeams(since_id,until_id,start,limit,team_id,game_id,rank,awa
 }
 function processAwayTeams(since_id,until_id,start,limit,team_id,game_id,rank,away_rank,game,done){
 	pool.getConnection(function(err,conn){
-		console.log('open connection, processing away team');
+		console.log('business','open connection, processing away team');
 		conn.query("SELECT a.*,e.rank FROM "+config.database.database+".game_teams a\
 					INNER JOIN "+config.database.database+".game_users b\
 					ON a.user_id = b.id\
@@ -261,10 +267,10 @@ function processAwayTeams(since_id,until_id,start,limit,team_id,game_id,rank,awa
 					WHERE a.team_id = ? AND a.n_status=1 AND a.id BETWEEN ? AND ? LIMIT ?,?;",
 					[team_id,since_id,until_id,start,limit],
 					function(err,rs){
-							console.log(S(this.sql).collapseWhitespace().s);
+							console.log('business',S(this.sql).collapseWhitespace().s);
 							conn.release();
 								
-								console.log('processing each away teams');
+								console.log('business','processing each away teams');
 								async.eachSeries(rs,
 									function(team,callback){
 										async.waterfall([
@@ -308,13 +314,13 @@ function processAwayTeams(since_id,until_id,start,limit,team_id,game_id,rank,awa
 * 4. calculate winning bonuses and user points bonuses (ini blm ada datanya)
 */
 function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
-	console.log('calculate_home_revenue_stats: team->',team);
-	console.log('calculate_home_revenue_stats: ','away rank',away_rank);
-	console.log('calculate_home_revenue_stats: ','game:',game);
+	console.log('business','calculate_home_revenue_stats: team->',team);
+	console.log('business','calculate_home_revenue_stats: ','away rank',away_rank);
+	console.log('business','calculate_home_revenue_stats: ','game:',game);
 	
-	console.log('-----');
+	console.log('business','-----');
 	var cashflow = [];
-	console.log('match real attendance :',game[0].attendance);
+	console.log('business','match real attendance :',game[0].attendance);
 	var attendance = game[0].attendance;
 
 	if(team.rank==null){
@@ -322,15 +328,15 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 	}
 	var quadrant = getQuadrant(team.rank);
 	var stadium_income_type = getStadiumIncome(away_rank);
-	console.log('home team quadrant : ',quadrant);
-	console.log('stadium_income_type : ',stadium_income_type);
-	console.log('attendance',attendance);
-	console.log(stadium_earnings[quadrant].price[stadium_income_type]);
-	console.log(stadium_earnings[quadrant]);
+	console.log('business','home team quadrant : ',quadrant);
+	console.log('business','stadium_income_type : ',stadium_income_type);
+	console.log('business','attendance',attendance);
+	console.log('business',stadium_earnings[quadrant].price[stadium_income_type]);
+	console.log('business',stadium_earnings[quadrant]);
 
 	//var ticket_earnings = stadium_earnings[quadrant].price[stadium_income_type] * attendance;
 	 						//stadium_earnings[quadrant].ratio[stadium_income_type];
-							//console.log('stadium earnings : ',ticket_earnings);
+							//console.log('business','stadium earnings : ',ticket_earnings);
 	var earnings = [];
 	var costs = [];
 	pool.getConnection(function(err,conn){
@@ -341,130 +347,143 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 					conn.query("SELECT stadium_capacity FROM "+config.database.database+".master_team WHERE uid = ? LIMIT 1;",
 							[team.team_id],
 							function(err,rs){
-								//console.log(this.sql);
-								//console.log('rs',rs);
+								//console.log('business',this.sql);
+								//console.log('business','rs',rs);
 								try{
 									attendance = rs[0].stadium_capacity;
 								}catch(e){}
-								console.log('the attendance : ',attendance);
+								console.log('business','the attendance : ',attendance);
 								callback(err);
 							});
 				},
 				function(callback){
 					//get team's officials
 					conn.query(
-						"SELECT b.* FROM "+config.database.database+".game_team_officials a\
-						INNER JOIN "+config.database.database+".game_officials b\
-						ON a.official_id = b.id WHERE game_team_id=?\
-						LIMIT 20;",
+						"SELECT b.* FROM "+config.database.database+".game_team_staffs a\
+						INNER JOIN "+config.database.database+".master_staffs b\
+						ON a.staff_id = b.id WHERE game_team_id=?\
+						LIMIT 100;",
 						[team.id],
 						function(err,officials){
-
+							console.log('business',S(this.sql).collapseWhitespace().s);
 							callback(null,officials);
 					});
 				},
 				function(officials,callback){
-					conn.query("SELECT SUM(salary) AS salaries \
+					conn.query("SELECT SUM(a.salary) AS salaries,SUM(cleansheet_bonus) as cleansheet \
 								FROM "+config.database.database+".game_team_players a\
 								INNER JOIN "+config.database.database+".master_player b\
 								ON a.player_id = b.uid\
 								WHERE a.game_team_id = ?;",
 								[team.id],
 								function(err,rs){
+									console.log('business',S(this.sql).collapseWhitespace().s);
 									if(!err){
-										callback(err,rs[0].salaries,officials);
+										callback(err,rs[0].salaries,rs[0].cleansheet,officials);
 									}else{
 										callback(err,null,null);
 									}
 					});
 				},
-				function(player_salaries,officials,callback){
-					console.log('officials',officials);
+				function(player_salaries,cleansheet_bonus,officials,callback){
+					console.log('business','officials',officials);
 					//get 100% ticket guarantee from head of security.
-					var official = getOfficial('Head of Security',officials);
+					var official = getOfficial('security',officials);
 					var final_attendance = attendance * stadium_earnings[quadrant].ratio[stadium_income_type];
 
 
 					//1. TICKET EARNINGS
 					var ticket_earnings = 0;
-					if(official.attendance_bonus!=0){
-						console.log('Head of Security bonus applied');
+					if(game_config.staff_bonus.security[official.rank]!=0){
+						console.log('business','Head of Security bonus applied');
 						//ticket_earnings = (attendance * official.attendance_bonus) *  stadium_earnings[quadrant].price[stadium_income_type];
-						console.log('(',attendance,' x ',stadium_earnings[quadrant].ratio[stadium_income_type],') x',stadium_earnings[quadrant].price[stadium_income_type]);
+						attendance = attendance + (attendance * game_config.staff_bonus.security[official.rank]);
+						console.log('business','(',attendance,' x ',stadium_earnings[quadrant].ratio[stadium_income_type],') x',stadium_earnings[quadrant].price[stadium_income_type]);
 						ticket_earnings = (attendance * stadium_earnings[quadrant].ratio[stadium_income_type]) *  stadium_earnings[quadrant].price[stadium_income_type];
 					}else{
-						console.log('head of security bonus not applied');
-						//sementara di skip dulu penalty securitynya.
-						//console.log('(',attendance,' x ',stadium_earnings[quadrant].ratio[stadium_income_type],') x',stadium_earnings[quadrant].price[stadium_income_type],' x 80% [income reduced by 20%]');
-						//ticket_earnings = (attendance * stadium_earnings[quadrant].ratio[stadium_income_type]) *  stadium_earnings[quadrant].price[stadium_income_type] * 0.8;
+						console.log('business','head of security bonus not applied');
+						
+						//console.log('business','(',attendance,' x ',stadium_earnings[quadrant].ratio[stadium_income_type],') x',stadium_earnings[quadrant].price[stadium_income_type],' x 80% [income reduced by 20%]');
 						ticket_earnings = (attendance * stadium_earnings[quadrant].ratio[stadium_income_type]) *  stadium_earnings[quadrant].price[stadium_income_type];
+						//ticket_earnings = (attendance * stadium_earnings[quadrant].ratio[stadium_income_type]) *  stadium_earnings[quadrant].price[stadium_income_type];
 						
 					}
 					earnings.push({name:'tickets_sold',value:ticket_earnings,total:final_attendance});
-					console.log('ticket earnings ',ticket_earnings);
+					console.log('business','ticket earnings ',ticket_earnings);
 
 
 					//2. Earning Bonus from Commercial Director
+					/*
 					official = getOfficial('Commercial Director',officials);
 					if(official!=null){
-						console.log(ticket_earnings,'*',official.attendance_bonus);	
+						console.log('business',ticket_earnings,'*',official.attendance_bonus);	
 						earnings.push({name:'commercial_director_bonus',value:ticket_earnings*official.attendance_bonus,total:1});
 					}
-
+					*/
 					//3. Earning Bonus from Marketing Manager
-					official = getOfficial('Marketing Manager',officials);
+					official = getOfficial('marketing',officials);
 					if(official!=null){
-						console.log(ticket_earnings,'*',official.attendance_bonus);	
-						earnings.push({name:'marketing_manager_bonus',value:ticket_earnings*official.attendance_bonus,total:1});
+						console.log('business',ticket_earnings,'*',game_config.staff_bonus.marketing[official.rank]);	
+						earnings.push({name:'marketing_manager_bonus',
+										value:ticket_earnings*game_config.staff_bonus.marketing[official.rank],total:1});
 					}
 					//4. Earning Bonus from Public Relation Officer
-					official = getOfficial('Public Relation Officer',officials);
+					official = getOfficial('pr',officials);
 					if(official!=null){
-						console.log(ticket_earnings,'*',official.attendance_bonus);	
-						earnings.push({name:'public_relation_officer_bonus',value:ticket_earnings*official.attendance_bonus,total:1});
+						console.log('business',ticket_earnings,'*',game_config.staff_bonus.pr[official.rank]);	
+						earnings.push({name:'public_relation_officer_bonus',
+											value:ticket_earnings*game_config.staff_bonus.pr[official.rank],total:1});
 					}
-					console.log('earnings : ',earnings);
+					console.log('business','earnings : ',earnings);
 					
 
 					//5. operating costs
 					var basic_cost = cost_mods.operating_cost * ticket_earnings;
 					var op_cost = basic_cost;
-					console.log(cost_mods.operating_cost,'*',ticket_earnings);
-					console.log('basic_cost',basic_cost);
+					console.log('business',cost_mods.operating_cost,'*',ticket_earnings);
+					console.log('business','basic_cost',basic_cost);
 
 					//6. bonuses that reduce the costs.
+					/*
 					official = getOfficial('Finance Director',officials);
 					if(official!=null){
 						var deduct = basic_cost * official.op_cost_bonus;
-						console.log(deduct);
+						console.log('business',deduct);
 						op_cost+=(basic_cost * official.op_cost_bonus);
 					}
 					official = getOfficial('Tax Consultant',officials);
 					if(official!=null){
 						var deduct = basic_cost * official.op_cost_bonus;
-						console.log(deduct);
+						console.log('business',deduct);
 						op_cost+=(basic_cost * official.op_cost_bonus);
 					}
 					official = getOfficial('Accountant',officials);
 					if(official!=null){
 						var deduct = basic_cost * official.op_cost_bonus;
-						console.log(deduct);
+						console.log('business',deduct);
 						op_cost+=(basic_cost * official.op_cost_bonus);
 					}
-					console.log('operational costs',op_cost);
+					*/
+					console.log('business','operational costs',op_cost);
 					costs.push({name:'operating_cost',value:op_cost,total:1});
-
+				
 					//7. Player Salaries (to be added soon)
-					console.log('player salaries : ',player_salaries);
+					console.log('business','player salaries : ',player_salaries);
 					costs.push({name:'player_salaries',value:player_salaries,total:1});
 					//8. Official Salaries
 					for(var i in officials){
-						console.log(officials[i].salary);
-						costs.push({name:reformatName(officials[i].name),value:officials[i].salary,total:1});
+						console.log('business',officials[i].salary);
+						costs.push({name:reformatName(officials[i].staff_type),value:officials[i].salary,total:1});
 					}
-					console.log('costs',costs);
+
+					//9. PLAYER CLEANSHEET BONUSES
+					if(game[0].away_score == 0){
+						costs.push({name:'player_cleansheet_bonus',value:cleansheet_bonus,total:1});
+					}
+					console.log('business','costs',costs);
 					callback(null,officials,earnings,costs);
 				},
+
 				function(officials,earnings,costs,callback){
 					//sponsorship bonuses
 					conn.query(
@@ -476,7 +495,7 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 						function(err,sponsors){
 							
 							if(err){
-								console.log(err.message);
+								console.log('business',err.message);
 							}
 							callback(null,officials,earnings,costs,sponsors);
 					});
@@ -490,35 +509,33 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 					}
 
 					earnings.push({name:'sponsorship',value:sponsor_bonus,total:1});
-
+					
 					//winning bonuses
 					if(game.home_score > game.away_score){
-						console.log('home team is winning');
+						console.log('business','home team is winning');
 						earnings.push({name:'win_bonus',value:sponsor_bonus*0.01,total:1});
 					}
 
 					//bonuses from officials
-					official = getOfficial('Commercial Director',officials);
-					if(official!=null){
-						earnings.push({name:'commercial_director_sponsor_bonus',value:sponsor_bonus*official.sponsor_bonus,total:1});
-					}
-
+					var official = {};
 					
-					official = getOfficial('Marketing Manager',officials);
+					official = getOfficial('marketing',officials);
 					if(official!=null){
-						earnings.push({name:'marketing_manager_sponsor_bonus',value:sponsor_bonus*official.sponsor_bonus,total:1});
+						earnings.push({name:'marketing_manager_sponsor_bonus',
+										value:sponsor_bonus*game_config.staff_bonus.marketing[official.rank],total:1});
 					}
 					
-					official = getOfficial('Public Relation Officer',officials);
+					official = getOfficial('pr',officials);
 					if(official!=null){
 						
-						earnings.push({name:'public_relation_officer_sponsor_bonus',value:sponsor_bonus*official.sponsor_bonus,total:1});
+						earnings.push({name:'public_relation_officer_sponsor_bonus',value:game_config.staff_bonus.pr[official.rank],total:1});
 					}
+					
 					callback(null,{earnings:earnings,costs:costs});
 				},
 				function(match_money,callback){
 					//save into database
-					console.log('match money',match_money);
+					console.log('business','match money',match_money);
 					var sql = "INSERT INTO "+config.database.database+".game_team_expenditures\
 								(game_team_id,item_name,item_type,amount,game_id,match_day,item_total)\
 								VALUES ";
@@ -555,16 +572,16 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 						   item_total = VALUES(item_total);";
 
 					conn.query(sql,vals,function(err,rs){
-						console.log(S(this.sql).collapseWhitespace().s);
+						console.log('business',S(this.sql).collapseWhitespace().s);
 						callback(null,'ok');
 					});
 					
 				}
 			],
 			function(err,result){
-				console.log('home calculation finished',result);
+				console.log('business','home calculation finished',result);
 				conn.release();
-				console.log('finished calculation');
+				console.log('business','finished calculation');
 				done(err,null);
 				
 			}
@@ -579,11 +596,11 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 * 2. expenses include player salaries and staff salaries
 */
 function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
-	console.log('calculating away revenue');
-	console.log(team,rank);
-	console.log('game:');
-	console.log(game);
-	console.log('-----');
+	console.log('business','calculating away revenue');
+	console.log('business',team,rank);
+	console.log('business','game:');
+	console.log('business',game);
+	console.log('business','-----');
 
 
 	
@@ -607,7 +624,7 @@ function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
 					});
 				},
 				function(officials,callback){
-					conn.query("SELECT SUM(salary) AS salaries \
+					conn.query("SELECT SUM(salary) AS salaries,SUM(cleansheet_bonus) AS cleansheet\
 								FROM "+config.database.database+".game_team_players a\
 								INNER JOIN "+config.database.database+".master_player b\
 								ON a.player_id = b.uid\
@@ -615,24 +632,29 @@ function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
 								[team.id],
 								function(err,rs){
 									if(!err){
-										callback(err,rs[0].salaries,officials);
+										callback(err,rs[0].salaries,rs[0].cleansheet,officials);
 									}else{
 										callback(err,null,null);
 									}
 					});
 				},
-				function(player_salaries,officials,callback){
-					console.log(officials);
+				function(player_salaries,cleansheet_bonus,officials,callback){
+					console.log('business',officials);
 
 					//7. Player Salaries
-					console.log('player salaries : ',player_salaries);
+					console.log('business','player salaries : ',player_salaries);
 					costs.push({name:'player_salaries',value:player_salaries,total:1});
 					//8. Official Salaries
 					for(var i in officials){
-						console.log(officials[i].salary);
+						console.log('business',officials[i].salary);
 						costs.push({name:reformatName(officials[i].name),value:officials[i].salary,total:1});
 					}
-					console.log('costs',costs);
+					//9. PLAYER CLEANSHEET BONUSES
+					if(game[0].home_score == 0){
+						costs.push({name:'player_cleansheet_bonus',value:cleansheet_bonus,total:1});
+					}
+
+					console.log('business','costs',costs);
 					callback(null,officials,earnings,costs);
 				},
 				function(officials,earnings,costs,callback){
@@ -646,7 +668,7 @@ function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
 						function(err,sponsors){
 							
 							if(err){
-								console.log(err.message);
+								console.log('business',err.message);
 							}
 							callback(null,officials,earnings,costs,sponsors);
 					});
@@ -660,35 +682,36 @@ function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
 					}
 
 					earnings.push({name:'sponsorship',value:sponsor_bonus,total:1});
-
+					
 					//winning bonuses
 					if(game.home_score < game.away_score){
-						console.log('away team is winning');
+						console.log('business','away team is winning');
 						earnings.push({name:'win_bonus',value:sponsor_bonus*0.01,total:1});
 					}
 
 					//bonuses from officials
-					official = getOfficial('Commercial Director',officials);
-					if(official!=null){
-						earnings.push({name:'commercial_director_sponsor_bonus',value:sponsor_bonus*official.sponsor_bonus,total:1});
-					}
+					
+					var official = {};
 
 					
 					official = getOfficial('Marketing Manager',officials);
 					if(official!=null){
-						earnings.push({name:'marketing_manager_sponsor_bonus',value:sponsor_bonus*official.sponsor_bonus,total:1});
+						earnings.push({name:'marketing_manager_sponsor_bonus',
+											value:sponsor_bonus*game_config.staff_bonus.marketing[official.rank],total:1});
 					}
 					
-					official = getOfficial('Public Relation Officer',officials);
+					official = getOfficial('pr',officials);
 					if(official!=null){
 						
-						earnings.push({name:'public_relation_officer_sponsor_bonus',value:sponsor_bonus*official.sponsor_bonus,total:1});
+						earnings.push({name:'public_relation_officer_sponsor_bonus',
+										value:sponsor_bonus*game_config.staff_bonus.pr[official.rank],total:1});
 					}
+				
 					callback(null,{earnings:earnings,costs:costs});
 				},
 				function(match_money,callback){
 					//save into database
-					console.log(match_money);
+					console.log('business',match_money);
 					var sql = "INSERT INTO "+config.database.database+".game_team_expenditures\
 								(game_team_id,item_name,item_type,amount,game_id,match_day,item_total)\
 								VALUES ";
@@ -725,16 +748,16 @@ function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
 						   item_total = VALUES(item_total);";
 
 					conn.query(sql,vals,function(err,rs){
-						console.log(this.sql);
+						console.log('business',this.sql);
 						callback(null,'ok');
 					});
 					
 				}
 			],
 			function(err,result){
-				console.log(result);
+				console.log('business',result);
 				conn.release();
-				console.log('finished calculation');
+				console.log('business','finished calculation');
 				done(err,null);
 					
 			}
@@ -756,15 +779,12 @@ function isOfficialExists(official_name,officials){
 }
 function getOfficial(official_name,officials){
 	for(var i in officials){
-		if(officials[i].name==official_name){
+		if(officials[i].staff_type==official_name){
 			return officials[i];
 		}
 	}
 	return {
-		sponsor_bonus:0,
-		attendance_bonus:0,
-		op_cost_bonus:0,
-		transfer_bonus:0
+		rank:0
 	};
 }
 /* Stadium Income
@@ -798,12 +818,12 @@ function getQuadrant(rank){
 }
 function getHomeTeams(team_id,start,limit,done){
 	pool.getConnection(function(err,conn){
-		console.log('open connection');
+		console.log('business','open connection');
 		conn.query("SELECT * FROM "+config.database.database+".game_fixtures WHERE game_id=?",
 					[game_id],
 					function(err,rs){
 							conn.release();
-							console.log('disconnected')
+							console.log('business','disconnected')
 							done(err,rs);
 							
 					});
@@ -811,15 +831,15 @@ function getHomeTeams(team_id,start,limit,done){
 	});
 }
 function getGameFixture(game_id,done){
-	console.log('get info for game_id #'+game_id);
+	console.log('business','get info for game_id #'+game_id);
 	pool.getConnection(function(err,conn){
-		console.log('open connection');
+		console.log('business','open connection');
 		conn.query("SELECT * FROM "+config.database.database+".game_fixtures WHERE game_id=?",
 					[game_id],
 					function(err,rs){
-							console.log(S(this.sql).collapseWhitespace().s);
+							console.log('business',S(this.sql).collapseWhitespace().s);
 							conn.release();
-							console.log('disconnected')
+							console.log('business','business','disconnected')
 							done(err,rs);
 						
 					});
@@ -827,8 +847,8 @@ function getGameFixture(game_id,done){
 	});
 }
 function getTeamProfile(game,done){
-	console.log(game);
-	console.log('get team profile');
+	console.log('business',game);
+	console.log('business','get team profile');
 	var home,away;
 	pool.getConnection(function(err,conn){
 		async.parallel([
@@ -856,7 +876,7 @@ function getTeamProfile(game,done){
 				},
 			],
 			function(err,result){
-				//console.log(result);
+				//console.log('business',result);
 				conn.release();
 				done(err,{home:result[0],away:result[1]});	
 		});

@@ -24,6 +24,7 @@
     </div>
 </div>
 <!-- -->
+<!--
 <script>
   window.fbAsyncInit = function() {
     // init the FB JS SDK
@@ -69,5 +70,38 @@ function fb_login(){
 	
 }
 </script>
+-->
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '<?=$FB_APP_ID?>',
+      xfbml      : true,
+      cookie : true,
+      version    : 'v2.2'
+    });
+  };
 
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+  function fb_login(){
+  
+   
+    FB.login(function(response) {
+      if (response.authResponse) {
+          console.log('Logged in.');
+          window.location = window.location;
+          document.location = "<?=$FB_AFTER_LOGIN_URL?>";
+        } else {
+          document.location = "http://<?=Configure::read('DOMAIN')?>";
+        }
+      },{scope: 'email,user_location,user_birthday'});
+      
+    }
+</script>
 <!-- Conversion: Supersoccer_activity_login_page --><img src="http://avn.innity.com/conversion/?cb=15406&conversion=707&value=[VALUE]" width="1" height="1" border="0"/>

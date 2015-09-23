@@ -921,8 +921,8 @@ class ApiController extends AppController {
 										WHERE game_id='{$n}' 
 										LIMIT 1");
 
-					$rs['data']['daily_stats'][$n]['fixture'] = $fixture[0]['game_fixtures'];
-					$rs['data']['daily_stats'][$n]['fixture']['ts'] = $fixture[0][0]['ts'];
+					$rs['data']['daily_stats'][$n]['fixture'] = @$fixture[0]['game_fixtures'];
+					$rs['data']['daily_stats'][$n]['fixture']['ts'] = @$fixture[0][0]['ts'];
 				}
 			}
 

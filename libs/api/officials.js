@@ -54,6 +54,7 @@ function official_list(game_team_id,done){
 }
 
 function hire_official(game_team_id,staff_id,meta,callback){
+	console.log('hire_official',game_team_id,staff_id);
 	prepareDb(function(conn){
 		async.waterfall(
 			[
@@ -131,6 +132,7 @@ function updateCache(conn,game_team_id,callback){
 					//-->					
 					if(staffs.length > 0){
 						for(var i in staffs){
+
 							o[staffs[i].staff_type] = staffs[i].rank;
 							if(staffs[i].staff_type=='gk_coach'){
 								staffs[i].meta = JSON.parse(staffs[i].meta);
@@ -144,14 +146,19 @@ function updateCache(conn,game_team_id,callback){
 								staffs[i].meta = JSON.parse(staffs[i].meta);
 								o.mid_tactics.push(staffs[i].meta.tactics.id);
 							}
-							if(staffs[i].staff_type=='fwd_coach'){
+							if(staffs[i].staff_type=='fw_coach'){
+								o['fwd_coach'] = staffs[i].rank;
 								staffs[i].meta = JSON.parse(staffs[i].meta);
 								o.fwd_tactics.push(staffs[i].meta.tactics.id);
 							}
 						}	
 					}
-					console.log(o);
+					
 					redisClient.set(name,JSON.stringify(o),function(err){
+						if(err){
+							console.log('updateStaffCache',err.message);
+						}
+						console.log('updateStaffCache',JSON.stringify(o));
 						callback(err);
 					});
 				});

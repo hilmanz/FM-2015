@@ -486,7 +486,7 @@ class ManageController extends AppController {
 			if($official['staff_type']=='gk_coach' ||
 				$official['staff_type']=='def_coach' ||
 				$official['staff_type']=='mid_coach' ||
-				$official['staff_type']=='fwd_coach'){
+				$official['staff_type']=='fw_coach'){
 				$random_tactic = $this->getRandomTactics($official['staff_type'],
 														 $official['rank']);
 				$officials[$n]['tactics'] = $random_tactic['name'];
@@ -505,7 +505,7 @@ class ManageController extends AppController {
 			$coach_tactics = array('gk_coach'=>array(7),
 	                        'def_coach'=>array(5,6,7),
 	                        'mid_coach'=>array(1,2,3,4),
-	                        'fwd_coach'=>array(1,2,3,4,6));
+	                        'fw_coach'=>array(1,2,3,4,6));
 
 			$tactics = $coach_tactics[$coach];
 			$n = sizeof($tactics)-1;

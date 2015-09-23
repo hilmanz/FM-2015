@@ -283,9 +283,9 @@ $weekly_performance = null;
         </div>
         <div class="club-info fl">
             <p>Morales</p>
-            <h4><?=$data['player']['morale']?>%</h4>
+            <h4><?=round($data['player']['morale'])?>%</h4>
             <p>Fitness</p>
-            <h4><?=$data['player']['fitness']?>%</h4>
+            <h4><?=round($data['player']['fitness'])?>%</h4>
         </div>
         <div class="club-info fl">
             <h5>
@@ -307,7 +307,7 @@ $weekly_performance = null;
                     <opta widget="playerprofile" sport="football" competition="8" season="2015" 
                         team="<?=str_replace('t','',$data['player']['original_team_id'])?>" player="<?=str_replace("p","",$data['player']['player_id'])?>" show_image="true" show_nationality="true" opta_logo="false" narrow_limit="400"></opta>
                 </div>
-                
+               
             	<div class="profileStats-container" style="display: block;">
                   <h2><span>Overall Performance</span></h2>
                   <div class="profileStatsContainer">
@@ -339,6 +339,21 @@ $weekly_performance = null;
                   </div><!-- end .profileStats-container -->
                 </div><!-- end .profileStats-container -->     
             </div><!-- end #Info -->
+             <div class="morale tr">
+                <h3>Info</h3>
+                <ul>
+                <?php foreach($data['player']['morale_bonuses'] as $morale):?>
+                    <li>
+                        <?php
+                        if($morale['value'] > 0){
+                            $morale['value'] = "+".$morale['value'];
+                        }
+                        ?>
+                        <?=$morale['name']?> (<?=$morale['value']?>)
+                    </li>
+                <?php endforeach;?>
+                </ul>
+            </div>
             <?php if(sizeof($data['daily_stats'])>0):?>
             <div id="chartbox" class="row">
                 <div class="stats"></div>

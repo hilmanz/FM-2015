@@ -352,10 +352,11 @@ Cache::config('_cake_model_', array(
 
 
 //Additional configurations
-Configure::write('FB.APP_ID','491900054220103');
-Configure::write('FB.SECRET','da627aba8b812be62ba21acc9d96965b');
+
+Configure::write('FB.APP_ID','280564288774787');
+Configure::write('FB.SECRET','eb853d44afdbc352d7566ccf9d6bf376');
 Configure::write('FB.AFTER_LOGIN_REDIRECT_URL','http://localhost/fm_2014/login/facebook_auth');
-Configure::write('DOMAIN','localhost/fantasy');
+Configure::write('DOMAIN','localhost/fm_2014');
 
 if(@$_SESSION['league']=='ita'){
 	Configure::write('API_URL',array('http://localhost:3022'));

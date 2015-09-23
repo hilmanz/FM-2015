@@ -12,7 +12,7 @@ var dateFormat = require('dateformat');
 var redis = require('redis');
 var S = require('string');
 var formations = require(path.resolve('./libs/game_config')).formations;
-var game_config = require(path.resolve('./libs/game_config'))	;
+var game_config = require(path.resolve('./libs/game_config'));
 var player_stats_category = require(path.resolve('./libs/game_config')).player_stats_category;
 var pool = {};
 var frontend_schema = "";
@@ -607,9 +607,11 @@ function getPlayers(game_team_id,callback){
 //get user's budget
 function getBudget(game_team_id,callback){
 	var sql = "SELECT SUM(initial_budget+total) AS budget \
-			FROM (SELECT budget AS initial_budget,0 AS total FROM "+config.database.database+".game_team_purse WHERE game_team_id = ?\
+			FROM (SELECT budget AS initial_budget,0 AS total \
+					FROM "+config.database.database+".game_team_purse WHERE game_team_id = ?\
 			UNION ALL\
-			SELECT 0,SUM(amount) AS total FROM "+config.database.database+".game_team_expenditures WHERE game_team_id = ?) a;";
+			SELECT 0,SUM(amount) AS total FROM "+config.database.database+".game_team_expenditures\
+			 WHERE game_team_id = ?) a;";
 	prepareDb(function(conn){
 		conn.query(sql,
 				[game_team_id,game_team_id],
@@ -746,7 +748,7 @@ function getPlayerOverallStats(game_team_id,player_id,callback){
 	console.log('getPlayerOverallStats',game_team_id,player_id);
 	var sql = "";
 	if(game_team_id!=0){
-		sql = "SELECT stats_name,stats_category,SUM(stats_value) AS total,SUM(a.points) as points\
+		sql = "SELECT stats_name,coach_bonus,stats_category,SUM(stats_value) AS total,SUM(a.points) as points\
 				FROM "+config.database.statsdb+".game_team_player_weekly a\
 				WHERE a.player_id=? AND a.game_team_id=?\
 				GROUP BY a.stats_name LIMIT 20000;";
@@ -776,7 +778,8 @@ function getPlayerTeamStats(game_team_id,player_id,callback){
 	redisClient.get('getPlayerTeamStats_'+league+'_'+game_team_id+'_'+player_id,function(err,rs){
 		if(JSON.parse(rs)==null){
 			console.log('getPlayerTeamStats','query from db');
-			var sql = "SELECT a.game_id,SUM(b.points) AS points,a.performance,b.matchday\
+			var sql = "SELECT a.game_id,SUM(b.points) AS points,a.coach_bonus,\
+						a.performance,b.matchday\
 						FROM "+config.database.statsdb+".game_match_player_points a\
 						INNER JOIN\
 						"+config.database.statsdb+".game_team_player_weekly b\
@@ -843,7 +846,7 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 			}
 			var sql = "";
 			if(game_team_id!=0){
-				sql = "SELECT a.game_id,stats_name,stats_category,SUM(stats_value) AS total,\
+				sql = "SELECT a.game_id,stats_name,stats_category,coach_bonus,SUM(stats_value) AS total,\
 						SUM(points) as points\
 						FROM "+config.database.statsdb+".game_team_player_weekly a\
 						WHERE a.player_id=? AND a.game_team_id=?\
@@ -891,7 +894,8 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 										passing_and_attacking:0,
 										defending:0,
 										goalkeeper:0,
-										mistakes_and_errors:0
+										mistakes_and_errors:0,
+										coach_bonus:0
 									};
 								}
 								if(result[i].stats_category!=''){
@@ -913,6 +917,7 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 
 										}
 									}
+									daily[result[i].game_id].coach_bonus = result[i].coach_bonus;
 								}
 								
 							}

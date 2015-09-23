@@ -171,38 +171,95 @@ class LoginController extends AppController {
 
 	public function facebook_auth()
 	{
-		App::import("Vendor", "facebook/facebook");
-		$fb = new Facebook(array(
+		//App::import("Vendor", "facebook/facebook");
+		require_once APP . 'Vendor' .DS. 'facebook-5.0/src/Facebook/autoload.php';
+		$fb = new Facebook\Facebook(array(
+				  'app_id' => $this->FB_APP_ID,
+				  'app_secret' =>  $this->FB_SECRET,
+				  'default_graph_version' => 'v2.2',
+				  ));
+		/*$fb = new Facebook(array(
 				  'appId'  => $this->FB_APP_ID,
 				  'secret' => $this->FB_SECRET,
 				  'cookie' => true)
 
-				  );
+				  );*/
+		$helper = $fb->getJavascriptHelper();
+		try {
+			
+		  $accessToken = $helper->getAccessToken();
+		
+		 
+		} catch(Facebook\Exceptions\FacebookResponseException $e) {
+		 	session_destroy();
+		 	// unset cookies
+			if (isset($_SERVER['HTTP_COOKIE'])) {
+			    $cookies = explode(';', $_SERVER['HTTP_COOKIE']);
+			    foreach($cookies as $cookie) {
+			        $parts = explode('=', $cookie);
+			        $name = trim($parts[0]);
+			        setcookie($name, '', time()-1000);
+			        setcookie($name, '', time()-1000, '/');
+			    }
+			}
+		  Cakelog::write('error', 'login.facebook_auth Error facebook :'.$e->getMessage());
+			$this->redirect("/login");
+		} catch(Facebook\Exceptions\FacebookSDKException $e) {
+		  // When validation fails or other local issues
+		 Cakelog::write('error', 'login.facebook_auth Error facebook :'.$e->getMessage());
+			$this->redirect("/login/error?e=3");
+		}
 
+		if (! isset($accessToken)) {
+		  $this->redirect("/login/error?e=2");
+		  exit;
+		}
+
+		
 		try{
 
-			$fb_id = $fb->getUser();
+			//$fb_id = $fb->getUser();
 			
-			if(intval($fb_id) > 0){
-				$me = $fb->api('/me');
-				$this->Session->write('UserFBDetail',$me);
-				$this->Session->write('Userlogin.is_login', true);
-				$this->Session->write('Userlogin.info',array('fb_id'=>$fb_id,
-											'username'=>'',
-											'name'=>$me['name'],
-											'birthday'=>$me['birthday'],
-											'email'=>@$me['email'],
-											'location'=> array('name', $me['location']['name']),
-											'role'=>1,
-											'access_token'=>$this->getAccessToken()));
-				$this->afterLogin();
-			}else{
+			//if(intval($fb_id) > 0){
+				$this->Session->write('fb_access_token',(string) $accessToken);
 
-				$this->redirect($fb->getLoginUrl());
-			}
+				$response = $fb->get('/me',$accessToken);
+				$me = $response->getGraphUser();
+				
+				if(isset($me['id'])){
+					if(isset($me['birthday'])){
+						$birthday = date("Y/m/d",$me['birthday']->getTimestamp());
+					}else{
+						$birthday = "";
+					}
+					if(isset($me['location'])){
+						$location = $me['location']['name'];
+					}else{
+						$location = '';
+					}
+					$this->Session->write('UserFBDetail',$me);
+					$this->Session->write('Userlogin.is_login', true);
+					$this->Session->write('Userlogin.info',array('fb_id'=>$me['id'],
+												'username'=>'',
+												'name'=>$me['name'],
+												'birthday'=>$birthday,
+												'email'=>@$me['email'],
+												'location'=> array('name', $location),
+												'role'=>1,
+												'access_token'=>$this->getAccessToken()));
+					$this->afterLogin();
+				}else{
+					Cakelog::write('error', 'unverified fb account : '.$me['id']);
+					$this->redirect("/login/error?e=-1");
+				}
+				
+			//}else{
+
+				//$this->redirect($fb->getLoginUrl());
+			//}
 		}catch(Exception $e){
 			Cakelog::write('error', 'login.facebook_auth Error facebook :'.$e->getMessage());
-			$this->redirect("/login/error?e=1");
+			$this->redirect("/login/error?e=0");
 		}
 		die();
 	}
@@ -240,12 +297,14 @@ class LoginController extends AppController {
 		$this->loadModel('User');
 		
 		$user_session = $this->Session->read('Userlogin.info');
+		
 		//pasang external tracking code here
-		curlGet('http://avn.innity.com/conversion/?cb=26575&conversion=719&value=[VALUE]');
+		curlGet('http://avn.innity.com/conversion/?cb=26575&conversion=719&value=[VALUE]',null);
 		//---->
 		//1. check if the user is already registered in database
 		$rs = $this->User->findByFb_id($user_session['fb_id']);
-
+		
+		
 		if(@$rs['User']['fb_id']==$user_session['fb_id']&&$user_session['fb_id']>0){
 		
 
@@ -256,6 +315,7 @@ class LoginController extends AppController {
 
 			//get team 
 			$user_session['team'] = $this->Game->getTeam($user_session['fb_id']);
+			
 			$this->Session->write('Userlogin.info',$user_session);
 			
 			//log time

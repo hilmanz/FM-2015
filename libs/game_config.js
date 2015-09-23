@@ -263,10 +263,11 @@ exports.staff_bonus = {
 		0, 0.15,0.2,0.25,0.3,0.4
 	],
 	dice:[
-		24,16,12,8,6,4
+		24,18,12,10,8,6
 	]
 
 };
+
 exports.markup_modifiers = [
 	0, //0 buy
 	0.5, //first buy
@@ -296,7 +297,7 @@ exports.quadrant_comparison = {
 };
 exports.player_base_mod = {
 	fatigue:0.5, //fatigue per match -> 100 x -0.5 = -50
-	regen:5 //base regen
+	regen:0.3 //base regen
 };
 exports.coach_regen_bonus = [0,0.1,0.2,0.3,0.4,0.5];
 exports.coach_fatigue_bonus = [0,0.05,0.1,0.15,0.2,0.25];
@@ -307,7 +308,7 @@ exports.morale_mods = {
 	fitness60:-15,
 	fitness50:-20,
 	played_avg:10,
-	happy_with_salary:10,
+	happy_with_salary:50,
 	unhappy_with_salary:-10,
 	played_last_2match:15,
 	unplayed_acc_match:-5, //x how many unplayed
@@ -327,6 +328,7 @@ exports.morale_mods = {
 	no_bonus: -15,
 	has_bonus: 15,
 	fit100: 20,
-	fit80 : 10
+	fit80 : 10,
+	original_player: 50
 }
 

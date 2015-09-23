@@ -76,6 +76,6 @@ function stats_translated($stats_name,$locale='id'){
 
 	);
 	
-	return $STATS_NAME[$locale][$stats_name];
+	return @$STATS_NAME[$locale][$stats_name];
 }
 ?>

@@ -2,7 +2,8 @@
 require_once APP . 'Vendor' . DS. 'lib/Predis/Autoloader.php';
 App::uses('AppController', 'Controller');
 App::uses('Sanitize', 'Utility');
-
+//reCaptcha library
+require_once APP . 'Vendor' . DS. 'recaptchalib.php';
 
 class UpgradeController extends AppController {
 
@@ -30,6 +31,7 @@ class UpgradeController extends AppController {
 		if(!$this->hasTeam()
 			&&$this->request->params['action']!='plan'
 			&&$this->request->params['action']!='pay'
+			&&$this->request->params['action']!='redeem'
 			&&$this->request->params['action']!='payment_success'
 			&&$this->request->params['action']!='payment_error'
 			&&$this->request->params['action']!='payment_pending'
@@ -60,9 +62,14 @@ class UpgradeController extends AppController {
 			$this->set('doku_api', $doku_api);
 			$this->set('params',$data);
 			$this->render('doku');
+		}else if($this->request->data['payment_method']=='voucher'){
+			
+			$this->voucher();
+			$this->render('voucher');
 		}
 		else
 		{
+
 			$this->pay_with_ecash();
 			$this->render('ecash');
 		}
@@ -612,6 +619,159 @@ class UpgradeController extends AppController {
 		$this->set('transaction_id',$transaction_id);
 		$this->set('ecash_url',$rs['data']);
 	}
+	public function voucher(){
+		$user_id = $this->userDetail['User']['id'];
+
+		
+		
+		$transaction_id = 'v-'.date("YmdHis");
+		$this->set('transaction_id',$this->request->data['po_number']);
+		$trxinfo = unserialize(decrypt_param($this->request->data['trxinfo']));
+		
+		//make sure that user will be banned for 24 hour if they input wrong codes 5 times
+		$check = $this->Game->getInputAttempt($user_id,
+											'voucher_att');
+
+		if($check['status']==1){
+			if(intval($check['data']) > Configure::read('REDEEM_MAXIMUM_TRY')){
+				$this->redirect('/voucher/disallowed');
+			}
+		}
+		/*
+		if($this->request->is('post')){
+			$this->checkCode(intval($check['data']));
+		}*/
+		$captcha_public_key = Configure::read("reCaptcha_PUBLIC_KEY");
+		$captcha_html = recaptcha_get_html($captcha_public_key);
+		$this->set('captcha_html',$captcha_html);
+		$this->set('trxinfo',$this->request->data['trxinfo']);
+	}
+	public function redeem(){
+		$user_id = intval($this->userDetail['User']['id']);
+		//make sure that user will be banned for 24 hour if they input wrong codes 5 times
+		$check = $this->Game->getInputAttempt($user_id,'voucher_att');
+		if($this->request->is('post')){
+			$this->checkCode(intval($check['data']));
+		}else{
+			$this->render('voucher_error');
+		}
+	}
+	/*voucher stuffs */
+	private function checkCode($total_try=0){
+		$user_id = intval($this->userDetail['User']['id']);
+
+		if($this->isCaptchaValid()){
+			if($voucher = $this->redeemCode($user_id,$this->request->data['kode'])){
+				
+				$this->set('interval',$voucher['subscription_time']);
+				$this->render('voucher_success');
+			}else{
+				$this->Game->setInputAttempt($user_id,
+											'voucher_att',$total_try + 1);
+				$this->Session->setFlash('Maaf, kode yang lo masukkan salah !');
+				$this->render('voucher_error');
+			}
+		}else{
+			$this->Session->setFlash('Maaf, kode captcha yang lo masukkan salah !');
+			$this->render('voucher_error');
+		}
+
+	}
+	private function isCaptchaValid(){
+
+		$resp = recaptcha_check_answer (
+								Configure::read("reCaptcha_PRIVATE_KEY"),
+                                $_SERVER["REMOTE_ADDR"],
+                                $this->request->data["recaptcha_challenge_field"],
+                                $this->request->data["recaptcha_response_field"]);
+		return $resp->is_valid;
+	}
+
+	private function redeemCode($user_id,$voucher_code){
+		
+		$trxinfo = unserialize(decrypt_param($this->request->data['trxinfo']));
+		$transaction_id = $trxinfo['po_number'];
+		
+		$voucher_code = intval($voucher_code);
+		$rs = $this->Game->query("SELECT * FROM fantasy.vouchers a
+							WHERE voucher_no = {$voucher_code} AND n_status=0;");
+
+		
+		if(sizeof($rs)==1){
+			//then the voucher is existed
+			$this->User->query("UPDATE vouchers SET n_status = 1,
+								redeemed_date = NOW()
+								WHERE id = ".$rs[0]['a']['id']);
+
+			$this->User->query("INSERT INTO voucher_redeemers(user_id,voucher_id)
+								VALUES({$user_id},{$rs[0]['a']['id']});");
+			
+			$this->User->query("UPDATE users SET paid_plan='{$trxinfo['plan']}'
+										WHERE id={$user_id}");
+
+			
+			$rs_order = $this->MembershipTransactions->findByPo_number($transaction_id);
+			
+
+			
+			$userData = $this->userData;
+
+			$transaction_name = 'Purchase Order #'.$transaction_id;
+			$detail = json_encode($trxinfo);
+
+			try{
+				$amount = 0;
+				$dataSource = $this->MembershipTransactions->getDataSource();
+				$dataSource->begin();
+				
+				$save_data = array(
+									'fb_id' => $userData['fb_id'],
+									'transaction_dt' => date("Y-m-d H:i:s"),
+									'transaction_name' => $transaction_name,
+									'po_number' => $transaction_id,
+									'transaction_type' => 'SUBSCRIPTION',
+									'amount' => 0,
+									'payment_method' => 'voucher',
+									'details' => $detail,
+									'league' => $_SESSION['league'],
+									'n_status'=>0
+								);
+
+				
+				$this->MembershipTransactions->save($save_data);
+				
+				$interval = intval($rs[0]['a']['subscription_time']);
+
+				$this->MembershipTransactions->query("INSERT INTO member_billings
+											(fb_id,log_dt,expire)
+											VALUES('{$userData['fb_id']}',
+													NOW(), NOW() + INTERVAL {$interval} MONTH)");
+				
+				$this->User->query("UPDATE users SET paid_member=1,paid_member_status=1
+									WHERE fb_id='{$userData['fb_id']}'");
+									
+							
+				$this->User->query("UPDATE users SET paid_plan='{$trxinfo['plan']}'
+									WHERE fb_id='{$userData['fb_id']}'");
+
+
+
+				$dataSource->commit();
+				return $rs[0]['a'];
+			}catch(Exception $e){
+				$dataSource->rollback();
+				Cakelog::write('error', 'Upgrade.pay_with_voucher 
+					 message:'.$e->getMessage());
+				return false;
+				
+			}
+			
+		}else{
+			return false;
+		}
+
+	}
+	/*end of voucher stuffs */
 
 	public function payment_success(){
 		
