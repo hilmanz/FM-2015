@@ -175,6 +175,11 @@ class ProfileController extends AppController {
 							$this->redirect("/profile/send_activation");
 						}
 					}
+					else if($rs['User']['paid_member']==-1)
+					{
+						$this->Session->write('Userlogin.is_login', true);
+						$this->redirect('/upgrade/plan');
+					}
 					else if($rs_user['User']['register_completed'] == 0)
 					{
 						$this->Session->write('Userlogin.is_login', true);

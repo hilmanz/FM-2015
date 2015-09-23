@@ -232,6 +232,9 @@ class Game extends AppModel {
 	public function getAvailableOfficials($team_id){
 		$response = $this->api_call('/official/list/'.$team_id);
 		if($response['status']==1){
+			foreach($response['officials'] as $n=>$v){
+				$response['officials'][$n]['image'] = "http://".Configure::read('DOMAIN').'/images/staffs/'.$response['officials'][$n]['image'];
+			}
 			return $response['officials'];
 		}
 	}
@@ -240,6 +243,9 @@ class Game extends AppModel {
 			array('type'=>$type));
 		
 		if($response['status']==1){
+			foreach($response['data'] as $n=>$v){
+				$response['data'][$n]['image'] = "http://".Configure::read('DOMAIN').'/images/staffs/'.$response['data'][$n]['image'];
+			}
 			return $response['data'];
 		}
 	}

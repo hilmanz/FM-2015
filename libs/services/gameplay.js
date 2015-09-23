@@ -353,6 +353,7 @@ exports.player_team_data = function(req,res){
 	async.waterfall(
 		[
 			function(callback){
+				console.log('GET TEAM PLAYER DETAIL');
 				gameplay.getTeamPlayerDetail(req.params.game_team_id,
 											 req.params.id,
 											 function(err,player){
@@ -360,15 +361,21 @@ exports.player_team_data = function(req,res){
 				});
 			},
 			function(player,callback){
+				console.log('GET TEAM PLAYER STATS');
 				gameplay.getPlayerTeamStats(
 							req.params.game_team_id,
 							req.params.id,
 							function(err,rs){
-
-								callback(err,{player:player,stats:rs});	
+								if(!err){
+									callback(err,{player:player,stats:rs});	
+								}else{
+									callback(err,{player:player,stats:null});	
+								}
+								
 							});
 			},
 			function(result,callback){
+				console.log('GET TEAM PLAYER OVERAL STATS');
 				if(result.player != null){
 					gameplay.getPlayerOverallStats(req.params.game_team_id,
 												   result.player.player_id,
@@ -383,7 +390,7 @@ exports.player_team_data = function(req,res){
 				}
 			},
 			function(result,callback){
-				
+				console.log('GET TEAM PLAYER DAILY STATS');
 				if(result.player != null){
 					gameplay.getPlayerDailyTeamStats(req.params.game_team_id,
 												   result.player.player_id,
@@ -400,13 +407,16 @@ exports.player_team_data = function(req,res){
 			}
 		],
 		function(err,result){
-			console.log(result);
+			console.log('RESULT : ',result);
 			if(err){
+				console.log('ERROR :',err.message);
 				handleError(res);
 			}else{
 				if(result){
+					console.log(result);
 					res.json(200,{status:1,data:result});
 				}else{
+					console.log('no result');
 					res.send(200,{status:0,data:{player:{},stats:[]}});
 				}
 			}

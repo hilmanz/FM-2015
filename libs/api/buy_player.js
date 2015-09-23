@@ -100,12 +100,12 @@ var negotiate_transfer_process = function(conn,
 						//@TODO we need to calculate the player's performance value to affect
 						//the latest transfer value
 						if(rs.length>0){
-							rs[0].performance = rs[0].performance || 0;
+							rs[0].performance = (typeof rs[0].performance !== 'undefined' ? rs[0].performance : 0);
 							if(rs[0].performance!=0){
 								transfer_value = transfer_value + ((((rs[0].performance / 10) * 1)/100)*transfer_value);
 							}
 						}
-						console.log(rs[0].performance);
+						//console.log(rs[0].performance);
 						console.log('new transfer_value : ',transfer_value);
 						player.transfer_value = transfer_value;
 						cb(err,player,tw_id);

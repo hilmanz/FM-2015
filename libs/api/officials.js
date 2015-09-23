@@ -201,7 +201,9 @@ function get_user_officials(conn,game_team_id,done){
 	async.waterfall(
 		[
 			function(callback){
-				conn.query("SELECT * FROM "+config.database.database+".game_team_staffs\
+				conn.query("SELECT a.*,b.image FROM "+config.database.database+".game_team_staffs a\
+							INNER JOIN "+config.database.database+".master_staffs b\
+							ON a.staff_id = b.id\
 						    WHERE game_team_id = ? LIMIT 30;",
 							[game_team_id],
 							function(err,rs){

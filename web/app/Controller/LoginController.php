@@ -328,10 +328,10 @@ class LoginController extends AppController {
 				$this->Session->write('Userlogin.is_login', false);
 				$this->redirect('/profile/create_password');
 			}else if($rs['User']['paid_member']==-1){
+
 				$this->redirect('/upgrade/plan');
+
 			}else if($user_session['team']==null){
-				
-				
 				$this->redirect('/profile/register_team');
 			}else if($user_session['team']!=null&&$user_session['register_completed']==0){
 				$this->redirect('/profile/register_staff');

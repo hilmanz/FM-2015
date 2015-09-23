@@ -647,7 +647,7 @@ function getPlayerDetail(player_id,callback){
 					
 					conn.release();
 					if(rs!=null && rs.length==1){
-						callback(err,rs[0]);re	
+						callback(err,rs[0]);	
 					}else{
 						callback(err,null);
 					}
@@ -705,7 +705,7 @@ function getTeamPlayerDetail(game_team_id,player_id,callback){
 
 						
 					}
-					console.log(rs);
+					console.log('the player : ',rs);
 					cb(null,rs);
 				});
 			}else{
@@ -796,11 +796,16 @@ function getPlayerTeamStats(game_team_id,player_id,callback){
 									function(err,rs){
 										console.log(S(this.sql).collapseWhitespace().s);
 										conn.release();
-										redisClient.set('getPlayerTeamStats_'+league+'_'+game_team_id+'_'+player_id,
+										if(rs!=null){
+											redisClient.set('getPlayerTeamStats_'+league+'_'+game_team_id+'_'+player_id,
 														JSON.stringify(rs),
 														function(err,result){
-											callback(err,rs);	
-										});
+												callback(err,rs);	
+											});
+										}else{
+											callback(null,null);
+										}
+										
 										
 								});
 						});
