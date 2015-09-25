@@ -1,4 +1,5 @@
 var S = require('string');
+var async = require('async');
 /**
 * module for automatically add in-game cash based on a fraction of latest points. 
 * (currently we set for 10% of latest points)
@@ -16,17 +17,44 @@ exports.setConfig = function(c){
 }
 //adding cash
 function adding_cash(conn,fb_id,transaction_name,amount,details,callback){
-	conn.query("INSERT INTO "+config.database.frontend_schema+".game_transactions\
-				(fb_id,transaction_dt,transaction_name,amount,details)\
-				VALUES\
-				(?,NOW(),?,?,?)\
-				ON DUPLICATE KEY UPDATE\
-				amount = VALUES(amount);",
-				[fb_id,transaction_name,amount,details],
-				function(err,rs){
-					console.log(S(this.sql).collapseWhitespace().s);
-					callback(err,rs);
-				});
+	async.waterfall([
+		function(cb){
+			conn.query("SELECT paid_plan FROM "+config.database.frontend_schema+".users\
+						WHERE fb_id = ? LIMIT 1",[],function(err,rs){
+							if(!err && rs){
+								if(rs[0].paid_plan == 'pro1' || rs[0].paid_plan == 'pro2'){
+									cb(null,true);
+								}
+							}else{
+								cb(null,false);
+							}
+						});
+		},
+		function(is_pro,cb){
+			if(is_pro){
+
+				console.log('coin',fb_id,'is pro, got coins');
+				//only team who is pro member can have coins
+				conn.query("INSERT INTO "+config.database.frontend_schema+".game_transactions\
+							(fb_id,transaction_dt,transaction_name,amount,details)\
+							VALUES\
+							(?,NOW(),?,?,?)\
+							ON DUPLICATE KEY UPDATE\
+							amount = VALUES(amount);",
+							[fb_id,transaction_name,amount,details],
+							function(err,rs){
+								console.log(S(this.sql).collapseWhitespace().s);
+								callback(err,rs);
+							});
+			}else{
+				console.log('coin',fb_id,'is not pro, no coin');
+				callback(null,1);
+			}
+		}
+	],function(err,rs){
+		callback(err,rs);
+	});
+	
 }
 
 exports.adding_cash = adding_cash;

@@ -83,7 +83,7 @@ exports.update = function(conn,since_id,until_id,update_rank,game_id,done){
 					
 			},
 			function(matchday,cb){
-				
+				//update_rank = false;
 				if(update_rank){
 					console.log('update_rank','NOW WE RECALCULATE THE RANKS');
 					recalculate_ranks(conn,matchday,function(err){
@@ -129,10 +129,14 @@ function recalculate_ranks(conn,matchday,done){
 	console.log('recalculate ranks');
 	async.waterfall([
 		function(callback){
+			console.log('recalculate_ranks skipped');
+			/*
 			conn.query("CALL "+frontend_schema+".recalculate_rank(?);",[league],function(err,rs){
 				if(err) console.log(err);
 				callback(err);
 			});
+			*/
+			callback(null);
 		},
 		function(callback){
 			conn.query("SELECT matchday FROM "+frontend_schema+".weekly_points \
@@ -143,32 +147,24 @@ function recalculate_ranks(conn,matchday,done){
 		},
 		function(matchdays,callback){
 			//now we only need to recalculate 1 matchday
-			/*
-			async.eachSeries(matchdays,function(matchday,next){
-				conn.query("CALL "+frontend_schema+".recalculate_weekly_rank(?,?);",
-							[league,matchday.matchday],function(err,rs){
-								console.log('recalculating matchday #',matchday.matchday,' ranks');
-								next();				
-							});
-			},
-			function(err){
-				callback(err,matchdays);
-			});
+			console.log('recalculate_weekly_rank skipped');
+			/*conn.query("CALL "+frontend_schema+".recalculate_weekly_rank(?,?);",
+								[league,matchday],function(err,rs){
+									console.log('recalculating matchday #',matchday,' ranks');
+									callback(err);
+								});
 			*/
-		conn.query("CALL "+frontend_schema+".recalculate_weekly_rank(?,?);",
-							[league,matchday],function(err,rs){
-								console.log('recalculating matchday #',matchday,' ranks');
-								callback(err);
-							});
+			callback(null);
 		},
 		function(callback){
 			console.log('PRO WEEKLY RANK RECALCULATE');
-			
+				/*
 				conn.query("CALL "+frontend_schema+".recalculate_weekly_rank_pro(?,?);",
 							[league,matchday],function(err,rs){
 								console.log('recalculating matchday #',matchday,' pro weekly  ranks');
 								callback(err);	
-							});
+							});*/
+			callback(null);
 			
 		},
 		function(callback){
@@ -182,6 +178,8 @@ function recalculate_ranks(conn,matchday,done){
 		},
 		function(months,callback){
 			//console.log(months);
+			callback(null);
+			/*
 			async.eachSeries(months,function(m,next){
 				var mth = m.bln;
 				var yr = m.thn;
@@ -195,6 +193,7 @@ function recalculate_ranks(conn,matchday,done){
 				callback(err);
 
 			});
+			*/
 		},
 	],
 
@@ -406,7 +405,7 @@ function updatePoints(conn,team,stats,done){
 
 function updateWeeklyPoints(conn,team_id,game_points,done){
 	var sql = "INSERT INTO "+frontend_schema+".weekly_points\
-	                (team_id,game_id,matchday,matchdate,points,extra_points,league)\
+	                (team_id,game_id,matchday,matchdate,points,extra_points,league,t_month,t_year)\
 	                VALUES ?";
 	try{
 		if(game_points.length > 0){
@@ -422,6 +421,8 @@ function updateWeeklyPoints(conn,team_id,game_points,done){
 				params.push(weekly.total_points);
 				params.push(weekly.extra_points);
 				params.push(league);
+				params.push((new Date(weekly.match_date)).getMonth()+1);
+				params.push((new Date(weekly.match_date)).getFullYear());
 				bulks.push(params);
 			}
 			console.log(bulks);
@@ -434,7 +435,7 @@ function updateWeeklyPoints(conn,team_id,game_points,done){
 				conn.query(sql,
 			                [bulks],
 			                function(err,rs){
-			                	console.log(S(this.sql).collapseWhitespace().s);
+			                	console.log('weekly_points',S(this.sql).collapseWhitespace().s);
 			                	console.log("updating #",team_id," week #",weekly.matchday,'--->',weekly.total_points);
 			                	done(err);
 			                });
