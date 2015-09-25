@@ -461,8 +461,11 @@ class ManageController extends AppController {
 				if($rs['status']==1){
 					$msg = "@p1_".$this->userDetail['User']['id']." telah merekrut {$rs['officials']['name']} baru.";
 					$this->Info->write('hire staff',$msg);
+					$this->Session->setFlash("Staff berhasil di rekrut !");
+				}else{
+					$this->Session->setFlash("Mohon maaf, tidak bisa merekrut orang ini. Pastikan Koin loe cukup !");
 				}
-				$this->Session->setFlash("Staff berhasil di rekrut !");
+				
 				$this->redirect('/manage/staff');
 			}
 		}

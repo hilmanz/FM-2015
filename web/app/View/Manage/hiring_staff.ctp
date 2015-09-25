@@ -16,7 +16,7 @@
                             ?>
                             <div class="thumbStaff">
                                 <div class="avatar-big">
-                                    <img src="<?=$this->Html->url('/content/thumb/'.$img)?>" />
+                                    <img src="<?=$official['image']?>" />
                                 </div><!-- end .avatar-big -->
                                 <p><?=h($official['name'])?></p>
                                 <p class="rank">
@@ -36,6 +36,15 @@
                                     <?php if(!isset($official['hashed_data'])){
                                         $official['hashed_data'] = encrypt_param(json_encode(array('staff_id'=>$official['id'])));
                                     }?>
+                                    <?php if($official['price'] > 0):?>
+                                    <div class="price">
+                                        <h4 class="yellow"><?=number_format($official['price'])?> Coins</h4>
+                                    </div>
+                                    <?php else:?>
+                                    <div class="price">
+                                        <h4 class="yellow">FREE</h4>
+                                    </div>
+                                    <?php endif;?>
                                     <a href="<?=$this->Html->url('/manage/hiring_staff?hire=1&id='.$official['id'].'&r='.$official['hashed_data'])?>" class="button">
                                         Rekrut
                                     </a>

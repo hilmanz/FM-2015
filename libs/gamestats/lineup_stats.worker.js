@@ -859,6 +859,21 @@ function getPlayerDailyTeamStats(conn,game_team_id,player_id,player_pos,matchday
 			async.eachSeries(weekly,function(w,next){
 				async.waterfall([
 					function(cb){
+						console.log('ISSUE1','get morale and fitness from cache');
+						redisClient('p_'+league+'_'+w.game_team_id+'_'+w.player_id,function(err,data){
+							var fitness = 0;
+							var morale = 0;
+							if(data!=null){
+								var o = JSON.parse(data);
+								fitness = o.fitness;
+								morale = o.morale;
+							}
+							cb(err,morale,fitness);
+						});
+					},
+					function(morale,fitness,cb){
+						var player_mod = (morale+fitness) / 200;
+						console.log('ISSUE1',w.player_id,'morale : '+morale,'fitness : ',fitness);
 						console.log('ISSUE1','point ',w.points,'+',w.points,'*',coach_bonus,'=',(w.points + (w.points * coach_bonus)));
 						conn.query("INSERT INTO "+config.database.statsdb+".game_team_player_weekly\
 								(game_id,game_team_id,matchday,player_id,stats_category,\
@@ -877,7 +892,7 @@ function getPlayerDailyTeamStats(conn,game_team_id,player_id,player_pos,matchday
 								 w.category,
 								 w.stats_name,
 								 w.stats_value,
-								 (w.points + (w.points * coach_bonus)),
+								 ((w.points*player_mod) + ((w.points * player_mod) * coach_bonus)),
 								 coach_bonus,
 								 w.position_no
 								 ],function(err,rs){
@@ -1263,6 +1278,7 @@ function updateLineupStats(conn,game_id,lineups,summary,player_stats,in_game,don
 							callback(null,coach_bonus);
 						});
 					},
+
 					function(coach_bonus,callback){
 						conn.query("SELECT game_id,player_id,stats_name \
 									FROM "+config.database.statsdb+".master_player_stats \
@@ -1281,6 +1297,19 @@ function updateLineupStats(conn,game_id,lineups,summary,player_stats,in_game,don
 									});
 					},
 					function(coach_bonus,isStarter,callback){
+						redisClient.get('p_'+league+'_'+item.game_team_id+'_'+item.player_id,function(err,data){
+							var fitness = 0;
+							var morale = 0;
+							if(data != null){
+								var o = JSON.parse(data);
+								fitness = o.fitness;
+								morale = o.morale;
+							}
+							cb(err,coach_bonus,isStarter,fitness,morale);
+						});
+					},
+					function(coach_bonus,isStarter,fitness,morale,callback){
+						var player_mod = (fitness+morale) / 200;
 						for(var i in player_stats){
 							/*console.log('ISSUE1',item.game_team_id,'check -> ',
 										item.player_id,'--',player_stats[i].player_id);*/
@@ -1294,7 +1323,7 @@ function updateLineupStats(conn,game_id,lineups,summary,player_stats,in_game,don
 								//}
 								console.log('point total : ',item.player_id,'#',stats.points,'+',stats.points,'x',coach_bonus);
 								stats.original_points = stats.points;
-								stats.points = stats.points + (stats.points*coach_bonus);
+								stats.points = (stats.points*player_mod) + ((stats.points*player_mod)*coach_bonus);
 								console.log('point total :',item.player_id,'->',stats.points);
 								var apts =  summary[player_stats[i].team_id].average;
 								stats.performance = ((stats.points - apts)/apts)*100;

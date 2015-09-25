@@ -26,6 +26,14 @@ $coach_tactics = array('gk_coach'=>array(7),
                     <h1 class="red">Staff</h1>
                     <p>Tentukan sendiri staff mana yang akan Anda rekrut untuk membantu Anda mengelola tim dan klab secara maksimal. Pilih dengan bijak dan sesuaikan dengan kondisi keuangan.</p>
                 </div><!-- end .row-2 -->
+                <?php
+                $msg = $this->Session->flash();
+                if(strlen($msg)>0):
+                ?>
+                
+                        <?=$msg?>
+               
+                <?php endif;?>
                 <form class="theForm">
                     <div class="row-2">
                         <div class=" staff-list" id="available">

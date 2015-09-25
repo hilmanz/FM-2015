@@ -2,9 +2,7 @@
 api related to officials
 */
 var config = {};
-exports.setConfig = function(c){
-	config = c;
-}
+
 
 var crypto = require('crypto');
 var fs = require('fs');
@@ -15,10 +13,18 @@ var mysql = require('mysql');
 var dateFormat = require('dateformat');
 var redis = require('redis');
 var formations = require(path.resolve('./libs/game_config')).formations;
+var game_config = require(path.resolve('./libs/game_config'));
+var cash = require(path.resolve('./libs/gamestats/game_cash'));
 var S = require('string');
+var team_info = require(path.resolve('./libs/api/team_info'));
 var pool = {};
 var league = 'epl';
 var redisClient = {};
+exports.setConfig = function(c){
+	config = c;
+	cash.setConfig(config);
+	team_info.setConfig(config);
+}
 exports.setLeague = function(l){
 	league = l;
 }
@@ -59,25 +65,69 @@ function hire_official(game_team_id,staff_id,meta,callback){
 		async.waterfall(
 			[
 				function(callback){
+					//need to know how much coin the team has
+					team_info.getTeamInfo(conn,game_team_id,league,function(err,rs){
+						console.log('team_info',JSON.stringify(rs));
+						callback(null,rs);	
+					});
+					
+				},
+				function(team_info,callback){
+					var fb_id = team_info.game_user.fb_id;
+					cash.get_current_cash(conn,fb_id,function(err,coins){
+						callback(err,fb_id,coins);
+					});
+				},
+				function(fb_id,coins,callback){
 					conn.query("SELECT * FROM "+config.database.database+".master_staffs\
 								 WHERE id IN (?) LIMIT 1;",[staff_id],function(err,rs){
 								 	console.log(S(this.sql).collapseWhitespace().s);
-								 	callback(err,rs[0]);
+								 	callback(err,fb_id,coins,rs[0]);
 								 });
 				},
-				function(staff,callback){
-					conn.query("INSERT IGNORE INTO "+config.database.database+".game_team_staffs\
-					(game_team_id,staff_id,name,staff_type,salary,recruit_date,rank,meta)\
-					VALUES\
-					(?,?,?,?,?,NOW(),?,?);",
-					[game_team_id,staff.id,staff.name,staff.staff_type,staff.salary,staff.rank,meta],
-					function (err,rs){
-						console.log(S(this.sql).collapseWhitespace().s);
-						callback(err,rs.insertId,staff.id);
-					});		
+				function(fb_id,coins,staff,callback){
+					console.log(staff);
+					console.log('coins : ',coins,'price : ',
+						game_config.staff_price[staff.staff_type][staff.rank]);
+					if(coins >= game_config.staff_price[staff.staff_type][staff.rank]){
+						conn.query("INSERT IGNORE INTO "+config.database.database+".game_team_staffs\
+						(game_team_id,staff_id,name,staff_type,salary,recruit_date,rank,meta)\
+						VALUES\
+						(?,?,?,?,?,NOW(),?,?);",
+						[game_team_id,staff.id,staff.name,staff.staff_type,staff.salary,staff.rank,meta],
+						function (err,rs){
+							console.log(S(this.sql).collapseWhitespace().s);
+							callback(err,rs.insertId,staff.id,fb_id,game_config.staff_price[staff.staff_type][staff.rank]);
+						});		
+					}else{
+						callback(null,0,staff.id,fb_id,game_config.staff_price[staff.staff_type][staff.rank]);
+					}
+					
+				},
+				function(insertId,staff_id,fb_id,staff_price,callback){
+					if(insertId > 0){
+						conn.query("INSERT INTO "+config.database.frontend_schema+".game_transactions\
+							(fb_id,transaction_dt,transaction_name,amount,details)\
+							VALUES\
+							(?,NOW(),?,?,?)\
+							ON DUPLICATE KEY UPDATE\
+							amount = VALUES(amount);",
+							[fb_id,'hire_staff_'+staff_id+'_'+(new Date().getTime()),(staff_price * -1),'hire staff'],
+							function(err,rs){
+								console.log(S(this.sql).collapseWhitespace().s);
+								console.log('Update Coins');
+								cash.update_cash_summary(conn,fb_id,function(err,rs){
+									callback(err,insertId,staff_id);
+								});
+								
+							});
+					}else{
+						callback(null,insertId,staff_id);
+					}
 				},
 				function(insertId,staff_id,callback){
-					conn.query("SELECT * FROM "+config.database.database+".game_team_staffs a\
+					if(insertId > 0){
+						conn.query("SELECT * FROM "+config.database.database+".game_team_staffs a\
 								WHERE a.game_team_id = ? AND a.staff_id = ?;",
 								[game_team_id,staff_id],
 								function(err,rs){
@@ -85,14 +135,23 @@ function hire_official(game_team_id,staff_id,meta,callback){
 									console.log(rs);
 									callback(err,rs[0]);
 								});
+					}else{
+						callback(null,null);
+					}
+					
 				},
 				function(staff,callback){
-					updateCache(conn,game_team_id,function(e){
+					if(staff!=null){
+						updateCache(conn,game_team_id,function(e){
 						if(e!=null){
 							console.log('error_staff_cache',e.message());
 						}
 						callback(null,staff);
-					});
+						});
+					}else{
+						callback(null,null);
+					}
+					
 				}
 			],
 			function(err,result){
@@ -190,7 +249,11 @@ function get_master_staffs(game_team_id,type,callback){
 							 "+config.database.database+".game_team_staffs\
 						WHERE game_team_id = ?) AND staff_type = ? LIMIT 20;",
 					[game_team_id,type],function (err,rs){
-						console.log(S(this.sql).collapseWhitespace().s);
+						console.log('master-staff',S(this.sql).collapseWhitespace().s);
+						for(var i in rs){
+							console.log('master-staff',rs[i].rank,game_config.staff_price[rs[i].staff_type][rs[i].rank]);
+							rs[i].price = game_config.staff_price[rs[i].staff_type][rs[i].rank];
+						}
 						conn.release();
 						callback(err,rs);
 					});

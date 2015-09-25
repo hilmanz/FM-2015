@@ -32,7 +32,7 @@ function adding_cash(conn,fb_id,transaction_name,amount,details,callback){
 		},
 		function(is_pro,cb){
 			if(is_pro){
-
+				
 				console.log('coin',fb_id,'is pro, got coins');
 				//only team who is pro member can have coins
 				conn.query("INSERT INTO "+config.database.frontend_schema+".game_transactions\
@@ -73,3 +73,16 @@ function update_cash_summary(conn,fb_id,callback){
 				});
 }
 exports.update_cash_summary = update_cash_summary;
+
+
+exports.get_current_cash = function(conn,fb_id,callback){
+	conn.query("SELECT cash FROM "+config.database.frontend_schema+".game_team_cash\
+				WHERE fb_id = ? LIMIT 1;",[fb_id],function(err,rs){
+					console.log(S(this.sql).collapseWhitespace().s);
+					var cash = 0;
+					if(rs!=null && rs.length > 0){
+						cash = rs[0].cash;
+					}
+					callback(err,cash);
+				});
+}

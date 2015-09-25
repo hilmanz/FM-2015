@@ -59,7 +59,7 @@ function getLineup(redisClient,game_team_id,callback){
 					console.log('LINEUP','REDIS KEY : ','game_team_lineup_'+league+'_'+game_team_id);
 					redisClient.get('game_team_lineup_'+league+'_'+game_team_id,function(err,lineup){
 						var rs = JSON.parse(lineup);
-						console.log('LINEUP','-->',rs);
+						//console.log('LINEUP','-->',rs);
 						callback(err,rs);
 					});
 					//
@@ -84,7 +84,7 @@ function getLineup(redisClient,game_team_id,callback){
 									'game_team_lineup_'+league+'_'+game_team_id
 									,JSON.stringify(rs)
 									,function(err,lineup){
-										console.log('LINEUP','store to cache',rs);
+										//console.log('LINEUP','store to cache',rs);
 										callback(err,rs);
 									});
 						});
@@ -209,8 +209,8 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 								[game_team_id,players],
 								function(err,rs){
 									//console.log(S(this.sql).collapseWhitespace().s);
-									console.log('LINEUP','game_team_lineup_'+game_team_id,S(this.sql).collapseWhitespace().s);
-									console.log(rs);
+									//console.log('LINEUP','game_team_lineup_'+game_team_id,S(this.sql).collapseWhitespace().s);
+									//console.log(rs);
 									callback(null,rs);
 								});
 					
@@ -228,11 +228,11 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 									callback(err,rs);
 								});
 						}else{
-							console.log('LINEUP','game_team_lineup_'+game_team_id,'invalid positions');
+							//console.log('LINEUP','game_team_lineup_'+game_team_id,'invalid positions');
 							callback(new Error('invalid player positions'),[]);
 						}
 					}else{
-						console.log('LINEUP','game_team_lineup_'+game_team_id,'one or more player doesnt belong to the team');
+						//console.log('LINEUP','game_team_lineup_'+game_team_id,'one or more player doesnt belong to the team');
 						callback(new Error('one or more player doesnt belong to the team'),[]);
 					}
 				},
@@ -243,7 +243,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 								WHERE match_status = 0 ORDER BY matchday ASC LIMIT 1;",
 								[],
 								function(err,matchday){
-								console.log('LINEUP','game_team_lineup_'+game_team_id,'matchday : ',matchday[0].matchday);
+								//console.log('LINEUP','game_team_lineup_'+game_team_id,'matchday : ',matchday[0].matchday);
 								callback(err,rs,matchday[0].matchday);
 					});	
 				},
@@ -254,7 +254,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 								WHERE match_status = 0 ORDER BY matchday ASC LIMIT 1;",
 								[],
 								function(err,matchday){
-								console.log('LINEUP','game_team_lineup_'+game_team_id,'matchday : ',matchday[0].matchday);
+							//	console.log('LINEUP','game_team_lineup_'+game_team_id,'matchday : ',matchday[0].matchday);
 								callback(err,rs,upcoming_matchday,matchday[0].matchday);
 					});	
 				},
@@ -299,8 +299,8 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 						data.push(the_matchday);
 					}
 					conn.query(sql,data,function(err,rs){
-						console.log('LINEUP','game_team_lineup_'+game_team_id,' saving lineup for matchday : ',upcoming_matchday);
-						console.log('LINEUP','game_team_lineup_'+game_team_id,S(this.sql).collapseWhitespace().s);
+						//console.log('LINEUP','game_team_lineup_'+game_team_id,' saving lineup for matchday : ',upcoming_matchday);
+						//console.log('LINEUP','game_team_lineup_'+game_team_id,S(this.sql).collapseWhitespace().s);
 						callback(err,rs,the_matchday);
 					});
 				},
@@ -314,7 +314,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 								last_update = VALUES(last_update)",
 								[game_team_id,formation],
 								function(err,rs){
-									console.log('LINEUP','game_team_lineup_'+game_team_id,S(this.sql).collapseWhitespace().s);
+									//console.log('LINEUP','game_team_lineup_'+game_team_id,S(this.sql).collapseWhitespace().s);
 									callback(err,result,upcoming_matchday);
 								});
 				},
@@ -324,7 +324,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 									'game_team_lineup_'+league+'_'+game_team_id
 									,JSON.stringify(null)
 									,function(err,lineup){
-										console.log('LINEUP','reset the cache',lineup);
+										//console.log('LINEUP','reset the cache',lineup);
 										callback(err,result,upcoming_matchday);
 									});
 				}
@@ -470,7 +470,7 @@ function getPlayers(game_team_id,callback){
 							}
 						],
 						function(err,result){
-							console.log('getPlayers',result);
+							//console.log('getPlayers',result);
 							
 							conn.release();
 							redisClient.set('getPlayers_'+league+'_'+game_team_id,
@@ -489,7 +489,7 @@ function getPlayers(game_team_id,callback){
 			});
 		},
 		function(players,cb){
-			console.log('getPlayers',players);
+			//console.log('getPlayers',players);
 			//each players
 			var compiled = [];
 			async.eachSeries(players,function(player,next){
@@ -551,7 +551,7 @@ function getPlayers(game_team_id,callback){
 
 							data = JSON.stringify(player);
 							redisClient.set(name,data,function(err){
-								console.log("p_"+league+"_"+player.game_team_id+"_"+player.player_id+"-->created");
+								//console.log("p_"+league+"_"+player.game_team_id+"_"+player.player_id+"-->created");
 								compiled.push(player);
 								done(err);
 							});
@@ -583,7 +583,7 @@ function getPlayers(game_team_id,callback){
 							player.picking = o.picking;
 							player.homesick = o.homesick;
 							//skip
-							console.log("p_"+league+"_"+player.game_team_id+"_"+player.player_id+"-->exists");
+							//console.log("p_"+league+"_"+player.game_team_id+"_"+player.player_id+"-->exists");
 							compiled.push(player);
 							done(null);
 						}
@@ -594,7 +594,7 @@ function getPlayers(game_team_id,callback){
 				});
 			},
 			function(err){
-				console.log('compiled',compiled);
+				//console.log('compiled',compiled);
 				cb(err,compiled);
 			});
 		}
@@ -643,7 +643,7 @@ function getPlayerDetail(player_id,callback){
 		WHERE a.uid = ? LIMIT 1;",
 				[player_id],
 				function(err,rs){
-					console.log('getPlayers',player_id,'getPlayerDetail',S(this.sql).collapseWhitespace().s);
+					//console.log('getPlayers',player_id,'getPlayerDetail',S(this.sql).collapseWhitespace().s);
 					
 					conn.release();
 					if(rs!=null && rs.length==1){
@@ -694,7 +694,7 @@ function getTeamPlayerDetail(game_team_id,player_id,callback){
 		function(rs,cb){
 			
 			if(rs!=null){
-				console.log('p_'+league+'_'+game_team_id+'_'+player_id);
+				//console.log('p_'+league+'_'+game_team_id+'_'+player_id);
 				redisClient.get('p_'+league+'_'+game_team_id+'_'+player_id,function(err,data){
 					
 					if(data!=null){
@@ -705,7 +705,7 @@ function getTeamPlayerDetail(game_team_id,player_id,callback){
 
 						
 					}
-					console.log('the player : ',rs);
+					//console.log('the player : ',rs);
 					cb(null,rs);
 				});
 			}else{
@@ -831,7 +831,7 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 	redisClient.get('getPlayerDailyTeamStats_'+league+'_'+game_team_id+'_'+player_id,function(err,rs){
 		
 		rs = JSON.parse(rs);
-		console.log('getPlayerDailyTeamStats',typeof rs);
+		//console.log('getPlayerDailyTeamStats',typeof rs);
 		if(rs == null || (typeof rs === 'string') || isEmptyObject(rs)){
 			console.log('getPlayerDailyTeamStats','query data from db');
 			var pos = 'g';
@@ -927,7 +927,7 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 								
 							}
 						}
-						console.log('player daily stats ',player_id,daily);
+						//console.log('player daily stats ',player_id,daily);
 						callback(null,daily);
 					}
 				],

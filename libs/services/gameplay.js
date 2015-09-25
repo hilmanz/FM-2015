@@ -131,7 +131,7 @@ exports.hire_staff = function(req,res){
 			if(err){
 				handleError(res);
 			}else{
-				if(typeof rs !== 'undefined'){
+				if(typeof rs !== 'undefined' && rs!=null){
 					res.json(200,{status:1,officials:rs});
 				}else{
 					res.json(200,{status:0,officials:rs});
