@@ -891,11 +891,14 @@ class ManageController extends AppController {
 		
 		$this->set('lineup',$lineup['lineup']);
 
+		//available tactics
+		$available_tactics =  $this->getAvailableTactics($userData['team']['id']);
+		
 		//get current tactics
 		$current_tactics = $this->getCurrentTactics($upcoming_matchday);
 
 		$this->set('tactics',$current_tactics);
-
+		$this->set('available_tactics',$available_tactics);
 
 		//banners
 		$sidebar_banner = $this->getBanners('INSIDE_SIDEBAR',2,true);
@@ -905,7 +908,17 @@ class ManageController extends AppController {
 		//instruction points
 		$this->set('INSTRUCTION_POINTS',$instruction_points);
 	}
-
+	private function getAvailableTactics($game_team_id){
+		$rs = $this->Game->query("SELECT meta FROM ".$_SESSION['ffgamedb'].".game_team_staffs a
+						WHERE game_team_id = {$game_team_id} 
+							AND staff_type IN ('gk_coach','def_coach','mid_coach','fw_coach');");
+		$tactics = array();
+		for($i=0;$i<sizeof($rs);$i++){
+			$rs[$i]['a']['meta'] = json_decode($rs[$i]['a']['meta'],true);
+			$tactics[] = $rs[$i]['a']['meta']['tactics'];
+		}
+		return $tactics;
+	}
 	private function popup_setformation()
 	{
 		$userData = $this->userData;

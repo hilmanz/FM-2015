@@ -100,14 +100,11 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
                             <td><?=$lineup[$i]['name']?></td>
                             <td>
                                 <select name="instruction[]">
+
                                     <option value="0" <?php if($instruction_id == 0): echo 'selected="selected"';endif;?>>Tidak Ada</option>
-                                    <option value="1" <?php if($instruction_id == 1): echo 'selected="selected"';endif;?>>More Shoots</option>
-                                    <option value="2" <?php if($instruction_id == 2): echo 'selected="selected"';endif;?>>More Crosses</option>
-                                    <option value="3" <?php if($instruction_id == 3): echo 'selected="selected"';endif;?>>Focus on Through Ball</option>
-                                    <option value="4" <?php if($instruction_id == 4): echo 'selected="selected"';endif;?>>Create Chances</option>
-                                    <option value="5" <?php if($instruction_id == 5): echo 'selected="selected"';endif;?>>More Tackles</option>
-                                    <option value="6" <?php if($instruction_id == 6): echo 'selected="selected"';endif;?>>Dribbling</option>
-                                    <option value="7" <?php if($instruction_id == 7): echo 'selected="selected"';endif;?>>More Blocks</option>
+                                    <?php for($t=0;$t<sizeof($available_tactics);$t++):?>
+                                    <option value="<?=$available_tactics[$t]['id']?>" <?php if($instruction_id == $available_tactics[$t]['id']): echo 'selected="selected"';endif;?>><?=$available_tactics[$t]['name']?></option>
+                                    <?php endfor;?>
                                 </select>
 
                             </td>
