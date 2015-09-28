@@ -129,6 +129,13 @@ function recalculate_ranks(conn,matchday,done){
 	console.log('recalculate ranks');
 	async.waterfall([
 		function(callback){
+			conn.query("SELECT MONTH(match_date) AS t_month, YEAR(match_date) AS t_year \
+						FROM ffgame.game_fixtures WHERE matchday = ? AND session_id = ? LIMIT 1;",
+						[matchday,config.competition.year],function(err,rs){
+							cb(err,rs[0].t_month,rs[0].t_year);
+						});
+		},
+		function(t_month,t_year,callback){
 			console.log('recalculate_ranks skipped');
 			/*
 			conn.query("CALL "+frontend_schema+".recalculate_rank(?);",[league],function(err,rs){
@@ -136,7 +143,14 @@ function recalculate_ranks(conn,matchday,done){
 				callback(err);
 			});
 			*/
-			callback(null);
+			//all we do now is to insert the job
+			conn.query("INSERT INTO `ffgame_stats`.`job_update_ranks`\
+							(`t_month`,`t_year`,`matchday`,`queue_dt`,`league`,`n_status`) \
+							VALUES ( ?,?,?,NOW(),?,'0');",[t_month,t_year,matchday,league],
+			function(err,rs){
+				callback(err);
+			});
+			
 		},
 		function(callback){
 			conn.query("SELECT matchday FROM "+frontend_schema+".weekly_points \

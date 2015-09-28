@@ -327,6 +327,10 @@ class ApiController extends AppController {
 		$user = $this->User->findByFb_id($fb_id);
 		$game_team = $this->Game->getTeam($fb_id);
 
+		//club
+		$club = $this->Team->findByUser_id($user['User']['id']);
+		
+		CakeLog::write("debug",'save_formation : '.json_encode($club));
 
 		//can updte formation
 		$can_update_formation = false;
@@ -345,7 +349,9 @@ class ApiController extends AppController {
 		$next_match['match']['match_date_ts'] = strtotime($next_match['match']['match_date']);
 		$this->getCloseTime($next_match);
 
+		CakeLog::write("debug",'save_formation : '.json_encode($next_match));
 
+		
 		
 		if(time() < $this->closeTime['ts'] && Configure::read('debug') == 0){
 		    
@@ -2144,16 +2150,20 @@ class ApiController extends AppController {
 				
 		$upcoming_match = $this->nextMatch['match']['matchday_setup'];
 		
+		CakeLog::write("getCloseTime","previouse : ".json_encode($previous_match));
+		CakeLog::write("getCloseTime","upcoming_match : ".json_encode($upcoming_match));
 		try{
 			$last_matchday = @$this->nextMatch['match']['matchday'] - 1;
 		
 			$previous_match = @$this->nextMatch['match']['previous_setup'];
 			
 			$upcoming_match = @$this->nextMatch['match']['matchday_setup'];
+			CakeLog::write("getCloseTime","OK");
 		}catch(Exception $e){
 			$last_matchday = 0;
 			$previous_match = null;
 			$upcoming_match = null;
+			CakeLog::write("getCloseTime","NOK : ".$e->getMessage());
 		}
 
 
@@ -2162,7 +2172,7 @@ class ApiController extends AppController {
 			//check the previous match backend proccess status
 
 			$matchstatus = $this->Game->getMatchStatus($previous_match['matchday']);
-			
+			CakeLog::write("getCloseTime",json_encode($matchstatus));
 			if($matchstatus['is_finished']==0){
 
 				//if the backend process is not finished,
@@ -8379,7 +8389,7 @@ class ApiController extends AppController {
 		$next_match['match']['match_date_ts'] = strtotime($next_match['match']['match_date']);
 		$this->getCloseTime($next_match);
 
-
+		CakeLog::write("debug",json_encode($next_match));
 		
 		if(time() > $this->closeTime['ts'] && Configure::read('debug') == 0){
 		    

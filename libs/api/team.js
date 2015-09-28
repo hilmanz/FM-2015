@@ -224,7 +224,25 @@ function create(data,callback){
 					}
 				},
 				function(game_team_id,callback){
+					conn.query("INSERT INTO \
+								"+config.database.database+".game_team_players\
+								(game_team_id,player_id,salary,POSITION)\
+								SELECT game_team_id,player_id,b.salary,b.position \
+								FROM "+config.database.database+".game_team_players a\
+								INNER JOIN "+config.database.database+".master_player b\
+								ON a.player_id = b.uid WHERE a.game_team_id = ?\
+								ON DUPLICATE KEY UPDATE\
+								salary = VALUES(salary),\
+								POSITION = VALUES(POSITION);",
+								[game_team_id],function(err,rs){
+									callback(err,game_team_id);
+								});
+				},
+				function(game_team_id,callback){
 					console.log('data',data);
+					if(data.plan == ''){
+						data.plan = 'free';
+					}
 					if(game_team_id!=null){
 						conn.query(
 							"INSERT IGNORE INTO "+config.database.database+".game_team_purse(game_team_id,budget)\

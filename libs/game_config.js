@@ -365,3 +365,5 @@ exports.morale_mods = {
 	original_player: 50
 }
 
+exports.base_attendance = 30000;
+exports.base_ticket_price = 50;

@@ -29,46 +29,11 @@
       
       </div>  
     </div>
+   
     <div  id="pilih-liga"  class="widgets tr plan">
       <div class="box">
          <img src="<?=$this->Html->url('/images/pro1.jpg')?>"/>
          <p class="price">Rp. 25,000 / Bulan</p>
-         <p>Sebagai pro member, lo mendapatkan fasilitas berikut :  </p>
-         <ul>
-          <li>
-            Berkesempatan mendapatkan hadiah puluhan juta rupiah setiap minggunya.
-          </li>
-          <li>
-            Dapat memilih tim papan atas sebagai starter team.
-          </li>
-          <li>
-             Daftar cedera secara eksklusif setiap minggu.
-          </li>
-          <li>
-             Atur formasi secara otomatis(bot)
-          </li>
-          <li>
-             Tidak perlu membuka katalog hadiah level 1 (free)
-          </li>
-          <li>
-              Mendapatkan 3 saran pemain terbaik setiap minggu
-          </li>
-          <li>
-             Mendapatkan tambahan 15juta SS$
-          </li>
-         </ul>
-      </div>  
-     
-      <div>
-         <a href="<?=$this->Html->url('/upgrade/plan/pro1')?>" class="button">
-          PILIH
-         </a>
-      </div>  
-    </div>
-    <div  id="pilih-liga"  class="widgets tr plan">
-      <div class="box">
-         <img src="<?=$this->Html->url('/images/pro2.jpg')?>"/>
-         <p class="price">Rp. 50,000 / Bulan</p>
          <p>Sebagai pro member, lo mendapatkan fasilitas berikut :  </p>
          <ul>
           <li>
@@ -101,9 +66,7 @@
            <li>
              Tidak perlu membuka trivia apps (free)
           </li>
-           <li>
-             Mendapatkan 2x bursa transfer dalam 1 bulan
-          </li>
+          
          </ul>
       </div>  
      

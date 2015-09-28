@@ -251,7 +251,81 @@ function run(done){
 			});
 			
 		},
+		//weekly points pro
+		function(cb){
+			console.log("Weekly Points PRO",league,"matchday : "+matchday);
+			processWeeklyPointsPro(function(err){
+				cb(err);
+			});
+		},
+		function(cb){
+			console.log('UPDATING DATABASE');
+			redisClient.llen('weekly_points_pro_'+league,function(err,counts){
+				console.log('total sorted :',counts);
+				cb(err,counts);
+			});
+		},
+		function(counts,cb){
+			redisClient.lrange('weekly_points_pro_'+league,0,counts,function(err,rs){
+				cb(err,rs);
+			});
+		},
+		function(data,cb){
 
+			//console.log(data);
+			var rank = 1;
+			var ts = (new Date().getTime());
+			var ets = 0;
+			var bulk = [];
+			var n = 0;
+			console.log('updating weekly ranks');
+			pool.getConnection(function(err,conn){
+				async.whilst(function(){
+					if(data.length!=0){
+						//console.log('current lenght',data.length);
+						return true;
+					}else{
+						return false;
+					}
+				},
+				function(done){
+					var o = data.shift();
+					bulk.push([o,matchday,rank,league]);
+					rank++;
+					if((n%100 == 0 && n>0) || data.length==0){
+						//console.log(n,data.length);
+						conn.query("INSERT INTO fantasy.weekly_ranks_pro(team_id,matchday,rank,league) \
+								VALUES ? \
+								ON DUPLICATE KEY UPDATE \
+								rank = VALUES(rank)",
+						[bulk],
+						function(err,rs){
+							if(err){
+								console.log(err.message);
+							}
+							console.log(S(this.sql).collapseWhitespace().s);
+							bulk = [];
+							n++;
+							done();
+						});
+					}else{
+						n++;
+						done();
+					}
+					
+				},function(err){
+					total_time+=(((new Date()).getTime() - ts) / 60000);
+					console.log('Ended in ',(((new Date()).getTime() - ts) / 60000),'minutes');
+					conn.release();
+					cb(err);
+				});
+			});
+			
+		},
+
+		//--> end of weekly points pro
+
+		//monthly points
 		function(cb){
 			console.log("Monthly Points",league,"matchday : "+matchday);
 			processMonthlyPoints(function(err){
@@ -371,6 +445,26 @@ function cleaningUp(callback){
 								cb();
 							});
 						});
+					});
+				});
+			});
+		},
+		function(cb){
+			redisClient.llen('weekly_points_pro_'+league,function(err,counts){
+				redisClient.lrange('weekly_points_pro_'+league,0,counts,function(err,rs){
+
+					async.eachSeries(rs,function(item,next){
+						redisClient.del("twpp_"+league+"_"+item,function(err){
+							//console.log("removing : "+"tp_"+league+"_"+item);
+							next();
+						});
+					},function(err){
+						
+						redisClient.del("weekly_points_pro_"+league,function(err){
+							console.log("weekly_points_pro_"+league,"removed");
+							cb();
+						});
+						
 					});
 				});
 			});
@@ -577,7 +671,84 @@ function processWeeklyPoints(callback){
 		);
 	});
 }
+function processWeeklyPointsPro(callback){
+	var is_done = false;
+	var since_id = 0;
+	var limit = 1000;
+	redisClient.del('weekly_points_pro_'+league,function(err){
+		async.whilst(
+		    function () { 
+		    	if(!is_done){return true;}
+		    	return false;
+		    },
+		    function (done) {
+		    	async.waterfall([
+		    		function(cb){
+		    			pool.getConnection(function(err,conn){
+		    				conn.query("SELECT aa.team_id,aa.rank\
+										FROM fantasy.weekly_ranks aa\
+										INNER JOIN fantasy.teams bb\
+										ON aa.team_id = bb.id\
+										INNER JOIN fantasy.users cc\
+										ON cc.id = bb.user_id\
+										WHERE aa.rank > ? AND aa.league = ? \
+										AND aa.matchday=? AND cc.paid_member = 1 \
+										AND cc.paid_member_status =1 \
+										ORDER BY aa.rank ASC LIMIT "+limit,
+		    							[
+		    								since_id,
+		    								league,
+		    								matchday
+		    							],function(err,rs){
+		    								console.log('pro',S(this.sql).collapseWhitespace().s);
+		    								if(rs!=null && rs.length >0){
+		    									since_id = rs[rs.length-1].rank;
+		    								}else{
+		    									is_done = true;
+		    									rs = [];
+		    								}
+		    								conn.release();
+		    								cb(err,rs);						
+		    				});
+		    			});
+		    		},
+		    		function(rs,cb){
+		    			var multi = redisClient.multi();
 
+		    			for(var i in rs){
+		    				console.log('pro','->',rs[i].team_id);
+		    				multi.rpush('weekly_points_pro_'+league,
+		    									rs[i].team_id);
+		    			}
+		    			multi.exec(function(err,result){
+		    				if(err){
+		    					console.log(err.message);
+		    				}
+		    				
+		    				async.eachSeries(rs,function(item,next){
+	    						console.log('pro','twpp_'+league+'_'+item.team_id);
+	    						redisClient.set('twpp_'+league+'_'+item.team_id,
+	    											Math.floor(item.rankw),
+	    						function(err,rs){
+	    							next();
+	    						});
+			    				
+			    			},function(err){
+			    				cb(null,rs);
+			    			});
+		    			});
+		    		}
+		    	],
+		    	function(err,rs){
+		    		done();
+		    	});
+		    },
+		    function(err){
+    				callback(err);
+			}
+		);
+	});
+}
 function processMonthlyPoints(callback){
 	var is_done = false;
 	var since_id = 0;

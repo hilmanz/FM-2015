@@ -244,7 +244,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 								[],
 								function(err,matchday){
 								//console.log('LINEUP','game_team_lineup_'+game_team_id,'matchday : ',matchday[0].matchday);
-								callback(err,rs,matchday[0].matchday);
+						callback(err,rs,matchday[0].matchday);
 					});	
 				},
 				function(rs,upcoming_matchday,callback){
